@@ -8,6 +8,7 @@ import org.hibernate.mapping.Join;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter @Setter
@@ -19,10 +20,13 @@ public class Trip {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long tripId;
 
-    @Column(length = 20)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @ManyToMany
+    @JoinTable(
+            name = "trip_participants",
+            joinColumns = @JoinColumn(name = "trip_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> participants;
 
     @Column(length = 50)
     private String tripName;

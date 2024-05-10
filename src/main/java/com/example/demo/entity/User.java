@@ -34,7 +34,7 @@ public class User {
     @Column(nullable = false)
     private LocalDate createdAt;
 
-    @OneToMany(mappedBy = "user")
+    @ManyToMany(mappedBy = "participants")
     @JsonIgnore
     private List<Trip> trips;
 }
