@@ -1,18 +1,20 @@
 package com.example.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import org.hibernate.mapping.Join;
+import lombok.*;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 @Entity
 @Getter @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @ToString
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tripId")
 public class Trip {
 
     @Id
@@ -44,6 +46,7 @@ public class Trip {
 
     // 세부일정 (TripDate) 엔티티와 연결
     @OneToMany(mappedBy = "trip")
+    @JsonManagedReference // 순환 참조 방지 (부모 엔티티에서 자식 엔티티를 직렬화)
     private List<TripDate> tripDates;
 
 }

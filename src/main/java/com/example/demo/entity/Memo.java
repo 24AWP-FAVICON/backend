@@ -1,15 +1,15 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @ToString
 public class Memo {
 
@@ -17,6 +17,7 @@ public class Memo {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long memoId;
 
+    @Column(name = "trip_id", nullable = false)
     private Long tripId;
 
     private LocalDateTime createdAt;

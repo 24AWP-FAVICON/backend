@@ -1,15 +1,18 @@
 package com.example.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
 @Getter @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @ToString
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "locationId")
 public class Location {
 
     @Id
@@ -24,4 +27,14 @@ public class Location {
 
     @Column(length = 50)
     private String locationAddress;
+
+    public Location(String name, TripDate newTripDate) {
+    }
+
+    public Location(String name, String address, TripDate newTripDate) {
+        this.locationName = name;
+        this.locationAddress = address;
+        this.tripDate = newTripDate;
+    }
+
 }

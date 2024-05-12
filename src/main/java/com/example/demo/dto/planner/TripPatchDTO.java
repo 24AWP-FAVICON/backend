@@ -1,6 +1,5 @@
-package com.example.demo.dto.trip;
+package com.example.demo.dto.planner;
 
-import com.example.demo.entity.User;
 import lombok.Getter;
 import lombok.Setter;
 
