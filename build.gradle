@@ -38,6 +38,9 @@ dependencies {
 	// Swagger 의존성 추가
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
 
+	// json처리
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.1'
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
