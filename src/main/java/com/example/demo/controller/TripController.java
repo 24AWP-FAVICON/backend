@@ -3,12 +3,15 @@ package com.example.demo.controller;
 import com.example.demo.dto.trip.TripCreationDTO;
 import com.example.demo.dto.trip.TripPatchDTO;
 import com.example.demo.entity.Trip;
+import com.example.demo.entity.TripDate;
 import com.example.demo.entity.User;
+import com.example.demo.repository.TripDateRepository;
 import com.example.demo.repository.TripRepository;
 import com.example.demo.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +28,7 @@ public class TripController {
 
     private final TripRepository tripRepository;
     private final UserRepository userRepository;
+    private final TripDateRepository tripDateRepository;
 
     /*
     전체 여행 계획 조회
@@ -38,7 +42,7 @@ public class TripController {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
             return new ResponseEntity<>(trips, HttpStatus.OK);
-        } catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

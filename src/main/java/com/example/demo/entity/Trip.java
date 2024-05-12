@@ -16,7 +16,6 @@ import java.util.List;
 public class Trip {
 
     @Id
-    @Column(length = 20)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long tripId;
 
@@ -42,5 +41,9 @@ public class Trip {
     private Long budget;
 
     private Long roomId;
+
+    // 세부일정 (TripDate) 엔티티와 연결
+    @OneToMany(mappedBy = "trip")
+    private List<TripDate> tripDates;
 
 }
