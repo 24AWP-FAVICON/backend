@@ -3,8 +3,6 @@ package com.example.demo.dto.post;
 import com.example.demo.dto.like.PostLikeResponseDto;
 import com.example.demo.dto.view.ViewResponseDto;
 import com.example.demo.entity.Post;
-import com.example.demo.entity.PostLike;
-import com.example.demo.entity.View;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -31,7 +29,6 @@ public class PostResponseDto {
     private Set<ViewResponseDto> views; // 조회
 
     private Set<PostLikeResponseDto> postLikes; // 조회
-
     public static PostResponseDto toDto(Post post) {
         Set<ViewResponseDto> viewResponseDtoSet = new HashSet<>();
         Set<PostLikeResponseDto> postLikeResponseDtoSet = new HashSet<>();

@@ -59,4 +59,10 @@ public class Post{
     @JsonManagedReference
     private Set<PostLike> postLikes = new HashSet<>();                 //좋아요
 
+    @Builder.Default
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private Set<Comment> comments = new HashSet<>();               //댓글
+
+
 }
