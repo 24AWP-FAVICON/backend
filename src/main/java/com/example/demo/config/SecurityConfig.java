@@ -1,8 +1,8 @@
 package com.example.demo.config;
 
+import com.example.demo.filter.CustomLogoutFilter;
 import com.example.demo.service.JwtUtil;
 import com.example.demo.service.RedisUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.example.demo.handler.OAuth2SuccessHandler;
 import com.example.demo.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -25,14 +26,10 @@ import org.springframework.web.filter.CorsFilter;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    // 의존성 주입
-    private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtUtil jwtUtil; // jwtutil 생성자 주입
-    private final ObjectMapper objectMapper;
     private final RedisUtil redisUtil;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
-
 
 
     @Bean
@@ -87,6 +84,8 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService))
                         .successHandler(oAuth2SuccessHandler)
                 );
+
+        http.addFilterBefore(new CustomLogoutFilter(jwtUtil, redisUtil), LogoutFilter.class);
 
         //세션 설정
         http
