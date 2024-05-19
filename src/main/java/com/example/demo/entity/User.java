@@ -17,7 +17,7 @@ public class User {
 
     @Id
     @Column(length = 20)
-    private String googleId;
+    private String userId;
 
     @Column(nullable = false, length = 50, unique = true)
     private String nickname;

@@ -103,7 +103,7 @@ public class TripController {
             Trip updateTrip = tripOptional.get();
             // 참여자 ID 리스트를 통해 User 객체들을 조회
             List<User> participants = userRepository.findAllById(trip.getParticipants().stream()
-                    .map(User::getGoogleId)
+                    .map(User::getUserId)
                     .collect(Collectors.toList()));
 
             // Trip 객체의 모든 필드 업데이트
@@ -374,7 +374,7 @@ public class TripController {
             Optional<Trip> tripOptional = tripRepository.findById(tripId);
             if (tripOptional.isPresent()) {
                 Trip trip = tripOptional.get();
-                List<User> participants = userRepository.findAllByGoogleIdIn(userIdsDTO.getUserGoogleIds());
+                List<User> participants = userRepository.findAllByUserIdIn(userIdsDTO.getUserGoogleIds());
                 if (participants.isEmpty()) {
                     return new ResponseEntity<>("User Google IDs are invalid", HttpStatus.BAD_REQUEST);
                 }

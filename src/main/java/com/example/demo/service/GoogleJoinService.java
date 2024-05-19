@@ -41,7 +41,7 @@ public class GoogleJoinService {
     private static User setGoogleUserEntity(JoinGoogleUserDTO joinGoogleUserDTO) {
         User newUser = new User();
         newUser.setNickname(joinGoogleUserDTO.getNickname());
-        newUser.setGoogleId(joinGoogleUserDTO.getGoogleId());
+        newUser.setUserId(joinGoogleUserDTO.getGoogleId());
         newUser.setRecentConnect(LocalDateTime.now());
         newUser.setCreatedAt(LocalDate.now());
         newUser.setRole(Role.valueOf(joinGoogleUserDTO.getRole()));

@@ -25,8 +25,8 @@ public class UserCleanupScheduler {
     public void cleanupMembers() {
         List<User> deleteUserList = userRepository.findByDeleteAt(LocalDate.now());
         for (User user : deleteUserList) {
-            if (user.getGoogleId() != null)
-                redisUtil.deleteData(user.getGoogleId());   //redis의 userId 제거
+            if (user.getUserId() != null)
+                redisUtil.deleteData(user.getUserId());   //redis의 userId 제거
 
             userRepository.delete(user);
         }
