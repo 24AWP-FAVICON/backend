@@ -48,7 +48,7 @@ public class JwtController {
         String role = jwtUtil.getRole(refreshToken);
 
         //make new JWT
-        String newAccess = jwtUtil.createToken("access", email, role, 1000*60+10L);
+        String newAccess = jwtUtil.createToken("access", email, role, 1000*60*60L);
         String newRefresh = jwtUtil.createToken("refresh", email, role, 1000*60*60*24L);
 
         redisUtil.deleteData(accessToken); // 기존 리프레시 토큰 삭제

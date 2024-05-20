@@ -52,7 +52,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-        String accessToken = jwtUtil.createToken("access", googleId, role, 1000*60*10L); // access token 생성 유효기간 10분
+        String accessToken = jwtUtil.createToken("access", googleId, role, 1000*60*60L); // access token 생성 유효기간 1시간
         String refreshToken = jwtUtil.createToken("refresh", googleId, role, 1000*60*60*24L); // refresh token 생성 유효기간 24시간
 
         redisUtil.setData(accessToken, refreshToken); // 레디스에 리프레시 토큰 저장
@@ -68,6 +68,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         Cookie cookie = new Cookie("refresh", value);
         cookie.setMaxAge(24*60*60); // 쿠키 유효시간 24시간으로 설정
         cookie.setHttpOnly(true); // XSS 공격 방어
+        cookie.setSecure(true); //https 옵션 설정
+        cookie.setPath("/"); // 모든 곳에서 쿠키열람이 가능하도록 설정
 
         return cookie;
     }
