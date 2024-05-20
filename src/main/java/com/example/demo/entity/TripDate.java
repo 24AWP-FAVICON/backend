@@ -18,7 +18,7 @@ import java.util.List;
 public class TripDate {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long tripDateId;
 
     @ManyToOne(fetch = FetchType.LAZY)
