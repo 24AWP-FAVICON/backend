@@ -21,7 +21,6 @@ import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor
-@Transactional
 @Service
 public class CommentService {
 
@@ -68,7 +67,8 @@ public class CommentService {
         return fromCommentListToCommentResponseDtoList(commentRepository.findByUserId(userId));
     }
 
-    public CommentResponseDto savePostComment(CommentRequestDto commentRequestDto, String userId, Long postId) {
+    @Transactional
+    public CommentResponseDto createComment(CommentRequestDto commentRequestDto, String userId, Long postId) {
 
         try {
             //댓글을 등록할 게시글이 존재하는지 확인
@@ -92,6 +92,7 @@ public class CommentService {
         }
     }
 
+    @Transactional
     public CommentResponseDto updateComment(CommentRequestDto commentRequestDto, Long commentId, String userId) {
         Comment comment = commentRepository.findByCommentId(commentId).orElseThrow(() -> new ComponentNotFoundException("COMMENT_NOT_FOUND"));
 
