@@ -14,14 +14,14 @@ import java.util.List;
 
 
 @RequiredArgsConstructor
-@RequestMapping("/comment")
+@RequestMapping("/community")
 @RestController
 public class CommentController {
 
     private final CommentService commentService;
     private final JwtCheckService jwtCheckService;
 
-    @GetMapping("/all-comments")
+    @GetMapping("/comments")
     public ResponseEntity<List<CommentResponseDto>> getAllComments(HttpServletRequest request,
                                                                   HttpServletResponse response) {
         jwtCheckService.checkJwt(request, response);
@@ -38,7 +38,7 @@ public class CommentController {
     }
 
     //회원이 작성한 모든 댓글 조회
-    @GetMapping("/user/{userId}/comments")
+    @GetMapping("/comments/user/{userId}")
     public ResponseEntity<List<CommentResponseDto>> getCommentsByUserId(@PathVariable String userId,
                                                         HttpServletRequest request,
                                                         HttpServletResponse response) {
@@ -46,7 +46,7 @@ public class CommentController {
         return ResponseEntity.ok(commentService.getCommentsByUserId(userId));
     }
 
-    @PostMapping("/create/{postId}")
+    @PostMapping("/post/{postId}/comment")
     public ResponseEntity<CommentResponseDto> createComment(@RequestBody CommentRequestDto commentRequestDto,
                                             @PathVariable Long postId,
                                             HttpServletRequest request,
@@ -56,7 +56,7 @@ public class CommentController {
         return ResponseEntity.ok(commentService.createComment(commentRequestDto, userId, postId));
     }
 
-    @PostMapping("/update/{commentId}")
+    @PutMapping("/post/{postId}/comment/{commentId}")
     public ResponseEntity<CommentResponseDto> updateComment(@RequestBody CommentRequestDto commentRequestDto,
                                             @PathVariable Long commentId,
                                             HttpServletRequest request,
@@ -66,7 +66,7 @@ public class CommentController {
         return ResponseEntity.ok(commentService.updateComment(commentRequestDto, commentId, userId));
     }
 
-    @DeleteMapping("/{commentId}/delete")
+    @DeleteMapping("/post/{postId}/comment/{commentId}")
     public ResponseEntity<String> deleteArticleComment(@PathVariable Long commentId,
                                      HttpServletRequest request,
                                      HttpServletResponse response) {

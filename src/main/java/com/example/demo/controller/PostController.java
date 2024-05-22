@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RequestMapping("/post")
+@RequestMapping("/community")
 @RestController
 public class PostController {
     private final PostService postService;
@@ -26,7 +26,7 @@ public class PostController {
     private final AttachmentFileService attachmentFileService;
 
     //모든 게시글 불러오기
-    @GetMapping("/all-posts")
+    @GetMapping("/posts")
     public ResponseEntity<List<PostResponseDto>> getAllPosts(HttpServletRequest request,
                                                              HttpServletResponse response) {
         jwtCheckService.checkJwt(request, response);
@@ -34,7 +34,7 @@ public class PostController {
     }
 
     //게시글 id로 게시글 조회
-    @GetMapping("/{postId}")
+    @GetMapping("/post/{postId}")
     public ResponseEntity<PostResponseDto> getPostByPostId(@PathVariable Long postId,
                                                            HttpServletRequest request,
                                                            HttpServletResponse response) {
@@ -44,7 +44,7 @@ public class PostController {
     }
 
     //회원이 작성한 모든 게시글 불러오기
-    @GetMapping("/user/{requestedUserId}")
+    @GetMapping("/posts/user/{requestedUserId}")
     public ResponseEntity<List<PostResponseDto>> getAllPostsByUserId(@PathVariable String requestedUserId,
                                                                      HttpServletRequest request,
                                                                      HttpServletResponse response) {
@@ -54,7 +54,7 @@ public class PostController {
     }
 
     //게시글 좋아요 하나 증가
-    @GetMapping("/likes/increase/{postId}")
+    @GetMapping("/post/{postId}/like")
     public ResponseEntity<String> increaseLikes(@PathVariable Long postId,
                                                 HttpServletRequest request,
                                                 HttpServletResponse response) {
@@ -65,7 +65,7 @@ public class PostController {
     }
 
     //게시글 좋아요 하나 감소
-    @DeleteMapping("/likes/decrease/{postId}")
+    @DeleteMapping("/post/{postId}/like")
     public ResponseEntity<String> decreaseLikes(@PathVariable Long postId,
                                                 HttpServletRequest request,
                                                 HttpServletResponse response) {
@@ -77,7 +77,7 @@ public class PostController {
 
 
     //게시글 작성. 사용자로부터 제목, 내용, 해쉬태그, 공개여부, 썸네일 이미지 주소, 회원 id, 댓글 허용여부, 시리즈 id 받아야 함.
-    @PostMapping("/create-post")
+    @PostMapping("/posts")
     public ResponseEntity<PostResponseDto> createPost(@RequestBody PostRequestDto postRequestDto,
                                                       HttpServletRequest request,
                                                       HttpServletResponse response) {
@@ -88,7 +88,7 @@ public class PostController {
     }
 
     //게시글 수정. 제목, 내용, 해쉬태그, 공개여부, 썸네일, 시리즈 id 수정 가능.
-    @PostMapping("/update-post/{postId}")
+    @PutMapping("/post/{postId}")
     public ResponseEntity<PostResponseDto> updatePost(@RequestBody PostRequestDto postRequestDto,
                                                       @PathVariable Long postId,
                                                       HttpServletRequest request,
@@ -100,10 +100,10 @@ public class PostController {
     }
 
     //게시글 삭제. 게시글 id 받아야 함.
-    @DeleteMapping("/delete-post/{postId}")
+    @DeleteMapping("/post/{postId}")
     public ResponseEntity<String> deletePost(@PathVariable Long postId,
-                                        HttpServletRequest request,
-                                        HttpServletResponse response) {
+                                             HttpServletRequest request,
+                                             HttpServletResponse response) {
 
         String userId = jwtCheckService.checkJwt(request, response);
         postService.deletePostByPostId(postId, userId);
@@ -112,11 +112,11 @@ public class PostController {
 
 
     //s3에 파일 업로드하고 response entity로 s3 저장 경로 반환.
-    @PostMapping("/s3/upload/{postId}")
+    @PostMapping("/post/{postId}/s3/upload")
     public ResponseEntity<String> s3Upload(@RequestPart(value = "image", required = false) MultipartFile image,
-                                      @PathVariable Long postId,
-                                      HttpServletRequest request,
-                                      HttpServletResponse response) {
+                                           @PathVariable Long postId,
+                                           HttpServletRequest request,
+                                           HttpServletResponse response) {
         String userId = jwtCheckService.checkJwt(request, response);
 
         String multipartFilePath = s3ImageService.upload(image);
@@ -125,11 +125,11 @@ public class PostController {
     }
 
     //s3에 저장된 파일 삭제.
-    @DeleteMapping("/s3/delete/{postId}")
+    @DeleteMapping("/post/{postId}/s3/delete")
     public ResponseEntity<String> s3delete(@RequestParam String path,
-                                      @PathVariable Long postId,
-                                      HttpServletRequest request,
-                                      HttpServletResponse response) {
+                                           @PathVariable Long postId,
+                                           HttpServletRequest request,
+                                           HttpServletResponse response) {
         String userId = jwtCheckService.checkJwt(request, response);
 
         if (postService.isFileInPost(path, postId)) {
