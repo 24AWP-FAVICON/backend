@@ -40,7 +40,7 @@ public class AttachmentFileService {
             // mongodb에 파일 메타데이터 저장.(s3 url, size, 이름, 타입)
             attachmentFileRepository.save(attachment);
         } else {
-            throw new IllegalArgumentException("자신의 게시글에만 파일을 업로드할 수 있습니다.");
+            throw new UnAuthorizedUserException("COULD_NOT_UPLOAD_FILE");
         }
     }
     @Transactional
@@ -50,7 +50,7 @@ public class AttachmentFileService {
             attachmentFileRepository.deleteByFilePath(path);
             return ResponseEntity.ok().body("DELETE_SUCCESS");
         } else {
-            throw new IllegalArgumentException("자신의 게시글의 파일만 삭제할 수 있습니다.");
+            throw new UnAuthorizedUserException("COULD_NOT_DELETE_FILE");
         }
     }
 

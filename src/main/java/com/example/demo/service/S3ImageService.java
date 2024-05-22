@@ -43,7 +43,7 @@ public class S3ImageService {
     }
 
     private String uploadImage(MultipartFile image) {
-        this.validateImageFileExtention(image.getOriginalFilename());
+        this.validateImageFileExtension(image.getOriginalFilename());
         try {
             return this.uploadImageToS3(image);
         } catch (IOException e) {
@@ -51,22 +51,22 @@ public class S3ImageService {
         }
     }
 
-    private void validateImageFileExtention(String filename) {
+    private void validateImageFileExtension(String filename) {
         int lastDotIndex = filename.lastIndexOf(".");
         if (lastDotIndex == -1) {
             throw new IllegalArgumentException();
         }
 
-        String extention = filename.substring(lastDotIndex + 1).toLowerCase();
+        String extension = filename.substring(lastDotIndex + 1).toLowerCase();
 
-        if (!allowedExtentionList.contains(extention)) {
+        if (!allowedExtentionList.contains(extension)) {
             throw new IllegalArgumentException();
         }
     }
 
     public String uploadImageToS3(MultipartFile image) throws IOException {
         String originalFilename = image.getOriginalFilename(); //원본 파일 명
-        String extention = originalFilename.substring(originalFilename.lastIndexOf(".")); //확장자 명
+        String extension = originalFilename.substring(originalFilename.lastIndexOf(".")); //확장자 명
 
         String s3FileName = UUID.randomUUID().toString().substring(0, 10) + originalFilename; //변경된 파일 명
 
@@ -74,7 +74,7 @@ public class S3ImageService {
         byte[] bytes = IOUtils.toByteArray(is);
 
         ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType("image/" + extention);
+        metadata.setContentType("image/" + extension);
         metadata.setContentLength(bytes.length);
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
 
