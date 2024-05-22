@@ -65,4 +65,8 @@ public class AttachmentFileService {
         attachmentFileList.forEach(file -> filePathList.add(file.getFilePath()));
         return filePathList;
     }
+
+    public List<Attachment> getAttachmentsByPost(Post post){
+        return attachmentFileRepository.findByPost(post);
+    }
 }
