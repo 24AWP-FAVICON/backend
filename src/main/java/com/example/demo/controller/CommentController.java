@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -54,7 +53,7 @@ public class CommentController {
                                             HttpServletResponse response) {
         String userId = jwtCheckService.checkJwt(request, response);
 
-        return ResponseEntity.ok(commentService.savePostComment(commentRequestDto, userId, postId));
+        return ResponseEntity.ok(commentService.createComment(commentRequestDto, userId, postId));
     }
 
     @PostMapping("/update/{commentId}")
