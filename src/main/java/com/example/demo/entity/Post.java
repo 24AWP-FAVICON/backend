@@ -1,5 +1,6 @@
 package com.example.demo.entity;
 
+import com.example.demo.dto.post.PostRequestDto;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,16 +13,17 @@ import java.util.Set;
 
 
 @Builder
-@Getter @Setter
+@Getter
+@Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Entity
-public class Post{
+public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
-    private Long   postId;              //게시글 id
+    private Long postId;              //게시글 id
 
     @JoinColumn(name = "userId")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -53,7 +55,6 @@ public class Post{
     @JsonManagedReference
     private Set<View> views = new HashSet<>(); // 조회
 
-
     @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @JsonManagedReference
@@ -64,5 +65,21 @@ public class Post{
     @JsonManagedReference
     private Set<Comment> comments = new HashSet<>();               //댓글
 
+    public static Post of(Post post, PostRequestDto postRequestDto, List<Attachment> attachmentList) {
+        return Post.builder()
+                .postId(post.getPostId())
+                .user(post.getUser())
+                .title(postRequestDto.getTitle())
+                .content(postRequestDto.getContent())
+                .open(postRequestDto.isOpen())
+                .thumbnailImageId(postRequestDto.getThumbnailImageId())
+                .createdAt(post.getCreatedAt())
+                .modifiedAt(LocalDateTime.now())
+                .attachmentList(attachmentList)
+                .views(post.getViews())
+                .postLikes(post.getPostLikes())
+                .comments(post.getComments())
+                .build();
+    }
 
 }
