@@ -28,7 +28,6 @@ public class Comment {
 
     @Builder.Default
     @Setter
-    @Column(updatable = false)
     private Long parentCommentId = null; // 부모 댓글 ID
 
     @Setter
