@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.dto.oauth2.JoinGoogleUserDTO;
 import com.example.demo.entity.User;
 import com.example.demo.entity.Role;
+import com.example.demo.exception.ComponentNotFoundException;
 import com.example.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +53,7 @@ public class GoogleJoinService {
 
 
     public void updateGoogleUser(JoinGoogleUserDTO joinGoogleUserDTO) {
-        User user = userRepository.findById(joinGoogleUserDTO.getGoogleId()).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(joinGoogleUserDTO.getGoogleId()).orElseThrow(() -> new ComponentNotFoundException("USER_NOT_FOUND"));
         user.setNickname(joinGoogleUserDTO.getNickname());
         userRepository.save(user);
     }
