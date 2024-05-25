@@ -1,10 +1,10 @@
 package com.example.demo.controller;
 
+import com.example.demo.service.jwt.JwtUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import com.example.demo.service.JwtUtil;
 import com.example.demo.service.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 
 @RestController()
-@RequestMapping("/member")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 @Slf4j
 public class JwtController {
