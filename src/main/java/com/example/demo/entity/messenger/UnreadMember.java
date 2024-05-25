@@ -1,9 +1,7 @@
-package com.example.demo.entity;
+package com.example.demo.entity.messenger;
 
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 
 @Getter

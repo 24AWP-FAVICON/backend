@@ -1,7 +1,7 @@
-package com.example.demo.service;
+package com.example.demo.service.kafka;
 
-import com.example.demo.entity.Message;
-import com.example.demo.repository.MessageRepository;
+import com.example.demo.entity.messenger.Message;
+import com.example.demo.repository.messenger.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
