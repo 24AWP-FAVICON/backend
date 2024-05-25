@@ -1,11 +1,7 @@
-package com.example.demo.dto.planner;
+package com.example.demo.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @Getter
 @Setter
