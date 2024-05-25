@@ -1,7 +1,7 @@
-package com.example.demo.controller;
+package com.example.demo.controller.community;
 
-import com.example.demo.dto.CommentRequestDto;
-import com.example.demo.dto.CommentResponseDto;
+import com.example.demo.dto.community.comment.CommentRequestDto;
+import com.example.demo.dto.community.comment.CommentResponseDto;
 import com.example.demo.service.community.comment.CommentService;
 import com.example.demo.service.jwt.JwtCheckService;
 import jakarta.servlet.http.HttpServletRequest;

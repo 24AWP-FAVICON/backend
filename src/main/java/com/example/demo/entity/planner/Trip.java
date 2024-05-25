@@ -1,5 +1,6 @@
-package com.example.demo.entity;
+package com.example.demo.entity.planner;
 
+import com.example.demo.entity.users.user.User;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.annotation.JsonManagedReference;

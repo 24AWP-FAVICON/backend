@@ -1,8 +1,8 @@
-package com.example.demo.dto.comment;
+package com.example.demo.dto.community.comment;
 
-import com.example.demo.entity.Comment;
-import com.example.demo.entity.Post;
-import com.example.demo.entity.User;
+import com.example.demo.entity.community.comment.Comment;
+import com.example.demo.entity.community.post.Post;
+import com.example.demo.entity.users.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

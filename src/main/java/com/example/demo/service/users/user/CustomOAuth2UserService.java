@@ -1,10 +1,10 @@
-package com.example.demo.service;
+package com.example.demo.service.users.user;
 
-import com.example.demo.repository.UserRepository;
-import com.example.demo.dto.JoinGoogleUserDTO;
-import com.example.demo.dto.CustomOAuth2User;
-import com.example.demo.dto.GoogleOAuth2DTO;
-import com.example.demo.dto.OAuth2DTO;
+import com.example.demo.repository.users.user.UserRepository;
+import com.example.demo.dto.users.user.JoinGoogleUserDTO;
+import com.example.demo.dto.users.user.CustomOAuth2User;
+import com.example.demo.dto.users.user.GoogleOAuth2DTO;
+import com.example.demo.dto.users.user.OAuth2DTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;

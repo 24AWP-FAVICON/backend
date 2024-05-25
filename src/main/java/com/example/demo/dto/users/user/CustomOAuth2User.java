@@ -1,4 +1,4 @@
-package com.example.demo.dto;
+package com.example.demo.dto.users.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

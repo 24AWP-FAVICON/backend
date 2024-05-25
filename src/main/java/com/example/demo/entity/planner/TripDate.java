@@ -1,4 +1,4 @@
-package com.example.demo.entity;
+package com.example.demo.entity.planner;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;

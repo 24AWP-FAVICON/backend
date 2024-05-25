@@ -1,6 +1,6 @@
-package com.example.demo.dto;
+package com.example.demo.dto.community.post;
 
-import com.example.demo.entity.Post;
+import com.example.demo.entity.community.post.Post;
 import lombok.*;
 
 import java.time.LocalDateTime;

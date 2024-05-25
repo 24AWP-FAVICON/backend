@@ -1,14 +1,14 @@
-package com.example.demo.controller;
+package com.example.demo.controller.trip;
 
-import com.example.demo.dto.TripCreationDTO;
-import com.example.demo.dto.TripDateDetailsDTO;
-import com.example.demo.dto.TripPatchDTO;
-import com.example.demo.dto.UserIdsDTO;
+import com.example.demo.dto.planner.TripCreationDTO;
+import com.example.demo.dto.planner.TripDateDetailsDTO;
+import com.example.demo.dto.planner.TripPatchDTO;
+import com.example.demo.dto.users.user.UserIdsDTO;
 import com.example.demo.entity.planner.Accommodation;
 import com.example.demo.entity.planner.Location;
 import com.example.demo.entity.planner.Trip;
 import com.example.demo.entity.planner.TripDate;
-import com.example.demo.entity.User;
+import com.example.demo.entity.users.user.User;
 import com.example.demo.repository.planner.AccommodationRepository;
 import com.example.demo.repository.planner.LocationRepository;
 import com.example.demo.repository.planner.TripDateRepository;

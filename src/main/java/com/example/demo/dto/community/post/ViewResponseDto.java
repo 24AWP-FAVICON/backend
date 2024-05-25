@@ -1,6 +1,6 @@
-package com.example.demo.dto;
+package com.example.demo.dto.community.post;
 
-import com.example.demo.entity.View;
+import com.example.demo.entity.community.post.View;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
