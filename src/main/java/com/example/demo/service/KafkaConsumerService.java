@@ -19,8 +19,8 @@ public class KafkaConsumerService {
         // 메시지를 데이터베이스에 저장
         Message msg = new Message();
         msg.setContent(message);
-
         msg.setSendAt(LocalDateTime.now());
+        msg.setUnreadCount(0); // 초기 값으로 설정
         messageRepository.save(msg);
     }
 

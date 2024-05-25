@@ -19,11 +19,15 @@ public class Message {
     private Long messageId;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sender_id", nullable = false)
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private ChatRoom room;
 
     private String content;
 
     private LocalDateTime sendAt;
 
-    private Long unreadCount;
+    private int unreadCount;
 }
