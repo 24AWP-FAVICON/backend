@@ -1,5 +1,7 @@
 package com.example.demo.dto.planner;
 
+import com.example.demo.dto.planner.AccommodationDetailsDTO;
+import com.example.demo.dto.planner.LocationDetailsDTO;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;

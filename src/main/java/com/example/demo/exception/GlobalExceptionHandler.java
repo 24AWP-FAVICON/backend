@@ -31,4 +31,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleIndexOutOfBoundsException(IndexOutOfBoundsException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
+
+    @ExceptionHandler(AlarmConnectionException.class)
+    public ResponseEntity<String> handleAlarmConnectionException(AlarmConnectionException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+    }
 }

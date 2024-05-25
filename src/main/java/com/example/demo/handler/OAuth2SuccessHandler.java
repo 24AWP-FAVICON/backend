@@ -1,12 +1,12 @@
 package com.example.demo.handler;
 
-import com.example.demo.service.JwtUtil;
+import com.example.demo.service.jwt.JwtUtil;
 import com.example.demo.service.RedisUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import com.example.demo.dto.oauth2.CustomOAuth2User;
+import com.example.demo.dto.users.user.CustomOAuth2User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -35,15 +35,15 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) authentication.getPrincipal();
 
-        String googleId = customOAuth2User.getName();
+        String userId = customOAuth2User.getName();
 
-        log.info("googleId {}",googleId);
+        log.info("googleId {}",userId);
 
         OAuth2AuthorizedClient client = oAuth2AuthorizedClientService.loadAuthorizedClient(
                 "google", authentication.getName());
         String googleAccessToken = client.getAccessToken().getTokenValue();
 
-        redisUtil.setData(googleId, googleAccessToken);
+        redisUtil.setData(userId, googleAccessToken);
 
 
         // jwt 처리
@@ -52,8 +52,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-        String accessToken = jwtUtil.createToken("access", googleId, role, 1000*60*60L); // access token 생성 유효기간 1시간
-        String refreshToken = jwtUtil.createToken("refresh", googleId, role, 1000*60*60*24L); // refresh token 생성 유효기간 24시간
+        String accessToken = jwtUtil.createToken("access", userId, role, 1000*60*60L); // access token 생성 유효기간 1시간
+        String refreshToken = jwtUtil.createToken("refresh", userId, role, 1000*60*60*24L); // refresh token 생성 유효기간 24시간
 
         redisUtil.setData(accessToken, refreshToken); // 레디스에 리프레시 토큰 저장
 

@@ -41,6 +41,8 @@ dependencies {
 	// json처리
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.1'
 
+	implementation 'org.springframework.kafka:spring-kafka'
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'

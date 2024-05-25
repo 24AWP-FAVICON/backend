@@ -1,6 +1,6 @@
 package com.example.demo.filter;
 
-import com.example.demo.service.JwtUtil;
+import com.example.demo.service.jwt.JwtUtil;
 import com.example.demo.service.RedisUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
