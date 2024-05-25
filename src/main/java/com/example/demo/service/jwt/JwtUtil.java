@@ -1,11 +1,11 @@
-package com.example.demo.service;
+package com.example.demo.service.jwt;
 
 import com.example.demo.exception.ComponentNotFoundException;
 import com.example.demo.service.RedisUtil;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.repository.users.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
