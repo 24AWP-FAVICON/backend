@@ -1,7 +1,7 @@
-package com.example.demo.service;
+package com.example.demo.service.users.user;
 
-import com.example.demo.entity.User;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.entity.users.user.User;
+import com.example.demo.repository.users.user.UserRepository;
 import com.example.demo.service.RedisUtil;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

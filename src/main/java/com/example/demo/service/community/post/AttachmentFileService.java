@@ -1,11 +1,11 @@
-package com.example.demo.service;
+package com.example.demo.service.community.post;
 
-import com.example.demo.entity.Attachment;
-import com.example.demo.entity.Post;
+import com.example.demo.entity.community.post.Attachment;
+import com.example.demo.entity.community.post.Post;
 import com.example.demo.exception.ComponentNotFoundException;
 import com.example.demo.exception.UnAuthorizedUserException;
-import com.example.demo.repository.AttachmentFileRepository;
-import com.example.demo.repository.PostRepository;
+import com.example.demo.repository.community.post.AttachmentFileRepository;
+import com.example.demo.repository.community.post.PostRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

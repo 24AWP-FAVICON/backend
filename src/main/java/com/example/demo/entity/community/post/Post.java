@@ -1,6 +1,8 @@
-package com.example.demo.entity;
+package com.example.demo.entity.community.post;
 
-import com.example.demo.dto.PostRequestDto;
+import com.example.demo.dto.community.post.PostRequestDto;
+import com.example.demo.entity.community.comment.Comment;
+import com.example.demo.entity.users.user.User;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;

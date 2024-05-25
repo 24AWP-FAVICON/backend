@@ -1,6 +1,9 @@
-package com.example.demo.entity;
+package com.example.demo.entity.users.user;
 
 import com.example.demo.entity.Alarm.AlarmSettings;
+import com.example.demo.entity.community.block.Block;
+import com.example.demo.entity.community.follow.Follow;
+import com.example.demo.entity.community.post.Post;
 import com.example.demo.entity.planner.Trip;
 import com.example.demo.entity.users.Alarm.AlarmSettings;
 import com.fasterxml.jackson.annotation.JsonIgnore;

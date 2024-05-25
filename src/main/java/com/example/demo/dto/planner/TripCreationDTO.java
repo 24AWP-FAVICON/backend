@@ -1,4 +1,4 @@
-package com.example.demo.dto;
+package com.example.demo.dto.planner;
 
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotEmpty;

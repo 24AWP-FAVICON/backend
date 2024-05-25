@@ -1,5 +1,6 @@
-package com.example.demo.entity;
+package com.example.demo.entity.community.post;
 
+import com.example.demo.entity.users.user.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;

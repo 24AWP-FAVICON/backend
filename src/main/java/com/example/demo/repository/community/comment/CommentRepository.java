@@ -1,7 +1,7 @@
-package com.example.demo.repository;
+package com.example.demo.repository.community.comment;
 
 
-import com.example.demo.entity.Comment;
+import com.example.demo.entity.community.comment.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

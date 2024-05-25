@@ -1,16 +1,17 @@
-package com.example.demo.service;
+package com.example.demo.service.community.comment;
 
 
-import com.example.demo.dto.CommentRequestDto;
-import com.example.demo.dto.CommentResponseDto;
-import com.example.demo.entity.Comment;
-import com.example.demo.entity.Post;
-import com.example.demo.entity.User;
+import com.example.demo.dto.community.comment.CommentRequestDto;
+import com.example.demo.dto.community.comment.CommentResponseDto;
+import com.example.demo.entity.community.comment.Comment;
+import com.example.demo.entity.community.post.Post;
+import com.example.demo.entity.users.user.User;
 import com.example.demo.exception.ComponentNotFoundException;
 import com.example.demo.exception.UnAuthorizedUserException;
-import com.example.demo.repository.CommentRepository;
-import com.example.demo.repository.PostRepository;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.repository.community.comment.CommentRepository;
+import com.example.demo.repository.community.post.PostRepository;
+import com.example.demo.repository.users.user.UserRepository;
+import com.example.demo.service.users.alarm.AlarmService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

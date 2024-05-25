@@ -1,10 +1,10 @@
 package com.example.demo.config;
 
 import com.example.demo.filter.CustomLogoutFilter;
-import com.example.demo.service.JwtUtil;
+import com.example.demo.service.jwt.JwtUtil;
 import com.example.demo.service.RedisUtil;
 import com.example.demo.handler.OAuth2SuccessHandler;
-import com.example.demo.service.CustomOAuth2UserService;
+import com.example.demo.service.users.user.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

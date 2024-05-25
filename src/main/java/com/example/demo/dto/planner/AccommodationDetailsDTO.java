@@ -1,4 +1,4 @@
-package com.example.demo.dto;
+package com.example.demo.dto.planner;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;

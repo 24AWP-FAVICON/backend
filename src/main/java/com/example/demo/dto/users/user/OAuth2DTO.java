@@ -1,4 +1,4 @@
-package com.example.demo.dto;
+package com.example.demo.dto.users.user;
 
 public interface OAuth2DTO {
 

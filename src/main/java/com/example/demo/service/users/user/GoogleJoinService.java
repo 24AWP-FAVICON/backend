@@ -1,12 +1,12 @@
-package com.example.demo.service;
+package com.example.demo.service.users.user;
 
-import com.example.demo.dto.JoinGoogleUserDTO;
-import com.example.demo.entity.AlarmSettings;
-import com.example.demo.entity.User;
-import com.example.demo.entity.Role;
+import com.example.demo.dto.users.user.JoinGoogleUserDTO;
+import com.example.demo.entity.users.Alarm.AlarmSettings;
+import com.example.demo.entity.users.user.User;
+import com.example.demo.entity.users.user.Role;
 import com.example.demo.exception.ComponentNotFoundException;
-import com.example.demo.repository.AlarmSettingsRepository;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.repository.users.alarm.AlarmSettingsRepository;
+import com.example.demo.repository.users.user.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

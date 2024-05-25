@@ -1,6 +1,6 @@
-package com.example.demo.repository;
+package com.example.demo.repository.planner;
 
-import com.example.demo.entity.Location;
+import com.example.demo.entity.planner.Location;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

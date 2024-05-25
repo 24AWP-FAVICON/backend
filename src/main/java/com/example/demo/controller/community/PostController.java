@@ -1,8 +1,8 @@
-package com.example.demo.controller;
+package com.example.demo.controller.community;
 
-import com.example.demo.dto.PostRequestDto;
-import com.example.demo.dto.PostResponseDto;
-import com.example.demo.entity.Post;
+import com.example.demo.dto.community.post.PostRequestDto;
+import com.example.demo.dto.community.post.PostResponseDto;
+import com.example.demo.entity.community.post.Post;
 import com.example.demo.service.community.post.AttachmentFileService;
 import com.example.demo.service.jwt.JwtCheckService;
 import com.example.demo.service.community.post.PostService;

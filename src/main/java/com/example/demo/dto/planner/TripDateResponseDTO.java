@@ -1,5 +1,7 @@
-package com.example.demo.dto;
+package com.example.demo.dto.planner;
 
+import com.example.demo.dto.planner.AccommodationDetailsDTO;
+import com.example.demo.dto.planner.LocationDetailsDTO;
 import lombok.*;
 
 import java.time.LocalDate;

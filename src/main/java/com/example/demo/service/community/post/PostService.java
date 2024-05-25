@@ -1,18 +1,19 @@
-package com.example.demo.service;
+package com.example.demo.service.community.post;
 
 
-import com.example.demo.dto.PostRequestDto;
-import com.example.demo.dto.PostResponseDto;
-import com.example.demo.entity.Attachment;
-import com.example.demo.entity.Post;
-import com.example.demo.entity.PostLike;
-import com.example.demo.entity.View;
-import com.example.demo.entity.User;
+import com.example.demo.dto.community.post.PostRequestDto;
+import com.example.demo.dto.community.post.PostResponseDto;
+import com.example.demo.entity.community.post.Attachment;
+import com.example.demo.entity.community.post.Post;
+import com.example.demo.entity.community.post.PostLike;
+import com.example.demo.entity.community.post.View;
+import com.example.demo.entity.users.user.User;
 import com.example.demo.exception.ComponentNotFoundException;
 import com.example.demo.exception.UnAuthorizedUserException;
-import com.example.demo.repository.PostLikeRepository;
-import com.example.demo.repository.PostRepository;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.repository.community.post.PostLikeRepository;
+import com.example.demo.repository.community.post.PostRepository;
+import com.example.demo.repository.users.user.UserRepository;
+import com.example.demo.service.users.alarm.AlarmService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
