@@ -8,14 +8,19 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import java.util.logging.Logger;
 @Service
 @RequiredArgsConstructor
 public class ChatMessageService {
 
     private final ChatMessageRepository chatMessageRepository;
+    private final static Logger log = Logger.getLogger(ChatMessageService.class.getName());
 
     public ChatMessage saveMessage(ChatMessage message) {
         message.setSendAt(LocalDateTime.now());
+        ChatMessage savedMessage = chatMessageRepository.save(message);
+        log.info("Saved message: " + savedMessage.toString());
+
         return chatMessageRepository.save(message);
     }
 
