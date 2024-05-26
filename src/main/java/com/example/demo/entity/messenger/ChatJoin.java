@@ -1,10 +1,8 @@
-    package com.example.demo.entity.messenger;
+package com.example.demo.entity.messenger;
 
+import com.example.demo.entity.users.user.User;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
-
 
 @Getter
 @Setter
@@ -22,11 +20,17 @@ public class ChatJoin {
 
     private int msgCount;
 
-    // Constructors, getters, and setters
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "roomId", insertable = false, updatable = false)
+    private ChatRoom room;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", insertable = false, updatable = false)
+    private User user;
+
     public ChatJoin(String userId, Long roomId) {
         this.userId = userId;
         this.roomId = roomId;
         this.msgCount = 0;
     }
 }
-

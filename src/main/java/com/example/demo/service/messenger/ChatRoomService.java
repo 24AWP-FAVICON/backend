@@ -4,14 +4,19 @@ package com.example.demo.service.messenger;
 import com.example.demo.dto.messenger.ChatRoomRequestDTO;
 import com.example.demo.dto.messenger.ChatRoomResponseDTO;
 import com.example.demo.entity.messenger.ChatJoin;
+import com.example.demo.entity.messenger.ChatMessage;
 import com.example.demo.entity.messenger.ChatRoom;
+import com.example.demo.entity.users.user.User;
 import com.example.demo.repository.messenger.ChatJoinRepository;
+import com.example.demo.repository.messenger.ChatMessageRepository;
 import com.example.demo.repository.messenger.ChatRoomRepository;
+import com.example.demo.repository.users.user.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,18 +30,45 @@ public class ChatRoomService {
     @Autowired
     private ChatJoinRepository chatJoinRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+
+    private final ChatMessageRepository chatMessageRepository;
+
+    public ChatRoomService(ChatMessageRepository chatMessageRepository) {
+        this.chatMessageRepository = chatMessageRepository;
+    }
+
+
     // 채팅방 생성
+    /*
+    {
+          "name": "제주도 가보자고!",
+          "creatorUserId": "user1",
+          "participantIds": ["user1", "user2", "user3"]
+        }
+     */
     @Transactional
     public ChatRoomResponseDTO createChatRoom(ChatRoomRequestDTO.CreateDTO requestDTO) {
         ChatRoom chatRoom = requestDTO.toEntity(null);
-        chatRoom = chatRoomRepository.save(chatRoom);
+        //chatRoom = chatRoomRepository.save(chatRoom);
 
-        ChatJoin chatJoin = new ChatJoin(requestDTO.getCreatorUserId(), chatRoom.getRoomId());
-        chatJoinRepository.save(chatJoin);
+        List<ChatJoin> chatJoins = requestDTO.getParticipantIds().stream()
+                .map(userId -> {
+                    ChatJoin chatJoin = new ChatJoin(userId, chatRoom.getRoomId());
+                    chatJoin.setRoom(chatRoom);
+                    chatJoin.setUser(userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("Invalid user ID")));
+                    return chatJoin;
+                })
+                .collect(Collectors.toList());
 
-        List<String> users = List.of(requestDTO.getCreatorUserId());
+        chatJoinRepository.saveAll(chatJoins);
+
+        List<String> users = chatJoins.stream().map(ChatJoin::getUserId).collect(Collectors.toList());
         return new ChatRoomResponseDTO(chatRoom.getRoomId(), chatRoom.getName(), chatRoom.getCreateAt(), users);
     }
+
 
     // 사용자가 참여한 모든 채팅방 조회
     @Transactional
@@ -66,6 +98,8 @@ public class ChatRoomService {
     public void inviteUserToChatRoom(Long roomId, ChatRoomRequestDTO.InviteDTO inviteRequest) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(() -> new IllegalArgumentException("Invalid room ID"));
         ChatJoin chatJoin = new ChatJoin(inviteRequest.getInviteUserId(), chatRoom.getRoomId());
+        chatJoin.setRoom(chatRoom);
+        chatJoin.setUser(userRepository.findById(inviteRequest.getInviteUserId()).orElseThrow(() -> new IllegalArgumentException("Invalid user ID")));
         chatJoinRepository.save(chatJoin);
     }
 
@@ -75,5 +109,26 @@ public class ChatRoomService {
         ChatJoin chatJoin = chatJoinRepository.findByRoomIdAndUserId(roomId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found in chat room"));
         chatJoinRepository.delete(chatJoin);
+    }
+
+
+    @Transactional
+    public ChatMessage saveMessage(Long roomId, String senderId, String content) {
+        User user = userRepository.findById(senderId).orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
+        ChatRoom room = chatRoomRepository.findById(roomId).orElseThrow(() -> new IllegalArgumentException("Invalid room ID"));
+
+        ChatMessage message = ChatMessage.builder()
+                .user(user)
+                .room(room)
+                .content(content)
+                .sendAt(LocalDateTime.now())
+                .unreadCount(chatJoinRepository.countByRoomId(roomId))
+                .build();
+
+        return chatMessageRepository.save(message);
+    }
+
+    public List<ChatMessage> getAllMessagesByRoomId(Long roomId) {
+        return chatMessageRepository.findByRoomRoomId(roomId);
     }
 }

@@ -21,7 +21,7 @@ public class UnreadMember {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "msgId", insertable = false, updatable = false)
-    private Message message;
+    private ChatMessage chatMessage;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", insertable = false, updatable = false)

@@ -5,6 +5,7 @@ import com.example.demo.entity.users.user.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,6 +19,7 @@ public class ChatRoomRequestDTO {
     public static class CreateDTO {
         private String name;
         private String creatorUserId;
+        private List<String> participantIds;
 
         public ChatRoom toEntity(User user){
             return ChatRoom.builder()
