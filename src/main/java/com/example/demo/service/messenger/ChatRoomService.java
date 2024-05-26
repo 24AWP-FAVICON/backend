@@ -40,14 +40,20 @@ public class ChatRoomService {
     // 채팅방 생성
     @Transactional
     public ChatRoomResponseDTO createChatRoom(ChatRoomRequestDTO.CreateDTO requestDTO) {
-        ChatRoom chatRoom = requestDTO.toEntity(null);
-        //chatRoom = chatRoomRepository.save(chatRoom);
+        // 먼저 ChatRoom 엔티티를 저장
+        ChatRoom chatRoom = ChatRoom.builder()
+                .name(requestDTO.getName())
+                .createAt(LocalDateTime.now())
+                .build();
+        chatRoomRepository.save(chatRoom);
 
+        // ChatJoin 엔티티를 생성하고 저장
         List<ChatJoin> chatJoins = requestDTO.getParticipantIds().stream()
                 .map(userId -> {
                     ChatJoin chatJoin = new ChatJoin(userId, chatRoom.getRoomId());
                     chatJoin.setRoom(chatRoom);
-                    chatJoin.setUser(userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("Invalid user ID")));
+                    chatJoin.setUser(userRepository.findById(userId)
+                            .orElseThrow(() -> new IllegalArgumentException("Invalid user ID")));
                     return chatJoin;
                 })
                 .collect(Collectors.toList());
