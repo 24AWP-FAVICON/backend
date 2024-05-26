@@ -64,5 +64,13 @@ public class ChatRoomService {
         chatJoinRepository.save(chatJoin);
     }
 
+    // 특정 채팅방 나가기 (사용자 삭제)
+    @Transactional
+    public void leaveChatRoom(Long roomId, String userId) {
+        ChatJoin chatJoin = chatJoinRepository.findByRoomIdAndUserId(roomId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found in chat room"));
+        chatJoinRepository.delete(chatJoin);
+    }
+
 
 }

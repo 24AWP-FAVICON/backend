@@ -22,6 +22,7 @@ public class MessageController {
     private final ChatRoomService chatRoomService;
     private static final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
+    // 채팅방 생성
     @PostMapping("/chatRoom")
     public ResponseEntity<ChatRoomResponseDTO> createChatRoom(@RequestBody ChatRoomRequestDTO.CreateDTO requestDTO) {
         try {
@@ -33,9 +34,10 @@ public class MessageController {
         }
     }
 
+    // 사용자가 참여한 모든 채팅방 조회
     // localhost:8080/messeneger/chatRooms?userId=minbory925@gmail.com
     /*
-    현재는 위의 방식처럼 뒤에 userId를 넣어줘야 하지만 추후 Authenticated를 추가하면 삭제될 예정임
+    현재는 위의 방식처럼 뒤에 userId를 넣어줘야 하지만 추후 JWT 토큰 인증m 추가하면 삭제될 예정임
      */
     @GetMapping("/chatRooms")
     public ResponseEntity<List<ChatRoomResponseDTO>> getAllChatRooms(@RequestParam String userId) {
@@ -48,7 +50,7 @@ public class MessageController {
         }
     }
 
-
+    // 특정 채팅방 조회
     @GetMapping("/chatRoom/{roomId}")
     public ResponseEntity<ChatRoomResponseDTO> getChatRoomById(@PathVariable Long roomId) {
         try {
@@ -60,6 +62,7 @@ public class MessageController {
         }
     }
 
+    // 특정 채팅방에 사용자 초대
     @PostMapping("/chatRoom/{roomId}")
     public ResponseEntity<Void> inviteUserToChatRoom(@PathVariable("roomId") Long roomId, @RequestBody ChatRoomRequestDTO.InviteDTO inviteRequest) {
         try {
@@ -67,6 +70,23 @@ public class MessageController {
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             logger.error("Error inviting user to chat room", e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // 특정 채팅방 나가기 (사용자 삭제)
+     /*
+    모든 채팅방 조회와 마찬가지로
+    DELETE /messages/chatRoom/{room_id}?userId={userId}
+    userId를 입력해야 하지만 추후 JWT 토큰 인증을 넣으면 필요없어짐 (API 명세대로 구현할 수 있음)
+     */
+    @DeleteMapping("/chatRoom/{roomId}")
+    public ResponseEntity<Void> leaveChatRoom(@PathVariable("roomId") Long roomId, @RequestParam("userId") String userId) {
+        try {
+            chatRoomService.leaveChatRoom(roomId, userId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            logger.error("Error leaving chat room", e);
             return ResponseEntity.internalServerError().build();
         }
     }
