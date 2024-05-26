@@ -43,7 +43,7 @@ public class Trip {
     @Column(nullable = true)
     private Long budget;
 
-    private Long roomId;
+//    private Long roomId;
 
     // 세부일정 (TripDate) 엔티티와 연결
     @OneToMany(mappedBy = "trip")

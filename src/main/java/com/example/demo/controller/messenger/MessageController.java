@@ -1,6 +1,6 @@
 package com.example.demo.controller.messenger;
 
-import com.example.demo.dto.planner.UserIdsDTO;
+import com.example.demo.dto.users.user.UserIdsDTO;
 import com.example.demo.repository.messenger.MessageRepository;
 import com.example.demo.service.kafka.KafkaProducerService;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +20,5 @@ public class MessageController {
     @Autowired
     private MessageRepository messageRepository;
 
-    @PostMapping
-    public void sendMessage(@RequestBody MessageRequest request) {
 
-    }
 }

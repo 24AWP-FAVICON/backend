@@ -1,5 +1,6 @@
 package com.example.demo.entity.messenger;
 
+import com.example.demo.entity.planner.Trip;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,16 +12,20 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 @Entity
 public class ChatRoom {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @Column(nullable = false)
-    private Trip trip;
+    private String name;
 
     private LocalDateTime createAt;
+
+    // 이름 입력 constructor
+    public ChatRoom(String name) {
+        this.name = name;
+    }
 }
 

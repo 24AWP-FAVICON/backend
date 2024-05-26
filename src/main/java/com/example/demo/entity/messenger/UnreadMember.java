@@ -1,5 +1,6 @@
 package com.example.demo.entity.messenger;
 
+import com.example.demo.entity.users.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
