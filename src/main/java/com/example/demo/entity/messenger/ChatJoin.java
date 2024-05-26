@@ -15,14 +15,18 @@ import java.time.LocalDateTime;
 @IdClass(ChatJoinId.class)
 public class ChatJoin {
     @Id
-    private Long userId;
+    private String userId;
 
     @Id
     private Long roomId;
 
     private int msgCount;
 
-    public ChatJoin(String creatorUserId, Long roomId) {
+    // Constructors, getters, and setters
+    public ChatJoin(String userId, Long roomId) {
+        this.userId = userId;
+        this.roomId = roomId;
+        this.msgCount = 0;
     }
 }
 

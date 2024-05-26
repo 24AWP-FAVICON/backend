@@ -1,11 +1,11 @@
 package com.example.demo.entity.messenger;
 
+
 import java.io.Serializable;
 import java.util.Objects;
 
-
 public class ChatJoinId implements Serializable {
-    private Long userId;
+    private String userId;
     private Long roomId;
 
     public ChatJoinId() {}
