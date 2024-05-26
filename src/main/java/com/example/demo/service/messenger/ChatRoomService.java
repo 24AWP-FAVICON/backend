@@ -34,7 +34,8 @@ public class ChatRoomService {
         ChatJoin chatJoin = new ChatJoin(requestDTO.getCreatorUserId(), chatRoom.getRoomId());
         chatJoinRepository.save(chatJoin);
 
-        return new ChatRoomResponseDTO(chatRoom.getRoomId(), chatRoom.getName(), chatRoom.getCreateAt());
+        List<String> users = List.of(requestDTO.getCreatorUserId());
+        return new ChatRoomResponseDTO(chatRoom.getRoomId(), chatRoom.getName(), chatRoom.getCreateAt(), users);
     }
 
     // 사용자가 참여한 모든 채팅방 조회
@@ -44,7 +45,9 @@ public class ChatRoomService {
         return chatJoins.stream()
                 .map(chatJoin -> {
                     ChatRoom chatRoom = chatRoomRepository.findById(chatJoin.getRoomId()).orElseThrow(() -> new IllegalArgumentException("Invalid room ID"));
-                    return new ChatRoomResponseDTO(chatRoom.getRoomId(), chatRoom.getName(), chatRoom.getCreateAt());
+                    List<ChatJoin> usersInRoom = chatJoinRepository.findAllByRoomId(chatJoin.getRoomId());
+                    List<String> users = usersInRoom.stream().map(ChatJoin::getUserId).collect(Collectors.toList());
+                    return new ChatRoomResponseDTO(chatRoom.getRoomId(), chatRoom.getName(), chatRoom.getCreateAt(), users);
                 })
                 .collect(Collectors.toList());
     }
@@ -53,7 +56,9 @@ public class ChatRoomService {
     @Transactional
     public ChatRoomResponseDTO findChatRoomById(Long roomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(() -> new IllegalArgumentException("Invalid room ID"));
-        return new ChatRoomResponseDTO(chatRoom.getRoomId(), chatRoom.getName(), chatRoom.getCreateAt());
+        List<ChatJoin> chatJoins = chatJoinRepository.findAllByRoomId(roomId);
+        List<String> users = chatJoins.stream().map(ChatJoin::getUserId).collect(Collectors.toList());
+        return new ChatRoomResponseDTO(chatRoom.getRoomId(), chatRoom.getName(), chatRoom.getCreateAt(), users);
     }
 
     // 특정 채팅방에 사용자 초대
@@ -71,6 +76,4 @@ public class ChatRoomService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found in chat room"));
         chatJoinRepository.delete(chatJoin);
     }
-
-
 }

@@ -27,10 +27,10 @@ public class MessageController {
     public ResponseEntity<ChatRoomResponseDTO> createChatRoom(@RequestBody ChatRoomRequestDTO.CreateDTO requestDTO) {
         try {
             ChatRoomResponseDTO responseDTO = chatRoomService.createChatRoom(requestDTO);
-            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+            return ResponseEntity.ok(responseDTO);
         } catch (Exception e) {
             logger.error("Error creating chat room", e);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.internalServerError().body(null);
         }
     }
 
@@ -40,25 +40,25 @@ public class MessageController {
     현재는 위의 방식처럼 뒤에 userId를 넣어줘야 하지만 추후 JWT 토큰 인증m 추가하면 삭제될 예정임
      */
     @GetMapping("/chatRooms")
-    public ResponseEntity<List<ChatRoomResponseDTO>> getAllChatRooms(@RequestParam String userId) {
+    public ResponseEntity<List<ChatRoomResponseDTO>> getAllChatRooms(@RequestParam("userId") String userId) {
         try {
-            List<ChatRoomResponseDTO> chatRooms = chatRoomService.findAllChatRoomsByUserId(userId);
-            return ResponseEntity.ok(chatRooms);
+            List<ChatRoomResponseDTO> responseDTOList = chatRoomService.findAllChatRoomsByUserId(userId);
+            return ResponseEntity.ok(responseDTOList);
         } catch (Exception e) {
             logger.error("Error retrieving chat rooms", e);
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.internalServerError().body(null);
         }
     }
 
     // 특정 채팅방 조회
     @GetMapping("/chatRoom/{roomId}")
-    public ResponseEntity<ChatRoomResponseDTO> getChatRoomById(@PathVariable Long roomId) {
+    public ResponseEntity<ChatRoomResponseDTO> getChatRoomById(@PathVariable("roomId") Long roomId) {
         try {
-            ChatRoomResponseDTO chatRoom = chatRoomService.findChatRoomById(roomId);
-            return ResponseEntity.ok(chatRoom);
+            ChatRoomResponseDTO responseDTO = chatRoomService.findChatRoomById(roomId);
+            return ResponseEntity.ok(responseDTO);
         } catch (Exception e) {
             logger.error("Error retrieving chat room", e);
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.internalServerError().body(null);
         }
     }
 
@@ -90,5 +90,4 @@ public class MessageController {
             return ResponseEntity.internalServerError().build();
         }
     }
-
 }
