@@ -22,5 +22,7 @@ public class ChatJoin {
 
     private int msgCount;
 
+    public ChatJoin(String creatorUserId, Long roomId) {
+    }
 }
 
