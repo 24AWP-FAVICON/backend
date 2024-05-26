@@ -34,5 +34,13 @@ public class ChatRoomRequestDTO {
         private String creatorUserId;
     }
 
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @Getter
+    public static class InviteDTO {
+        private String inviteUserId;
 
+        public InviteDTO(String inviteUserId) {
+            this.inviteUserId = inviteUserId;
+        }
+    }
 }

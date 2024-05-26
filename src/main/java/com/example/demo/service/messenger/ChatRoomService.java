@@ -26,6 +26,7 @@ public class ChatRoomService {
     private ChatJoinRepository chatJoinRepository;
 
     // 채팅방 생성
+    @Transactional
     public ChatRoomResponseDTO createChatRoom(ChatRoomRequestDTO.CreateDTO requestDTO) {
         ChatRoom chatRoom = requestDTO.toEntity(null);
         chatRoom = chatRoomRepository.save(chatRoom);
@@ -37,6 +38,7 @@ public class ChatRoomService {
     }
 
     // 사용자가 참여한 모든 채팅방 조회
+    @Transactional
     public List<ChatRoomResponseDTO> findAllChatRoomsByUserId(String userId) {
         List<ChatJoin> chatJoins = chatJoinRepository.findAllByUserId(userId);
         return chatJoins.stream()
@@ -48,9 +50,18 @@ public class ChatRoomService {
     }
 
     // 특정 채팅방 조회
+    @Transactional
     public ChatRoomResponseDTO findChatRoomById(Long roomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(() -> new IllegalArgumentException("Invalid room ID"));
         return new ChatRoomResponseDTO(chatRoom.getRoomId(), chatRoom.getName(), chatRoom.getCreateAt());
+    }
+
+    // 특정 채팅방에 사용자 초대
+    @Transactional
+    public void inviteUserToChatRoom(Long roomId, ChatRoomRequestDTO.InviteDTO inviteRequest) {
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(() -> new IllegalArgumentException("Invalid room ID"));
+        ChatJoin chatJoin = new ChatJoin(inviteRequest.getInviteUserId(), chatRoom.getRoomId());
+        chatJoinRepository.save(chatJoin);
     }
 
 

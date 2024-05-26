@@ -60,4 +60,15 @@ public class MessageController {
         }
     }
 
+    @PostMapping("/chatRoom/{roomId}")
+    public ResponseEntity<Void> inviteUserToChatRoom(@PathVariable("roomId") Long roomId, @RequestBody ChatRoomRequestDTO.InviteDTO inviteRequest) {
+        try {
+            chatRoomService.inviteUserToChatRoom(roomId, inviteRequest);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            logger.error("Error inviting user to chat room", e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
 }
