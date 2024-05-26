@@ -11,6 +11,5 @@ public interface ChatJoinRepository extends JpaRepository<ChatJoin, ChatJoinId> 
     List<ChatJoin> findAllByUserId(String userId);
     Optional<ChatJoin> findByRoomIdAndUserId(Long roomId, String userId);
     List<ChatJoin> findAllByRoomId(Long roomId);
-
     int countByRoomId(Long roomId);
 }

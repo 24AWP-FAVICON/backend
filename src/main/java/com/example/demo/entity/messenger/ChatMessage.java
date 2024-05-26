@@ -25,10 +25,9 @@ public class ChatMessage {
     @JoinColumn(name = "room_id", nullable = false)
     private ChatRoom room;
 
-    @Enumerated(EnumType.STRING)
     private MessageType type;
-
     private String content;
     private LocalDateTime sendAt;
     private int unreadCount;
+
 }

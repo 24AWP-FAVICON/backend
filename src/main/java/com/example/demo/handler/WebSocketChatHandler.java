@@ -1,9 +1,12 @@
 package com.example.demo.handler;
 
 import com.example.demo.entity.messenger.ChatMessage;
+import com.example.demo.entity.messenger.MessageType;
+import com.example.demo.repository.messenger.ChatMessageRepository;
 import com.example.demo.service.messenger.ChatRoomService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -20,18 +23,28 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final ChatRoomService chatRoomService;
 
+    @Autowired
+    private ChatMessageRepository chatMessageRepository;
+
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         ChatMessage chatMessage = objectMapper.readValue(message.getPayload(), ChatMessage.class);
-        Long roomId = chatMessage.getRoom().getRoomId();
 
-        // Save message to the database
-        ChatMessage savedMessage = chatRoomService.saveMessage(roomId, chatMessage.getUser().getUserId(), chatMessage.getContent());
-
-        if (chatRooms.containsKey(roomId)) {
+        if (chatMessage.getType() == MessageType.READ) {
+            // 메시지 읽기 처리
+            ChatMessage existingMessage = chatMessageRepository.findById(chatMessage.getMessageId())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid message ID"));
+            int unreadCount = existingMessage.getUnreadCount();
+            if (unreadCount > 0) {
+                existingMessage.setUnreadCount(unreadCount - 1);
+                chatMessageRepository.save(existingMessage);
+            }
+        } else {
+            // 메시지 전송 처리
+            Long roomId = chatMessage.getRoom().getRoomId();
             for (WebSocketSession webSocketSession : chatRooms.get(roomId).values()) {
                 if (webSocketSession.isOpen()) {
-                    webSocketSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(savedMessage)));
+                    webSocketSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(chatMessage)));
                 }
             }
         }

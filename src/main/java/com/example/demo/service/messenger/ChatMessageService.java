@@ -20,6 +20,6 @@ public class ChatMessageService {
     }
 
     public List<ChatMessage> getMessagesByRoomId(Long roomId) {
-        return chatMessageRepository.findByRoomId(roomId);
+        return chatMessageRepository.findByRoom_RoomId(roomId);
     }
 }

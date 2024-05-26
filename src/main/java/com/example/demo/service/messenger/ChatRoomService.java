@@ -1,12 +1,10 @@
 package com.example.demo.service.messenger;
 
-
 import com.example.demo.dto.messenger.ChatRoomRequestDTO;
 import com.example.demo.dto.messenger.ChatRoomResponseDTO;
 import com.example.demo.entity.messenger.ChatJoin;
 import com.example.demo.entity.messenger.ChatMessage;
 import com.example.demo.entity.messenger.ChatRoom;
-import com.example.demo.entity.users.user.User;
 import com.example.demo.repository.messenger.ChatJoinRepository;
 import com.example.demo.repository.messenger.ChatMessageRepository;
 import com.example.demo.repository.messenger.ChatRoomRepository;
@@ -33,22 +31,13 @@ public class ChatRoomService {
     @Autowired
     private UserRepository userRepository;
 
-
     private final ChatMessageRepository chatMessageRepository;
 
     public ChatRoomService(ChatMessageRepository chatMessageRepository) {
         this.chatMessageRepository = chatMessageRepository;
     }
 
-
     // 채팅방 생성
-    /*
-    {
-          "name": "제주도 가보자고!",
-          "creatorUserId": "user1",
-          "participantIds": ["user1", "user2", "user3"]
-        }
-     */
     @Transactional
     public ChatRoomResponseDTO createChatRoom(ChatRoomRequestDTO.CreateDTO requestDTO) {
         ChatRoom chatRoom = requestDTO.toEntity(null);
@@ -68,7 +57,6 @@ public class ChatRoomService {
         List<String> users = chatJoins.stream().map(ChatJoin::getUserId).collect(Collectors.toList());
         return new ChatRoomResponseDTO(chatRoom.getRoomId(), chatRoom.getName(), chatRoom.getCreateAt(), users);
     }
-
 
     // 사용자가 참여한 모든 채팅방 조회
     @Transactional
@@ -111,24 +99,18 @@ public class ChatRoomService {
         chatJoinRepository.delete(chatJoin);
     }
 
+    // 메시지
+    public List<ChatMessage> getAllMessagesByRoomId(Long roomId) {
+        return chatMessageRepository.findByRoom_RoomId(roomId);
+    }
 
     @Transactional
-    public ChatMessage saveMessage(Long roomId, String senderId, String content) {
-        User user = userRepository.findById(senderId).orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
-        ChatRoom room = chatRoomRepository.findById(roomId).orElseThrow(() -> new IllegalArgumentException("Invalid room ID"));
-
-        ChatMessage message = ChatMessage.builder()
-                .user(user)
-                .room(room)
-                .content(content)
-                .sendAt(LocalDateTime.now())
-                .unreadCount(chatJoinRepository.countByRoomId(roomId))
-                .build();
-
+    public ChatMessage saveMessage(Long roomId, ChatMessage message) {
+        int participantCount = chatJoinRepository.countByRoomId(roomId);
+        message.setRoom(chatRoomRepository.findById(roomId).orElseThrow(() -> new IllegalArgumentException("Invalid room ID")));
+        message.setUnreadCount(participantCount - 1); // 보낸 사람 제외
+        message.setSendAt(LocalDateTime.now());
         return chatMessageRepository.save(message);
     }
 
-    public List<ChatMessage> getAllMessagesByRoomId(Long roomId) {
-        return chatMessageRepository.findByRoomRoomId(roomId);
-    }
 }
