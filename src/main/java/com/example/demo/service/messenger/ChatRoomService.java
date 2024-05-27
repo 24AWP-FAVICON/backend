@@ -106,17 +106,17 @@ public class ChatRoomService {
     }
 
     // 메시지
-    public List<ChatMessage> getAllMessagesByRoomId(Long roomId) {
-        return chatMessageRepository.findByRoom_RoomId(roomId);
-    }
-
-    @Transactional
-    public ChatMessage saveMessage(Long roomId, ChatMessage message) {
-        int participantCount = chatJoinRepository.countByRoomId(roomId);
-        message.setRoom(chatRoomRepository.findById(roomId).orElseThrow(() -> new IllegalArgumentException("Invalid room ID")));
-        message.setUnreadCount(participantCount - 1); // 보낸 사람 제외
-        message.setSendAt(LocalDateTime.now());
-        return chatMessageRepository.save(message);
-    }
+//    public List<ChatMessage> getAllMessagesByRoomId(Long roomId) {
+//        return chatMessageRepository.findByRoom_RoomId(roomId);
+//    }
+//
+//    @Transactional
+//    public ChatMessage saveMessage(Long roomId, ChatMessage message) {
+//        int participantCount = chatJoinRepository.countByRoomId(roomId);
+//        message.setRoom(chatRoomRepository.findById(roomId).orElseThrow(() -> new IllegalArgumentException("Invalid room ID")));
+//        message.setUnreadCount(participantCount - 1); // 보낸 사람 제외
+//        message.setSendAt(LocalDateTime.now());
+//        return chatMessageRepository.save(message);
+//    }
 
 }
