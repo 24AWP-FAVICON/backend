@@ -3,6 +3,7 @@ package com.example.demo.controller.messenger;
 import com.example.demo.dto.messenger.ChatMessageDTO;
 import com.example.demo.entity.messenger.ChatMessage;
 import com.example.demo.entity.messenger.Message;
+import com.example.demo.service.jwt.JwtCheckService;
 import com.example.demo.service.messenger.ChatRoomService;
 import com.example.demo.service.messenger.ChatMessageService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @RestController()
 @RequiredArgsConstructor
@@ -22,12 +25,18 @@ public class MessageController {
 
     private final ChatRoomService chatRoomService;
     private final ChatMessageService chatMessageService;
+    private final JwtCheckService jwtCheckService;
 
     private final SimpMessageSendingOperations simpMessageSendingOperations;
 
-    @MessageMapping("/message") // 1. 클라이언트에서 /pub/hello로 메시지 발행
-    public void message(ChatMessage message) {
-        // 2. 메시지에 정의된 채널 id에 메시지 보냄.
+    @MessageMapping("/message") // 클라이언트에서 /pub/hello로 메시지 발행
+    public void message(ChatMessage message,
+                        HttpServletRequest request,
+                        HttpServletResponse response) {
+        // JWT 토큰 검증
+        String userId = jwtCheckService.checkJwt(request, response);
+
+        // 메시지에 정의된 채널 id에 메시지 보냄.
         // /sub/channel/{roomId} 에 구독중인 클라이언트에게 메시지를 보냄
         log.info("Received Message: {}", message);
         // 테스트: simpMessageSendingOperations.convertAndSend("/sub/channel/" + message.getRoom().getRoomId(), message);
@@ -47,7 +56,10 @@ public class MessageController {
 
     // 메시지 읽음 여부 표시
     @PutMapping("/messages/read/{roomId}")
-    public void markMessagesAsRead(@PathVariable Long roomId, @RequestParam String userId) {
+    public void markMessagesAsRead(@PathVariable Long roomId,
+                                   HttpServletRequest request,
+                                   HttpServletResponse response) {
+        String userId = jwtCheckService.checkJwt(request, response);
         chatMessageService.markMessagesAsRead(roomId, userId);
     }
 

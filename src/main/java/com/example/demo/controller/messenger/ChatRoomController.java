@@ -2,7 +2,10 @@ package com.example.demo.controller.messenger;
 
 import com.example.demo.dto.messenger.ChatRoomRequestDTO;
 import com.example.demo.dto.messenger.ChatRoomResponseDTO;
+import com.example.demo.service.jwt.JwtCheckService;
 import com.example.demo.service.messenger.ChatRoomService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -18,13 +21,17 @@ import java.util.List;
 @Slf4j
 public class ChatRoomController {
 
+    private final JwtCheckService jwtCheckService;
     private final ChatRoomService chatRoomService;
     private static final Logger logger = LoggerFactory.getLogger(ChatRoomController.class);
 
     // 채팅방 생성
     @PostMapping("/chatRoom")
-    public ResponseEntity<ChatRoomResponseDTO> createChatRoom(@RequestBody ChatRoomRequestDTO.CreateDTO requestDTO) {
+    public ResponseEntity<ChatRoomResponseDTO> createChatRoom(@RequestBody ChatRoomRequestDTO.CreateDTO requestDTO,
+                                                              HttpServletRequest request,
+                                                              HttpServletResponse response) {
         try {
+            jwtCheckService.checkJwt(request, response);
             ChatRoomResponseDTO responseDTO = chatRoomService.createChatRoom(requestDTO);
             return ResponseEntity.ok(responseDTO);
         } catch (Exception e) {
@@ -34,13 +41,11 @@ public class ChatRoomController {
     }
 
     // 사용자가 참여한 모든 채팅방 조회
-    // localhost:8080/messeneger/chatRooms?userId=minbory925@gmail.com
-    /*
-    현재는 위의 방식처럼 뒤에 userId를 넣어줘야 하지만 추후 JWT 토큰 인증m 추가하면 삭제될 예정임
-     */
     @GetMapping("/chatRooms")
-    public ResponseEntity<List<ChatRoomResponseDTO>> getAllChatRooms(@RequestParam("userId") String userId) {
+    public ResponseEntity<List<ChatRoomResponseDTO>> getAllChatRooms(HttpServletRequest request,
+                                                                     HttpServletResponse response) {
         try {
+            String userId = jwtCheckService.checkJwt(request, response);
             List<ChatRoomResponseDTO> responseDTOList = chatRoomService.findAllChatRoomsByUserId(userId);
             return ResponseEntity.ok(responseDTOList);
         } catch (Exception e) {
@@ -51,8 +56,11 @@ public class ChatRoomController {
 
     // 특정 채팅방 조회
     @GetMapping("/chatRoom/{roomId}")
-    public ResponseEntity<ChatRoomResponseDTO> getChatRoomById(@PathVariable("roomId") Long roomId) {
+    public ResponseEntity<ChatRoomResponseDTO> getChatRoomById(@PathVariable("roomId") Long roomId,
+                                                               HttpServletRequest request,
+                                                               HttpServletResponse response) {
         try {
+            jwtCheckService.checkJwt(request, response);
             ChatRoomResponseDTO responseDTO = chatRoomService.findChatRoomById(roomId);
             return ResponseEntity.ok(responseDTO);
         } catch (Exception e) {
@@ -63,8 +71,12 @@ public class ChatRoomController {
 
     // 특정 채팅방에 사용자 초대
     @PostMapping("/chatRoom/{roomId}")
-    public ResponseEntity<Void> inviteUserToChatRoom(@PathVariable("roomId") Long roomId, @RequestBody ChatRoomRequestDTO.InviteDTO inviteRequest) {
+    public ResponseEntity<Void> inviteUserToChatRoom(@PathVariable("roomId") Long roomId,
+                                                     @RequestBody ChatRoomRequestDTO.InviteDTO inviteRequest,
+                                                     HttpServletRequest request,
+                                                     HttpServletResponse response) {
         try {
+            jwtCheckService.checkJwt(request, response);
             chatRoomService.inviteUserToChatRoom(roomId, inviteRequest);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -74,14 +86,12 @@ public class ChatRoomController {
     }
 
     // 특정 채팅방 나가기 (사용자 삭제)
-     /*
-    모든 채팅방 조회와 마찬가지로
-    DELETE /messages/chatRoom/{room_id}?userId={userId}
-    userId를 입력해야 하지만 추후 JWT 토큰 인증을 넣으면 필요없어짐 (API 명세대로 구현할 수 있음)
-     */
     @DeleteMapping("/chatRoom/{roomId}")
-    public ResponseEntity<Void> leaveChatRoom(@PathVariable("roomId") Long roomId, @RequestParam("userId") String userId) {
+    public ResponseEntity<Void> leaveChatRoom(@PathVariable("roomId") Long roomId,
+                                              HttpServletRequest request,
+                                              HttpServletResponse response) {
         try {
+            String userId = jwtCheckService.checkJwt(request, response);
             chatRoomService.leaveChatRoom(roomId, userId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
