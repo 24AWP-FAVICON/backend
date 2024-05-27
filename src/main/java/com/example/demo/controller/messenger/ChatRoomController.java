@@ -69,6 +69,21 @@ public class ChatRoomController {
         }
     }
 
+    // 특정 채팅방 이름 변경
+    @PutMapping("/chatRoom/{roomId}/name")
+    public ResponseEntity<Void> updateChatRoomName(@PathVariable("roomId") Long roomId,
+                                                   @RequestBody ChatRoomRequestDTO.UpdateDTO updateDTO,
+                                                   HttpServletRequest request,
+                                                   HttpServletResponse response) {
+        try {
+            jwtCheckService.checkJwt(request, response);
+            chatRoomService.updateChatRoomName(roomId, updateDTO.getName());
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            logger.error("Error updating chat room name", e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
     // 특정 채팅방에 사용자 초대
     @PostMapping("/chatRoom/{roomId}")
     public ResponseEntity<Void> inviteUserToChatRoom(@PathVariable("roomId") Long roomId,

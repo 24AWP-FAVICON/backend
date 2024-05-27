@@ -30,11 +30,12 @@ public class MessageController {
     private final SimpMessageSendingOperations simpMessageSendingOperations;
 
     @MessageMapping("/message") // 클라이언트에서 /pub/hello로 메시지 발행
-    public void message(ChatMessage message,
-                        HttpServletRequest request,
-                        HttpServletResponse response) {
+    public void message(ChatMessage message
+//                        HttpServletRequest request,
+//                        HttpServletResponse response
+                            ) {
         // JWT 토큰 검증
-        String userId = jwtCheckService.checkJwt(request, response);
+        //String userId = jwtCheckService.checkJwt(request, response);
 
         // 메시지에 정의된 채널 id에 메시지 보냄.
         // /sub/channel/{roomId} 에 구독중인 클라이언트에게 메시지를 보냄

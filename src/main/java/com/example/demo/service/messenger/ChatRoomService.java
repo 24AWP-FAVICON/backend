@@ -106,6 +106,15 @@ public class ChatRoomService {
         chatJoinRepository.delete(chatJoin);
     }
 
+    // 채팅방 이름 변경
+    @Transactional
+    public void updateChatRoomName(Long roomId, String newName) {
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid room ID"));
+        chatRoom.setName(newName);
+        chatRoomRepository.save(chatRoom);
+    }
+
     // 유저 채팅방 내 존재 유무 판단
     @Transactional
     public boolean isUserInChatRoom(Long roomId, String userId) {
