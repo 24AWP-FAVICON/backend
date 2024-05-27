@@ -1,5 +1,6 @@
 package com.example.demo.entity.users.user;
 
+import com.example.demo.entity.Alarm.AlarmSettings;
 import com.example.demo.entity.community.block.Block;
 import com.example.demo.entity.community.follow.Follow;
 import com.example.demo.entity.community.post.Post;

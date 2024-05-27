@@ -17,6 +17,7 @@ import com.example.demo.repository.users.user.UserRepository;
 import com.example.demo.service.jwt.JwtCheckService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,7 @@ public class TripController {
     private final LocationRepository locationRepository;
     private final JwtCheckService jwtCheckService;
 
+
     /*
     전체 여행 계획 조회
      */
@@ -49,6 +51,7 @@ public class TripController {
     public ResponseEntity<List<Trip>> getAllTrips(HttpServletRequest request,
                                                   HttpServletResponse response) {
         jwtCheckService.checkJwt(request, response);
+
         try {
             List<Trip> trips = tripRepository.findAll();
 
@@ -125,6 +128,7 @@ public class TripController {
                                                HttpServletResponse response) {
 
         jwtCheckService.checkJwt(request, response);
+
         Optional<Trip> tripOptional = tripRepository.findById(tripId);
 
         if (tripOptional.isPresent()) {
@@ -162,6 +166,7 @@ public class TripController {
                                                HttpServletResponse response) {
 
         jwtCheckService.checkJwt(request, response);
+
         Optional<Trip> tripOptional = tripRepository.findById(tripId);
 
         if (tripOptional.isPresent()) {
@@ -192,6 +197,7 @@ public class TripController {
                                                  HttpServletRequest request,
                                                  HttpServletResponse response) {
         jwtCheckService.checkJwt(request, response);
+
         try {
             tripRepository.deleteById(tripId);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -228,6 +234,7 @@ public class TripController {
                                     HttpServletResponse response) {
 
         jwtCheckService.checkJwt(request, response);
+
         try {
             Optional<Trip> tripOptional = tripRepository.findById(tripId);
             if (tripOptional.isEmpty()) {
@@ -281,6 +288,7 @@ public class TripController {
                                                     HttpServletResponse response) {
 
         jwtCheckService.checkJwt(request, response);
+
         Optional<Trip> tripOptional = tripRepository.findById(tripId);
         if (!tripOptional.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -305,6 +313,7 @@ public class TripController {
                                                                       HttpServletResponse response) {
 
         jwtCheckService.checkJwt(request, response);
+
         Optional<TripDate> tripDateOptional = tripDateRepository.findById(tripDateId);
 
         if (tripDateOptional.isPresent()) {
@@ -399,6 +408,7 @@ public class TripController {
                                                      HttpServletResponse response) {
 
         jwtCheckService.checkJwt(request, response);
+
         try {
             Optional<TripDate> tripDateOptional = tripDateRepository.findById(tripDateId);
 
@@ -438,6 +448,7 @@ public class TripController {
                                                         HttpServletResponse response) {
 
         jwtCheckService.checkJwt(request, response);
+
         try {
             Optional<Trip> tripOptional = tripRepository.findById(tripId);
             if (tripOptional.isPresent()) {

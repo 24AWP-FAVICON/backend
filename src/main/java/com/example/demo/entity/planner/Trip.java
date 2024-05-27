@@ -45,6 +45,7 @@ public class Trip {
 
 //    private Long roomId;
 
+
     // 세부일정 (TripDate) 엔티티와 연결
     @OneToMany(mappedBy = "trip")
     @JsonManagedReference // 순환 참조 방지 (부모 엔티티에서 자식 엔티티를 직렬화)
