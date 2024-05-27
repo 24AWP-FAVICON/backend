@@ -13,6 +13,14 @@ import java.util.logging.Logger;
 @RequiredArgsConstructor
 public class ChatMessageService {
 
+    private final ChatMessageRepository chatMessageRepository;
+
+    // 메시지를 DB에 저장
+    public ChatMessage saveMessage(ChatMessage message) {
+        message.setSendAt(LocalDateTime.now());
+        return chatMessageRepository.save(message);
+    }
+
 //    private final ChatMessageRepository chatMessageRepository;
 //    private final static Logger log = Logger.getLogger(ChatMessageService.class.getName());
 //

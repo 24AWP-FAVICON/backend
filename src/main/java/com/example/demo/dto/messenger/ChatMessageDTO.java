@@ -2,6 +2,8 @@ package com.example.demo.dto.messenger;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -12,6 +14,6 @@ public class ChatMessageDTO {
     private String senderId;
     private Long roomId;
     private String content;
-    private String sendAt;
+    private LocalDateTime sendAt;
     private int unreadCount;
 }

@@ -12,4 +12,7 @@ public interface ChatJoinRepository extends JpaRepository<ChatJoin, ChatJoinId> 
     Optional<ChatJoin> findByRoomIdAndUserId(Long roomId, String userId);
     List<ChatJoin> findAllByRoomId(Long roomId);
     int countByRoomId(Long roomId);
+
+    // 채팅방에 사용자 존재 유무 판단
+    boolean existsByRoomIdAndUserId(Long roomId, String userId);
 }

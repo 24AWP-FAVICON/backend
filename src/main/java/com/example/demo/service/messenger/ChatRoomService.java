@@ -40,6 +40,7 @@ public class ChatRoomService {
     // 채팅방 생성
     @Transactional
     public ChatRoomResponseDTO createChatRoom(ChatRoomRequestDTO.CreateDTO requestDTO) {
+
         // 먼저 ChatRoom 엔티티를 저장
         ChatRoom chatRoom = ChatRoom.builder()
                 .name(requestDTO.getName())
@@ -103,6 +104,12 @@ public class ChatRoomService {
         ChatJoin chatJoin = chatJoinRepository.findByRoomIdAndUserId(roomId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found in chat room"));
         chatJoinRepository.delete(chatJoin);
+    }
+
+    // 유저 채팅방 내 존재 유무 판단
+    @Transactional
+    public boolean isUserInChatRoom(Long roomId, String userId) {
+        return chatJoinRepository.existsByRoomIdAndUserId(roomId, userId);
     }
 
     // 메시지
