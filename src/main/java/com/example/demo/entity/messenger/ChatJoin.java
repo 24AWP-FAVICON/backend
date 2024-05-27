@@ -18,8 +18,6 @@ public class ChatJoin {
     @Id
     private Long roomId;
 
-    private int msgCount;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "roomId", insertable = false, updatable = false)
     private ChatRoom room;
@@ -31,6 +29,5 @@ public class ChatJoin {
     public ChatJoin(String userId, Long roomId) {
         this.userId = userId;
         this.roomId = roomId;
-        this.msgCount = 0;
     }
 }

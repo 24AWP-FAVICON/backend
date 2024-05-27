@@ -2,6 +2,7 @@ package com.example.demo.entity.messenger;
 
 import lombok.*;
 
+// 테스트용
 @Getter
 @Setter
 @Builder

@@ -1,21 +1,14 @@
-//package com.example.demo.config;
-//
-//import com.example.demo.entity.messenger.ChatMessage;
-//import com.example.demo.entity.messenger.MessageType;
-//import com.example.demo.entity.users.user.User;
-//import com.example.demo.repository.users.user.UserRepository;
-//import lombok.RequiredArgsConstructor;
-//import lombok.extern.slf4j.Slf4j;
-//import org.springframework.context.event.EventListener;
-//import org.springframework.messaging.simp.SimpMessageSendingOperations;
-//import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-//import org.springframework.stereotype.Component;
-//import org.springframework.web.socket.messaging.SessionDisconnectEvent;
-//
-//@Component
-//@Slf4j
-//@RequiredArgsConstructor
-//public class WebSocketEventListener {
+package com.example.demo.config;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+@Component
+@Slf4j
+@RequiredArgsConstructor
+public class WebSocketEventListener {
+    // 추후 RabbitMQ 도입 시 사용할 부분
 //
 //    private final SimpMessageSendingOperations messagingTemplate;
 //    private final UserRepository userRepository;
@@ -36,4 +29,4 @@
 //            messagingTemplate.convertAndSend("/topic/public", chatMessage);
 //        }
 //    }
-//}
+}

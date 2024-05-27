@@ -9,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -23,7 +26,7 @@ public class MessageController {
     private final SimpMessageSendingOperations simpMessageSendingOperations;
 
     @MessageMapping("/message") // 1. 클라이언트에서 /pub/hello로 메시지 발행
-    public void message(ChatMessage message){
+    public void message(ChatMessage message) {
         // 2. 메시지에 정의된 채널 id에 메시지 보냄.
         // /sub/channel/{roomId} 에 구독중인 클라이언트에게 메시지를 보냄
         log.info("Received Message: {}", message);
@@ -42,6 +45,12 @@ public class MessageController {
         }
     }
 
+    // 메시지 읽음 여부 표시
+    @PutMapping("/messages/read/{roomId}")
+    public void markMessagesAsRead(@PathVariable Long roomId, @RequestParam String userId) {
+        chatMessageService.markMessagesAsRead(roomId, userId);
+    }
+
 //    @MessageMapping("/send") // 1. 클라이언트에서 /pub/hello로 메시지 발행
 //    public void sendMessage(Message message){
 //        // 2. 메시지에 정의된 채널 id에 메시지 보냄.
@@ -49,20 +58,5 @@ public class MessageController {
 //        log.info("Received Message: {}", message);
 //        simpMessageSendingOperations.convertAndSend("/sub/channel/" + message.getChannelId(), message);
 //
-//    }
-
-//    @MessageMapping("/chat.sendMessage")
-//    @SendTo("/topic/public")
-//    public ChatMessage sendMessage(@Payload ChatMessage chatMessage) {
-//        chatMessage.setSendAt(LocalDateTime.now());
-//        chatMessageService.saveMessage(chatMessage);
-//        return chatMessage;
-//    }
-//
-//    @MessageMapping("/chat.addUser")
-//    @SendTo("/topic/public")
-//    public ChatMessage addUser(@Payload ChatMessage chatMessage, SimpMessageHeaderAccessor headerAccessor) {
-//        headerAccessor.getSessionAttributes().put("username", chatMessage.getUser().getUserId());
-//        return chatMessage;
 //    }
 }

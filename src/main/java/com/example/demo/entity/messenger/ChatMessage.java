@@ -25,8 +25,6 @@ public class ChatMessage {
     @JoinColumn(name = "room_id", nullable = false)
     private ChatRoom room; // channel Id
 
-    //private MessageType type;
-    private String type;
     private String content; // data
     private LocalDateTime sendAt;
     private int unreadCount;
