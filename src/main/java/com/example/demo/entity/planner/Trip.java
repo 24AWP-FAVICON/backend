@@ -19,7 +19,7 @@ import java.util.List;
 public class Trip {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long tripId;
 
     @ManyToMany
@@ -43,7 +43,8 @@ public class Trip {
     @Column(nullable = true)
     private Long budget;
 
-    private Long roomId;
+//    private Long roomId;
+
 
     // 세부일정 (TripDate) 엔티티와 연결
     @OneToMany(mappedBy = "trip")

@@ -44,19 +44,19 @@ public class User {
     @JsonIgnore
     private List<Trip> tripList;
 
-    @ManyToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<Post> postList;
 
-    @ManyToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<Follow> followerList;
 
-    @ManyToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<Follow> followingList;
 
-    @ManyToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<Block> blockList;
 

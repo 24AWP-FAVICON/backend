@@ -15,7 +15,7 @@ import lombok.*;
 public class Accommodation {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long accommodationId;
 
     @OneToOne(fetch = FetchType.LAZY)

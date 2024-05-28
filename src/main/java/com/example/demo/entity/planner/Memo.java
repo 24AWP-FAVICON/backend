@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class Memo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memoId;
 
     @Column(name = "trip_id", nullable = false)

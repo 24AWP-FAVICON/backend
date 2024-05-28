@@ -14,6 +14,10 @@ import com.example.demo.repository.planner.LocationRepository;
 import com.example.demo.repository.planner.TripDateRepository;
 import com.example.demo.repository.planner.TripRepository;
 import com.example.demo.repository.users.user.UserRepository;
+import com.example.demo.service.jwt.JwtCheckService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,12 +41,17 @@ public class TripController {
     private final TripDateRepository tripDateRepository;
     private final AccommodationRepository accommodationRepository;
     private final LocationRepository locationRepository;
+    private final JwtCheckService jwtCheckService;
+
 
     /*
     전체 여행 계획 조회
      */
     @GetMapping("/trip")
-    public ResponseEntity<List<Trip>> getAllTrips() {
+    public ResponseEntity<List<Trip>> getAllTrips(HttpServletRequest request,
+                                                  HttpServletResponse response) {
+        jwtCheckService.checkJwt(request, response);
+
         try {
             List<Trip> trips = tripRepository.findAll();
 
@@ -59,7 +68,10 @@ public class TripController {
     전체 여행 계획 생성
      */
     @PostMapping("/trip")
-    public ResponseEntity<?> addNewTrip(@Valid @RequestBody TripCreationDTO tripDTO) {
+    public ResponseEntity<?> addNewTrip(@Valid @RequestBody TripCreationDTO tripDTO,
+                                        HttpServletRequest request,
+                                        HttpServletResponse response) {
+       jwtCheckService.checkJwt(request, response);
        try {
            // 1. 참여자 확인
            List<User> participants = userRepository.findAllById(tripDTO.getParticipantIds());
@@ -92,7 +104,10 @@ public class TripController {
     특정 여행 계획 조회
      */
     @GetMapping("/trip/{tripId}")
-    public ResponseEntity<Trip> getTripById(@PathVariable("tripId") Long tripId) {
+    public ResponseEntity<Trip> getTripById(@PathVariable("tripId") Long tripId,
+                                            HttpServletRequest request,
+                                            HttpServletResponse response) {
+        jwtCheckService.checkJwt(request, response);
         Optional<Trip> tripOptional = tripRepository.findById(tripId);
 
         if (tripOptional.isPresent()) {
@@ -107,7 +122,13 @@ public class TripController {
     특정 여행 계획 수정
      */
     @PutMapping("/trip/{tripId}")
-    public ResponseEntity<Trip> updateTripById(@PathVariable("tripId") Long tripId, @RequestBody Trip trip) {
+    public ResponseEntity<Trip> updateTripById(@PathVariable("tripId") Long tripId,
+                                               @RequestBody Trip trip,
+                                               HttpServletRequest request,
+                                               HttpServletResponse response) {
+
+        jwtCheckService.checkJwt(request, response);
+
         Optional<Trip> tripOptional = tripRepository.findById(tripId);
 
         if (tripOptional.isPresent()) {
@@ -139,7 +160,13 @@ public class TripController {
     특정 여행 계획 일부 수정
      */
     @PatchMapping("/trip/{tripId}")
-    public ResponseEntity<Trip> updateTripById(@PathVariable("tripId") Long tripId, @RequestBody TripPatchDTO tripPatchDTO) {
+    public ResponseEntity<Trip> updateTripById(@PathVariable("tripId") Long tripId,
+                                               @RequestBody TripPatchDTO tripPatchDTO,
+                                               HttpServletRequest request,
+                                               HttpServletResponse response) {
+
+        jwtCheckService.checkJwt(request, response);
+
         Optional<Trip> tripOptional = tripRepository.findById(tripId);
 
         if (tripOptional.isPresent()) {
@@ -166,7 +193,11 @@ public class TripController {
     특정 여행 계획 삭제
      */
     @DeleteMapping("/trip/{tripId}")
-    public ResponseEntity<String> deleteTripById(@PathVariable("tripId") Long tripId) {
+    public ResponseEntity<String> deleteTripById(@PathVariable("tripId") Long tripId,
+                                                 HttpServletRequest request,
+                                                 HttpServletResponse response) {
+        jwtCheckService.checkJwt(request, response);
+
         try {
             tripRepository.deleteById(tripId);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -179,7 +210,11 @@ public class TripController {
     특정 여행 계획 내 세부 일정 조회
     */
     @GetMapping("/trip/{tripId}/detail")
-    ResponseEntity<List<TripDate>> getTripDetails(@PathVariable("tripId") Long tripId) {
+    ResponseEntity<List<TripDate>> getTripDetails(@PathVariable("tripId") Long tripId,
+                                                  HttpServletRequest request,
+                                                  HttpServletResponse response) {
+
+        jwtCheckService.checkJwt(request, response);
         Optional<Trip> tripDetails = tripRepository.findById(tripId);
         if (!tripDetails.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -193,7 +228,13 @@ public class TripController {
      */
     @PostMapping("/trip/{tripId}/detail")
     @Transactional
-    ResponseEntity<?> addTripDetail(@PathVariable("tripId") Long tripId, @RequestBody TripDateDetailsDTO tripDateDetailsDTO) {
+    ResponseEntity<?> addTripDetail(@PathVariable("tripId") Long tripId,
+                                    @RequestBody TripDateDetailsDTO tripDateDetailsDTO,
+                                    HttpServletRequest request,
+                                    HttpServletResponse response) {
+
+        jwtCheckService.checkJwt(request, response);
+
         try {
             Optional<Trip> tripOptional = tripRepository.findById(tripId);
             if (tripOptional.isEmpty()) {
@@ -241,7 +282,13 @@ public class TripController {
     특정 여행 계획 내 세부 일정 조회
      */
     @GetMapping("/trip/{tripId}/detail/{tripDateId}")
-    public ResponseEntity<TripDate> getTripDateById(@PathVariable("tripId") Long tripId, @PathVariable("tripDateId") Long tripDateId) {
+    public ResponseEntity<TripDate> getTripDateById(@PathVariable("tripId") Long tripId,
+                                                    @PathVariable("tripDateId") Long tripDateId,
+                                                    HttpServletRequest request,
+                                                    HttpServletResponse response) {
+
+        jwtCheckService.checkJwt(request, response);
+
         Optional<Trip> tripOptional = tripRepository.findById(tripId);
         if (!tripOptional.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -260,8 +307,13 @@ public class TripController {
      */
     @PutMapping("/trip/{tripId}/detail/{tripDateId}")
     public ResponseEntity<TripDate> updateCompleteTripDateDetailById( @PathVariable("tripId") Long tripId,
-                                                              @PathVariable("tripDateId") Long tripDateId,
-                                                              @RequestBody TripDateDetailsDTO tripDateDetailsDTO) {
+                                                                      @PathVariable("tripDateId") Long tripDateId,
+                                                                      @RequestBody TripDateDetailsDTO tripDateDetailsDTO,
+                                                                      HttpServletRequest request,
+                                                                      HttpServletResponse response) {
+
+        jwtCheckService.checkJwt(request, response);
+
         Optional<TripDate> tripDateOptional = tripDateRepository.findById(tripDateId);
 
         if (tripDateOptional.isPresent()) {
@@ -299,7 +351,11 @@ public class TripController {
     @PatchMapping("/trip/{tripId}/detail/{tripDateId}")
     public ResponseEntity<TripDate> updateTripDateDetailById(@PathVariable("tripId") Long tripId,
                                                              @PathVariable("tripDateId") Long tripDateId,
-                                                             @RequestBody TripDateDetailsDTO tripDateDetailsDTO) {
+                                                             @RequestBody TripDateDetailsDTO tripDateDetailsDTO,
+                                                             HttpServletRequest request,
+                                                             HttpServletResponse response) {
+
+        jwtCheckService.checkJwt(request, response);
         Optional<TripDate> tripDateOptional = tripDateRepository.findById(tripDateId);
 
         if (tripDateOptional.isPresent()) {
@@ -346,7 +402,13 @@ public class TripController {
     특정 여행 계획 내 세부 일정 삭제
      */
     @DeleteMapping("/trip/{tripId}/detail/{tripDateId}")
-    public ResponseEntity<String> deleteTripDateById(@PathVariable("tripId") Long tripId, @PathVariable("tripDateId") Long tripDateId) {
+    public ResponseEntity<String> deleteTripDateById(@PathVariable("tripId") Long tripId,
+                                                     @PathVariable("tripDateId") Long tripDateId,
+                                                     HttpServletRequest request,
+                                                     HttpServletResponse response) {
+
+        jwtCheckService.checkJwt(request, response);
+
         try {
             Optional<TripDate> tripDateOptional = tripDateRepository.findById(tripDateId);
 
@@ -380,7 +442,13 @@ public class TripController {
     다른 유저와 여행 계획 공유 및 초대
      */
     @PostMapping("/trip/{tripId}/share")
-    public ResponseEntity<String> shareTripPlanWithUser(@PathVariable("tripId") Long tripId, @RequestBody UserIdsDTO userIdsDTO) {
+    public ResponseEntity<String> shareTripPlanWithUser(@PathVariable("tripId") Long tripId,
+                                                        @RequestBody UserIdsDTO userIdsDTO,
+                                                        HttpServletRequest request,
+                                                        HttpServletResponse response) {
+
+        jwtCheckService.checkJwt(request, response);
+
         try {
             Optional<Trip> tripOptional = tripRepository.findById(tripId);
             if (tripOptional.isPresent()) {
