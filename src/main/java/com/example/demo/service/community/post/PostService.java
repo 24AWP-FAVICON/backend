@@ -40,6 +40,8 @@ public class PostService {
 
         Post post = postRepository.save(postRequestDto.toEntity(user));
 
+        attachmentFileService.setAttachmentsByContent(post);
+
         // 새 게시글 생성에 대해서 이 회원을 팔로우하고 있는 회원에게 알림 생성
         alarmService.createFollowersCreatePostAlarm(
                 post.getPostId(),
