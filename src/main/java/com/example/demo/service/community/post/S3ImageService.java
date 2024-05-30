@@ -1,5 +1,6 @@
 package com.example.demo.service.community.post;
 
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
@@ -83,8 +84,8 @@ public class S3ImageService {
                     new PutObjectRequest(bucketName, s3FileName, byteArrayInputStream, metadata)
                             .withCannedAcl(CannedAccessControlList.PublicRead);
             amazonS3.putObject(putObjectRequest); // s3에 이미지 저장
-        }catch (Exception e){
-            throw new IllegalArgumentException();
+        }catch (SdkClientException e){
+            throw new SdkClientException(e.getMessage(),e);
         }finally {
             byteArrayInputStream.close();
             is.close();
