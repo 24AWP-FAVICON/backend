@@ -121,7 +121,7 @@ public class PostController {
 
         String multipartFilePath = s3ImageService.upload(image);
         attachmentFileService.uploadImageMetadata(multipartFilePath, image, postId, userId);
-        return ResponseEntity.ok(multipartFilePath);
+        return ResponseEntity.ok("![]("+multipartFilePath+")");
     }
 
     //s3에 저장된 파일 삭제.
