@@ -69,8 +69,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(24*60*60); // 쿠키 유효시간 24시간으로 설정
-        cookie.setHttpOnly(true); // XSS 공격 방어
-        cookie.setSecure(true); //https 옵션 설정
         cookie.setPath("/"); // 모든 곳에서 쿠키열람이 가능하도록 설정
 
         return cookie;
