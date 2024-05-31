@@ -58,16 +58,16 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         redisUtil.setData(accessToken, refreshToken); // 레디스에 리프레시 토큰 저장
 
         response.addHeader("Authorization", "Bearer " + accessToken); // access token은 Authorization 헤더에
-        response.addCookie(createCookie(accessToken)); // accessToken은 쿠키에
-        response.addCookie(createCookie(refreshToken)); // refresh token은 쿠키에
+        response.addCookie(createCookie("access",accessToken)); // accessToken은 쿠키에
+        response.addCookie(createCookie("refresh",refreshToken)); // refresh token은 쿠키에
         response.setStatus(HttpStatus.OK.value());
         response.getWriter().write("SOCIAL_LOGIN_SUCCESS");
         response.sendRedirect("http://localhost:3000/login/success");
     }
 
-    private Cookie createCookie(String value) {
+    private Cookie createCookie(String key ,String value) {
 
-        Cookie cookie = new Cookie("refresh", value);
+        Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(24*60*60); // 쿠키 유효시간 24시간으로 설정
         cookie.setHttpOnly(true); // XSS 공격 방어
         cookie.setSecure(true); //https 옵션 설정
