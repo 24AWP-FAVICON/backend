@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController()
-@RequestMapping("/messeneger")
+@RequestMapping("/messenger")
 @RequiredArgsConstructor
 @Slf4j
 public class ChatRoomController {
@@ -44,6 +44,8 @@ public class ChatRoomController {
     @GetMapping("/chatRooms")
     public ResponseEntity<List<ChatRoomResponseDTO>> getAllChatRooms(HttpServletRequest request,
                                                                      HttpServletResponse response) {
+        logger.info("Received request to get all chat rooms");
+
         try {
             String userId = jwtCheckService.checkJwt(request, response);
             List<ChatRoomResponseDTO> responseDTOList = chatRoomService.findAllChatRoomsByUserId(userId);
