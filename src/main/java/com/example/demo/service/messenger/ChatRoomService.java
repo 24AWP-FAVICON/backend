@@ -1,5 +1,6 @@
 package com.example.demo.service.messenger;
 
+import com.example.demo.dto.messenger.ChatMessageDTO;
 import com.example.demo.dto.messenger.ChatRoomRequestDTO;
 import com.example.demo.dto.messenger.ChatRoomResponseDTO;
 import com.example.demo.entity.messenger.ChatJoin;
@@ -30,6 +31,9 @@ public class ChatRoomService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ChatMessageRepository chatMessageRepository;
 
     // 채팅방 생성
     @Transactional
@@ -76,7 +80,7 @@ public class ChatRoomService {
                 .collect(Collectors.toList());
     }
 
-    // 특정 채팅방 조회
+    // 특정 채팅방 정보 조회
     @Transactional
     public ChatRoomResponseDTO findChatRoomById(Long roomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
@@ -84,6 +88,15 @@ public class ChatRoomService {
         List<ChatJoin> chatJoins = chatJoinRepository.findAllByRoomId(roomId);
         List<String> users = chatJoins.stream().map(ChatJoin::getUserId).collect(Collectors.toList());
         return new ChatRoomResponseDTO(chatRoom.getRoomId(), chatRoom.getName(), chatRoom.getCreateAt(), users);
+    }
+
+    // 특정 채팅방 내 모든 대화 내역 조회
+    @Transactional
+    public List<ChatMessageDTO> getChatMessagesByRoomId(Long roomId) {
+        List<ChatMessage> messages = chatMessageRepository.findByRoom_RoomId(roomId);
+        return messages.stream()
+                .map(ChatMessage::toDTO)
+                .collect(Collectors.toList());
     }
 
     // 특정 채팅방에 사용자 초대

@@ -1,5 +1,6 @@
 package com.example.demo.controller.messenger;
 
+import com.example.demo.dto.messenger.ChatMessageDTO;
 import com.example.demo.dto.messenger.ChatRoomRequestDTO;
 import com.example.demo.dto.messenger.ChatRoomResponseDTO;
 import com.example.demo.service.jwt.JwtCheckService;
@@ -56,7 +57,7 @@ public class ChatRoomController {
         }
     }
 
-    // 특정 채팅방 조회
+    // 특정 채팅방 정보 조회
     @GetMapping("/chatRoom/{roomId}")
     public ResponseEntity<ChatRoomResponseDTO> getChatRoomById(@PathVariable("roomId") Long roomId,
                                                                HttpServletRequest request,
@@ -71,16 +72,17 @@ public class ChatRoomController {
         }
     }
 
+    // 특정 채팅방 내 대화 내역 조회
     @GetMapping("/chatRoom/{roomId}/messages")
-    public ResponseEntity<ChatRoomResponseDTO> getChatRoomContentsById(@PathVariable("roomId") Long roomId,
+    public ResponseEntity<List<ChatMessageDTO>> getChatRoomMessagesById(@PathVariable("roomId") Long roomId,
                                                                HttpServletRequest request,
                                                                HttpServletResponse response) {
         try {
             jwtCheckService.checkJwt(request, response);
-            ChatRoomResponseDTO responseDTO = chatRoomService.findChatRoomById(roomId);
-            return ResponseEntity.ok(responseDTO);
+            List<ChatMessageDTO> messages = chatRoomService.getChatMessagesByRoomId(roomId);
+            return ResponseEntity.ok(messages);
         } catch (Exception e) {
-            logger.error("Error retrieving chat room", e);
+            logger.error("Error retrieving chat room messages", e);
             return ResponseEntity.internalServerError().body(null);
         }
     }
