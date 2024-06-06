@@ -1,5 +1,6 @@
 package com.example.demo.controller.messenger;
 
+import com.example.demo.dto.messenger.ChatMessageDTO;
 import com.example.demo.dto.messenger.ChatRoomRequestDTO;
 import com.example.demo.dto.messenger.ChatRoomResponseDTO;
 import com.example.demo.service.jwt.JwtCheckService;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController()
-@RequestMapping("/messeneger")
+@RequestMapping("/messenger")
 @RequiredArgsConstructor
 @Slf4j
 public class ChatRoomController {
@@ -44,6 +45,8 @@ public class ChatRoomController {
     @GetMapping("/chatRooms")
     public ResponseEntity<List<ChatRoomResponseDTO>> getAllChatRooms(HttpServletRequest request,
                                                                      HttpServletResponse response) {
+        logger.info("Received request to get all chat rooms");
+
         try {
             String userId = jwtCheckService.checkJwt(request, response);
             List<ChatRoomResponseDTO> responseDTOList = chatRoomService.findAllChatRoomsByUserId(userId);
@@ -54,7 +57,7 @@ public class ChatRoomController {
         }
     }
 
-    // 특정 채팅방 조회
+    // 특정 채팅방 정보 조회
     @GetMapping("/chatRoom/{roomId}")
     public ResponseEntity<ChatRoomResponseDTO> getChatRoomById(@PathVariable("roomId") Long roomId,
                                                                HttpServletRequest request,
@@ -69,6 +72,20 @@ public class ChatRoomController {
         }
     }
 
+    // 특정 채팅방 내 대화 내역 조회
+    @GetMapping("/chatRoom/{roomId}/messages")
+    public ResponseEntity<List<ChatMessageDTO>> getChatRoomMessagesById(@PathVariable("roomId") Long roomId,
+                                                               HttpServletRequest request,
+                                                               HttpServletResponse response) {
+        try {
+            jwtCheckService.checkJwt(request, response);
+            List<ChatMessageDTO> messages = chatRoomService.getChatMessagesByRoomId(roomId);
+            return ResponseEntity.ok(messages);
+        } catch (Exception e) {
+            logger.error("Error retrieving chat room messages", e);
+            return ResponseEntity.internalServerError().body(null);
+        }
+    }
     // 특정 채팅방 이름 변경
     @PutMapping("/chatRoom/{roomId}/name")
     public ResponseEntity<Void> updateChatRoomName(@PathVariable("roomId") Long roomId,

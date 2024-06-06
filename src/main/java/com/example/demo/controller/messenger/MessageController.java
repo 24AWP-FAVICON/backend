@@ -33,13 +33,14 @@ public class MessageController {
     public void message(ChatMessage message
 //                        HttpServletRequest request,
 //                        HttpServletResponse response
-                            ) {
+    ) {
         // JWT 토큰 검증
         //String userId = jwtCheckService.checkJwt(request, response);
 
         // 메시지에 정의된 채널 id에 메시지 보냄.
         // /sub/channel/{roomId} 에 구독중인 클라이언트에게 메시지를 보냄
-        log.info("Received Message: {}", message);
+        log.info("Received Message: {}", message.getContent());
+        log.info("Sender: {}", message.getUser());
         // 테스트: simpMessageSendingOperations.convertAndSend("/sub/channel/" + message.getRoom().getRoomId(), message);
 
         // 채팅방에 사용자가 있는지 확인
@@ -63,13 +64,4 @@ public class MessageController {
         String userId = jwtCheckService.checkJwt(request, response);
         chatMessageService.markMessagesAsRead(roomId, userId);
     }
-
-//    @MessageMapping("/send") // 1. 클라이언트에서 /pub/hello로 메시지 발행
-//    public void sendMessage(Message message){
-//        // 2. 메시지에 정의된 채널 id에 메시지 보냄.
-//        // /sub/channel/채널아이디 에 구독중인 클라이언트에게 메시지를 보냄
-//        log.info("Received Message: {}", message);
-//        simpMessageSendingOperations.convertAndSend("/sub/channel/" + message.getChannelId(), message);
-//
-//    }
 }
