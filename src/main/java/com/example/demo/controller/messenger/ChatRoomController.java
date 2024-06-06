@@ -71,6 +71,19 @@ public class ChatRoomController {
         }
     }
 
+    @GetMapping("/chatRoom/{roomId}/messages")
+    public ResponseEntity<ChatRoomResponseDTO> getChatRoomContentsById(@PathVariable("roomId") Long roomId,
+                                                               HttpServletRequest request,
+                                                               HttpServletResponse response) {
+        try {
+            jwtCheckService.checkJwt(request, response);
+            ChatRoomResponseDTO responseDTO = chatRoomService.findChatRoomById(roomId);
+            return ResponseEntity.ok(responseDTO);
+        } catch (Exception e) {
+            logger.error("Error retrieving chat room", e);
+            return ResponseEntity.internalServerError().body(null);
+        }
+    }
     // 특정 채팅방 이름 변경
     @PutMapping("/chatRoom/{roomId}/name")
     public ResponseEntity<Void> updateChatRoomName(@PathVariable("roomId") Long roomId,

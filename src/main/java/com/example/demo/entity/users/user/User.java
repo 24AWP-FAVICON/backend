@@ -21,7 +21,7 @@ import java.util.List;
 public class User {
 
     @Id
-    @Column(length = 50)
+    @Column
     private String userId;
 
     @Column(nullable = false, length = 50, unique = true)
