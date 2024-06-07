@@ -55,22 +55,20 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String accessToken = jwtUtil.createToken("access", userId, role, 1000*60*60L); // access token 생성 유효기간 1시간
         String refreshToken = jwtUtil.createToken("refresh", userId, role, 1000*60*60*24L); // refresh token 생성 유효기간 24시간
 
-        redisUtil.setData(accessToken, refreshToken); // 레디스에 리프레시 토큰 저장
+        redisUtil.setData(accessToken, refreshToken); // 레디스에 access token과 refresh token 저장
 
         response.addHeader("Authorization", "Bearer " + accessToken); // access token은 Authorization 헤더에
-        response.addCookie(createCookie("access",accessToken)); // accessToken은 쿠키에
-        response.addCookie(createCookie("refresh",refreshToken)); // refresh token은 쿠키에
+        response.addCookie(createCookie("access", accessToken)); // accessToken은 쿠키에
+        response.addCookie(createCookie("refresh", refreshToken)); // refresh token은 쿠키에
         response.setStatus(HttpStatus.OK.value());
         response.getWriter().write("SOCIAL_LOGIN_SUCCESS");
         response.sendRedirect("http://localhost:3000/login/success");
     }
 
     private Cookie createCookie(String key ,String value) {
-
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(24*60*60); // 쿠키 유효시간 24시간으로 설정
         cookie.setPath("/"); // 모든 곳에서 쿠키열람이 가능하도록 설정
-
         return cookie;
     }
 }
