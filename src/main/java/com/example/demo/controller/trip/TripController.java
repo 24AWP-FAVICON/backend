@@ -84,17 +84,12 @@ public class TripController {
      */
     @GetMapping("/trip/{tripId}")
     public ResponseEntity<Trip> getTripById(@PathVariable("tripId") Long tripId,
-                                            HttpServletRequest request,
-                                            HttpServletResponse response) {
+                                            HttpServletRequest request, HttpServletResponse response) {
         jwtCheckService.checkJwt(request, response);
-        Optional<Trip> tripOptional = tripRepository.findById(tripId);
 
-        if (tripOptional.isPresent()) {
-            return new ResponseEntity<>(tripOptional.get(), HttpStatus.OK);
-        }
-        else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        Optional<Trip> tripOptional = tripPlannerService.getTripById(tripId);
+        return tripOptional.map(trip -> new ResponseEntity<>(trip, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     /*

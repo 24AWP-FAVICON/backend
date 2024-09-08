@@ -44,8 +44,6 @@ public class TripPlannerService {
         return tripRepository.save(newTrip);
     }
 
-
-
     @Transactional(readOnly = true)
     public Optional<Trip> getTripById(Long tripId) {
         return tripRepository.findById(tripId);
