@@ -15,6 +15,7 @@ import com.example.demo.repository.planner.TripDateRepository;
 import com.example.demo.repository.planner.TripRepository;
 import com.example.demo.repository.users.user.UserRepository;
 import com.example.demo.service.jwt.JwtCheckService;
+import com.example.demo.service.tripPlanner.TripPlannerService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -42,19 +43,16 @@ public class TripController {
     private final AccommodationRepository accommodationRepository;
     private final LocationRepository locationRepository;
     private final JwtCheckService jwtCheckService;
-
+    private final TripPlannerService tripPlannerService;
 
     /*
     전체 여행 계획 조회
      */
     @GetMapping("/trip")
-    public ResponseEntity<List<Trip>> getAllTrips(HttpServletRequest request,
-                                                  HttpServletResponse response) {
+    public ResponseEntity<List<Trip>> getAllTrips(HttpServletRequest request, HttpServletResponse response) {
         jwtCheckService.checkJwt(request, response);
-
         try {
-            List<Trip> trips = tripRepository.findAll();
-
+            List<Trip> trips = tripPlannerService.getAllTrips();
             if (trips.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
@@ -68,36 +66,17 @@ public class TripController {
     전체 여행 계획 생성
      */
     @PostMapping("/trip")
-    public ResponseEntity<?> addNewTrip(@Valid @RequestBody TripCreationDTO tripDTO,
-                                        HttpServletRequest request,
-                                        HttpServletResponse response) {
-       jwtCheckService.checkJwt(request, response);
-       try {
-           // 1. 참여자 확인
-           List<User> participants = userRepository.findAllById(tripDTO.getParticipantIds());
-           if (tripDTO.getParticipantIds() == null || tripDTO.getParticipantIds().isEmpty()) {
-               return new ResponseEntity<>("Participant IDs must be provided.", HttpStatus.BAD_REQUEST);
-           }
+    public ResponseEntity<Trip> addNewTrip(@RequestBody TripCreationDTO tripDTO,
+                                           HttpServletRequest request, HttpServletResponse response) {
+        jwtCheckService.checkJwt(request, response);
 
-           // 2. Trip 객체 생성
-           Trip newTrip = new Trip();
-           newTrip.setTripName(tripDTO.getTripName());
-           newTrip.setTripArea(tripDTO.getTripArea());
-           newTrip.setStartDate(tripDTO.getStartDate());
-           newTrip.setEndDate(tripDTO.getEndDate());
-           newTrip.setBudget(tripDTO.getBudget());
-           newTrip.setParticipants(participants);
-
-           // 3. 저장
-           Trip savedTrip = tripRepository.save(newTrip);
-
-           return new ResponseEntity<>(savedTrip, HttpStatus.CREATED);
-       }
-       catch (Exception e){
-           e.printStackTrace();
-           return new ResponseEntity<>("Internal Server Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-
-       }
+        try {
+            Trip createdTrip = tripPlannerService.createTrip(tripDTO);
+            return new ResponseEntity<>(createdTrip, HttpStatus.CREATED);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /*
