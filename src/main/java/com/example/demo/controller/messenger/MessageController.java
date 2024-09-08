@@ -2,17 +2,16 @@ package com.example.demo.controller.messenger;
 
 import com.example.demo.dto.messenger.ChatMessageDTO;
 import com.example.demo.entity.messenger.ChatMessage;
-import com.example.demo.entity.messenger.Message;
-import com.example.demo.service.jwt.JwtCheckService;
+import com.example.demo.entity.users.user.User;
 import com.example.demo.service.messenger.ChatRoomService;
 import com.example.demo.service.messenger.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +24,6 @@ public class MessageController {
 
     private final ChatRoomService chatRoomService;
     private final ChatMessageService chatMessageService;
-    private final JwtCheckService jwtCheckService;
 
     private final SimpMessageSendingOperations simpMessageSendingOperations;
 
@@ -60,8 +58,9 @@ public class MessageController {
     @PutMapping("/messages/read/{roomId}")
     public void markMessagesAsRead(@PathVariable Long roomId,
                                    HttpServletRequest request,
-                                   HttpServletResponse response) {
-        String userId = jwtCheckService.checkJwt(request, response);
+                                   HttpServletResponse response,
+                                   Authentication authentication) {
+        String userId = ((User) authentication.getPrincipal()).getUserId();
         chatMessageService.markMessagesAsRead(roomId, userId);
     }
 }
