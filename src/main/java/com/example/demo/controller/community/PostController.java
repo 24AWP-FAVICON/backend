@@ -3,14 +3,15 @@ package com.example.demo.controller.community;
 import com.example.demo.dto.community.post.PostRequestDto;
 import com.example.demo.dto.community.post.PostResponseDto;
 import com.example.demo.entity.community.post.Post;
+import com.example.demo.entity.users.user.User;
 import com.example.demo.service.community.post.AttachmentFileService;
-import com.example.demo.service.jwt.JwtCheckService;
 import com.example.demo.service.community.post.PostService;
 import com.example.demo.service.community.post.S3ImageService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +22,6 @@ import java.util.List;
 @RestController
 public class PostController {
     private final PostService postService;
-    private final JwtCheckService jwtCheckService;
     private final S3ImageService s3ImageService;
     private final AttachmentFileService attachmentFileService;
 
@@ -29,7 +29,6 @@ public class PostController {
     @GetMapping("/posts")
     public ResponseEntity<List<PostResponseDto>> getAllPosts(HttpServletRequest request,
                                                              HttpServletResponse response) {
-        jwtCheckService.checkJwt(request, response);
         return ResponseEntity.ok(postService.getAllPosts());
     }
 
@@ -37,9 +36,10 @@ public class PostController {
     @GetMapping("/post/{postId}")
     public ResponseEntity<PostResponseDto> getPostByPostId(@PathVariable Long postId,
                                                            HttpServletRequest request,
-                                                           HttpServletResponse response) {
+                                                           HttpServletResponse response,
+                                                           Authentication authentication) {
 
-        String userId = jwtCheckService.checkJwt(request, response);
+        String userId = ((User) authentication.getPrincipal()).getUserId();
         return ResponseEntity.ok(postService.getPostByPostId(postId, userId));
     }
 
@@ -47,8 +47,9 @@ public class PostController {
     @GetMapping("/posts/user/{requestedUserId}")
     public ResponseEntity<List<PostResponseDto>> getAllPostsByUserId(@PathVariable String requestedUserId,
                                                                      HttpServletRequest request,
-                                                                     HttpServletResponse response) {
-        String userId = jwtCheckService.checkJwt(request, response);
+                                                                     HttpServletResponse response,
+                                                                     Authentication authentication) {
+        String userId = ((User) authentication.getPrincipal()).getUserId();
 
         return ResponseEntity.ok(postService.getPostsByUserId(requestedUserId, userId));
     }
@@ -57,8 +58,9 @@ public class PostController {
     @GetMapping("/post/{postId}/like")
     public ResponseEntity<String> increaseLikes(@PathVariable Long postId,
                                                 HttpServletRequest request,
-                                                HttpServletResponse response) {
-        String userId = jwtCheckService.checkJwt(request, response);
+                                                HttpServletResponse response,
+                                                Authentication authentication) {
+        String userId = ((User) authentication.getPrincipal()).getUserId();
         Post post = postService.increaseLike(postId, userId);
 
         return ResponseEntity.ok("INCREASE_LIKE_SUCCESS_NEW_LIKES: " + post.getPostLikes().size());
@@ -68,8 +70,9 @@ public class PostController {
     @DeleteMapping("/post/{postId}/like")
     public ResponseEntity<String> decreaseLikes(@PathVariable Long postId,
                                                 HttpServletRequest request,
-                                                HttpServletResponse response) {
-        String userId = jwtCheckService.checkJwt(request, response);
+                                                HttpServletResponse response,
+                                                Authentication authentication) {
+        String userId = ((User) authentication.getPrincipal()).getUserId();
         int postLikeSize = postService.decreaseLike(postId, userId);
 
         return ResponseEntity.ok("DECREASE_LIKE_SUCCESS_NEW_LIKES: " + postLikeSize);
@@ -80,9 +83,10 @@ public class PostController {
     @PostMapping("/posts")
     public ResponseEntity<PostResponseDto> createPost(@RequestBody PostRequestDto postRequestDto,
                                                       HttpServletRequest request,
-                                                      HttpServletResponse response) {
+                                                      HttpServletResponse response,
+                                                      Authentication authentication) {
 
-        String userId = jwtCheckService.checkJwt(request, response);
+        String userId = ((User) authentication.getPrincipal()).getUserId();
         PostResponseDto postResponseDto = postService.createPost(postRequestDto, userId);
         return ResponseEntity.ok(postResponseDto);
     }
@@ -92,8 +96,9 @@ public class PostController {
     public ResponseEntity<PostResponseDto> updatePost(@RequestBody PostRequestDto postRequestDto,
                                                       @PathVariable Long postId,
                                                       HttpServletRequest request,
-                                                      HttpServletResponse response) {
-        String userId = jwtCheckService.checkJwt(request, response);
+                                                      HttpServletResponse response,
+                                                      Authentication authentication) {
+        String userId = ((User) authentication.getPrincipal()).getUserId();
 
         PostResponseDto postResponseDto = postService.updatePost(postRequestDto, postId, userId);
         return ResponseEntity.ok(postResponseDto);
@@ -103,9 +108,10 @@ public class PostController {
     @DeleteMapping("/post/{postId}")
     public ResponseEntity<String> deletePost(@PathVariable Long postId,
                                              HttpServletRequest request,
-                                             HttpServletResponse response) {
+                                             HttpServletResponse response,
+                                             Authentication authentication) {
 
-        String userId = jwtCheckService.checkJwt(request, response);
+        String userId = ((User) authentication.getPrincipal()).getUserId();
         postService.deletePostByPostId(postId, userId);
         return ResponseEntity.ok("DELETE_SUCCESS");
     }
@@ -116,8 +122,9 @@ public class PostController {
     public ResponseEntity<String> s3Upload(@RequestPart(value = "image", required = false) MultipartFile image,
                                            @PathVariable Long postId,
                                            HttpServletRequest request,
-                                           HttpServletResponse response) {
-        String userId = jwtCheckService.checkJwt(request, response);
+                                           HttpServletResponse response,
+                                           Authentication authentication) {
+        String userId = ((User) authentication.getPrincipal()).getUserId();
 
         String multipartFilePath = s3ImageService.upload(image);
         attachmentFileService.uploadImageMetadata(multipartFilePath, image, postId, userId);
@@ -129,8 +136,9 @@ public class PostController {
     public ResponseEntity<String> s3delete(@RequestParam String path,
                                            @PathVariable Long postId,
                                            HttpServletRequest request,
-                                           HttpServletResponse response) {
-        String userId = jwtCheckService.checkJwt(request, response);
+                                           HttpServletResponse response,
+                                           Authentication authentication) {
+        String userId = ((User) authentication.getPrincipal()).getUserId();
 
         if (postService.isFileInPost(path, postId)) {
             attachmentFileService.deleteFileData(path, postId, userId);
