@@ -27,26 +27,24 @@ public class GoogleJoinService {
      */
 
     @Transactional
-    public boolean joinGoogleProcess(JoinGoogleUserDTO joinGoogleUserDTO) {
+    public void joinGoogleProcess(JoinGoogleUserDTO joinGoogleUserDTO) {
         User newUser = setGoogleUserEntity(joinGoogleUserDTO);
         AlarmSettings alarmSettings = new AlarmSettings();
         alarmSettings.setUser(newUser);
         newUser.setAlarmSettings(alarmSettings);
 
-        log.info(newUser.getUserId());
+        log.info("New User Is Created. {}", newUser);
 
         try {
             alarmSettingsRepository.save(alarmSettings);
             userRepository.save(newUser);
         } catch (Exception e) {
             log.error(e.toString());
-            return false;
         }
-        return true;
     }
 
     /**
-     * 회원 엔티티 생성
+     * 새로운 회원 엔티티 생성
      */
     private static User setGoogleUserEntity(JoinGoogleUserDTO joinGoogleUserDTO) {
         User newUser = new User();
@@ -61,6 +59,10 @@ public class GoogleJoinService {
     }
 
 
+
+    /**
+     * 기존 회원 엔티티 업데이트
+     */
     public void updateGoogleUser(JoinGoogleUserDTO joinGoogleUserDTO) {
         User user = userRepository.findById(joinGoogleUserDTO.getUserId()).orElseThrow(() -> new ComponentNotFoundException("USER_NOT_FOUND"));
         user.setNickname(joinGoogleUserDTO.getNickname());

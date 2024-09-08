@@ -26,7 +26,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
-        log.info("google user: {}", oAuth2User.getAttributes());
+        log.info("Authenticated Google User: {}", oAuth2User.getAttributes());
 
         OAuth2DTO oAuth2DTO = new GoogleOAuth2DTO(oAuth2User.getAttributes());
 
