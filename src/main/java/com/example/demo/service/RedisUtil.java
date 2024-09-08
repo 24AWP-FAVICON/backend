@@ -2,11 +2,10 @@ package com.example.demo.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
-
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -18,9 +17,9 @@ public class RedisUtil {
         return (String) valueOperations.get(key);
     }
 
-    public void setData(String key, Object value) {//지정된 키(key)에 값을 저장하는 메서드
+    public void setData(String key, Object value, long timeout, TimeUnit timeUnit) {//지정된 키(key)에 값을 저장하는 메서드
         ValueOperations<Object, Object> valueOperations = redisTemplate.opsForValue();
-        valueOperations.set(key, value);
+        valueOperations.set(key, value, timeout, timeUnit);
     }
 
     public void setDataExpire(String key, Object value, long duration) {//지정된 키(key)에 값을 저장하고, 지정된 시간(duration) 후에 데이터가 만료되도록 설정하는 메서드
