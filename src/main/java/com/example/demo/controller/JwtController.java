@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 @RestController()
 @RequestMapping("/users")
@@ -52,7 +53,7 @@ public class JwtController {
         String newRefresh = jwtUtil.createToken("refresh", email, role, 1000*60*60*24L);
 
         redisUtil.deleteData(accessToken); // 기존 리프레시 토큰 삭제
-        redisUtil.setData(newAccess, newRefresh); // 새로운 리프레시 토큰 저장
+        redisUtil.setData(newAccess, newRefresh, 1000*60*60*24L, TimeUnit.MILLISECONDS);
         
         //response
         response.addHeader("Authorization", "Bearer " + newAccess);

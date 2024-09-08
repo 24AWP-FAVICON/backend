@@ -2,7 +2,6 @@ package com.example.demo.handler;
 
 import com.example.demo.service.jwt.JwtUtil;
 import com.example.demo.service.RedisUtil;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,6 +19,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -31,7 +31,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) authentication.getPrincipal();
 
@@ -43,7 +43,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 "google", authentication.getName());
         String googleAccessToken = client.getAccessToken().getTokenValue();
 
-        redisUtil.setData(userId, googleAccessToken);
+        redisUtil.setData(userId, googleAccessToken,1000*60*60*24L, TimeUnit.MILLISECONDS);
 
 
         // jwt 처리
@@ -55,7 +55,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String accessToken = jwtUtil.createToken("access", userId, role, 1000*60*60L); // access token 생성 유효기간 1시간
         String refreshToken = jwtUtil.createToken("refresh", userId, role, 1000*60*60*24L); // refresh token 생성 유효기간 24시간
 
-        redisUtil.setData(accessToken, refreshToken); // 레디스에 access token과 refresh token 저장
+        redisUtil.setData(accessToken, refreshToken,1000*60*60*24L, TimeUnit.MILLISECONDS); // 레디스에 access token과 refresh token 저장
 
         response.addHeader("Authorization", "Bearer " + accessToken); // access token은 Authorization 헤더에
         response.addCookie(createCookie("access", accessToken)); // accessToken은 쿠키에
