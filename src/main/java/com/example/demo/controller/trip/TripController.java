@@ -88,9 +88,14 @@ public class TripController {
                                             HttpServletRequest request, HttpServletResponse response) {
         jwtCheckService.checkJwt(request, response);
 
-        Optional<Trip> tripOptional = tripPlannerService.getTripById(tripId);
-        return tripOptional.map(trip -> new ResponseEntity<>(trip, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        try {
+            Trip trip = tripPlannerService.getTripById(tripId);
+            return new ResponseEntity<>(trip, HttpStatus.OK);
+        } catch (TripNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /*

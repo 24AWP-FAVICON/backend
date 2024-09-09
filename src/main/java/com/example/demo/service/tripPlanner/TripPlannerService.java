@@ -45,8 +45,9 @@ public class TripPlannerService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Trip> getTripById(Long tripId) {
-        return tripRepository.findById(tripId);
+    public Trip getTripById(Long tripId) {
+        return tripRepository.findById(tripId)
+                .orElseThrow(() -> new TripNotFoundException("Trip with ID " + tripId + " not found"));
     }
 
     @Transactional
