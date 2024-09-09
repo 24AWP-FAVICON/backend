@@ -50,20 +50,27 @@ public class TripPlannerService {
     }
 
     @Transactional
-    public Trip updateTrip(Long tripId, TripPatchDTO tripPatchDTO) {
-        Trip trip = tripRepository.findById(tripId)
-                .orElseThrow(() -> new IllegalArgumentException("Trip not found"));
+    public Trip updateTrip(Long tripId, Trip trip) throws TripNotFoundException {
+        Optional<Trip> tripOptional = tripRepository.findById(tripId);
 
-        List<User> participants = userRepository.findAllById(tripPatchDTO.getParticipantIds());
-        trip.setParticipants(participants);
+        if (tripOptional.isPresent()) {
+            Trip updateTrip = tripOptional.get();
 
-        if (tripPatchDTO.getTripName() != null) trip.setTripName(tripPatchDTO.getTripName());
-        if (tripPatchDTO.getStartDate() != null) trip.setStartDate(tripPatchDTO.getStartDate());
-        if (tripPatchDTO.getEndDate() != null) trip.setEndDate(tripPatchDTO.getEndDate());
-        if (tripPatchDTO.getTripArea() != null) trip.setTripArea(tripPatchDTO.getTripArea());
-        if (tripPatchDTO.getBudget() != null) trip.setBudget(tripPatchDTO.getBudget());
+            List<User> participants = userRepository.findAllById(trip.getParticipants().stream()
+                    .map(User::getUserId)
+                    .collect(Collectors.toList()));
 
-        return tripRepository.save(trip);
+            updateTrip.setTripName(trip.getTripName());
+            updateTrip.setParticipants(participants);
+            updateTrip.setStartDate(trip.getStartDate());
+            updateTrip.setEndDate(trip.getEndDate());
+            updateTrip.setTripArea(trip.getTripArea());
+            updateTrip.setBudget(trip.getBudget());
+
+            return tripRepository.save(updateTrip);
+        } else {
+            throw new TripNotFoundException("Trip with ID " + tripId + " not found");
+        }
     }
 
     @Transactional

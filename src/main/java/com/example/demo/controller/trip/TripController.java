@@ -15,6 +15,7 @@ import com.example.demo.repository.planner.TripDateRepository;
 import com.example.demo.repository.planner.TripRepository;
 import com.example.demo.repository.users.user.UserRepository;
 import com.example.demo.service.jwt.JwtCheckService;
+import com.example.demo.service.tripPlanner.TripNotFoundException;
 import com.example.demo.service.tripPlanner.TripPlannerService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -103,32 +104,56 @@ public class TripController {
 
         jwtCheckService.checkJwt(request, response);
 
-        Optional<Trip> tripOptional = tripRepository.findById(tripId);
-
-        if (tripOptional.isPresent()) {
-            Trip updateTrip = tripOptional.get();
-            // 참여자 ID 리스트를 통해 User 객체들을 조회
-            List<User> participants = userRepository.findAllById(trip.getParticipants().stream()
-                    .map(User::getUserId)
-                    .collect(Collectors.toList()));
-
-            // Trip 객체의 모든 필드 업데이트
-            updateTrip.setTripName(trip.getTripName());
-            updateTrip.setParticipants(participants); // 업데이트된 참여자 목록 설정
-            updateTrip.setStartDate(trip.getStartDate());
-            updateTrip.setEndDate(trip.getEndDate());
-            updateTrip.setTripArea(trip.getTripArea());
-            updateTrip.setBudget(trip.getBudget());
-
-            // 데이터베이스에 저장
-            tripRepository.save(updateTrip);
-
-            return new ResponseEntity<>(updateTrip, HttpStatus.OK);
-        }
-        else {
+        try {
+            Trip updatedTrip = tripPlannerService.updateTrip(tripId, trip);
+            return new ResponseEntity<>(updatedTrip, HttpStatus.OK);
+        } catch (TripNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+//    public ResponseEntity<Trip> updateTripById(@PathVariable("tripId") Long tripId,
+//                                               @RequestBody Trip tripPutDTO,
+//                                               HttpServletRequest request, HttpServletResponse response) {
+//        jwtCheckService.checkJwt(request, response);
+//
+//        Trip updatedTrip = tripPlannerService.updateTrip(tripId, tripPutDTO);
+//        return new ResponseEntity<>(updatedTrip, HttpStatus.OK);
+//    }
+//    public ResponseEntity<Trip> updateTripById(@PathVariable("tripId") Long tripId,
+//                                               @RequestBody Trip trip,
+//                                               HttpServletRequest request,
+//                                               HttpServletResponse response) {
+//
+//        jwtCheckService.checkJwt(request, response);
+//
+//        Optional<Trip> tripOptional = tripRepository.findById(tripId);
+//
+//        if (tripOptional.isPresent()) {
+//            Trip updateTrip = tripOptional.get();
+//            // 참여자 ID 리스트를 통해 User 객체들을 조회
+//            List<User> participants = userRepository.findAllById(trip.getParticipants().stream()
+//                    .map(User::getUserId)
+//                    .collect(Collectors.toList()));
+//
+//            // Trip 객체의 모든 필드 업데이트
+//            updateTrip.setTripName(trip.getTripName());
+//            updateTrip.setParticipants(participants); // 업데이트된 참여자 목록 설정
+//            updateTrip.setStartDate(trip.getStartDate());
+//            updateTrip.setEndDate(trip.getEndDate());
+//            updateTrip.setTripArea(trip.getTripArea());
+//            updateTrip.setBudget(trip.getBudget());
+//
+//            // 데이터베이스에 저장
+//            tripRepository.save(updateTrip);
+//
+//            return new ResponseEntity<>(updateTrip, HttpStatus.OK);
+//        }
+//        else {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+//    }
 
     /*
     특정 여행 계획 일부 수정
