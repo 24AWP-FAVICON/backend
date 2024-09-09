@@ -57,10 +57,12 @@ public class TripPlannerService {
         if (tripOptional.isPresent()) {
             Trip updateTrip = tripOptional.get();
 
+            // 참여자 ID 리스트를 통해 User 객체들을 조회
             List<User> participants = userRepository.findAllById(trip.getParticipants().stream()
                     .map(User::getUserId)
                     .collect(Collectors.toList()));
 
+            // Trip 객체의 모든 필드 업데이트
             updateTrip.setTripName(trip.getTripName());
             updateTrip.setParticipants(participants);
             updateTrip.setStartDate(trip.getStartDate());
@@ -68,10 +70,28 @@ public class TripPlannerService {
             updateTrip.setTripArea(trip.getTripArea());
             updateTrip.setBudget(trip.getBudget());
 
+            // 데이터베이스에 저장
             return tripRepository.save(updateTrip);
         } else {
             throw new TripNotFoundException("Trip with ID " + tripId + " not found");
         }
+    }
+
+    @Transactional
+    public Trip partialUpdateTrip(Long tripId, TripPatchDTO tripPatchDTO) {
+        Trip updateTrip = getTripById(tripId);
+
+        if (tripPatchDTO.getParticipantIds() != null) {
+            List<User> participants = userRepository.findAllById(tripPatchDTO.getParticipantIds());
+            updateTrip.setParticipants(participants);
+        }
+        if (tripPatchDTO.getTripName() != null) updateTrip.setTripName(tripPatchDTO.getTripName());
+        if (tripPatchDTO.getStartDate() != null) updateTrip.setStartDate(tripPatchDTO.getStartDate());
+        if (tripPatchDTO.getEndDate() != null) updateTrip.setEndDate(tripPatchDTO.getEndDate());
+        if (tripPatchDTO.getTripArea() != null) updateTrip.setTripArea(tripPatchDTO.getTripArea());
+        if (tripPatchDTO.getBudget() != null) updateTrip.setBudget(tripPatchDTO.getBudget());
+
+        return tripRepository.save(updateTrip);
     }
 
     @Transactional
