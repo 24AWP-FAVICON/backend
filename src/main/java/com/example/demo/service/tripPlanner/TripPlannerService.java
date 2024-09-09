@@ -95,7 +95,7 @@ public class TripPlannerService {
     }
 
     @Transactional
-    public void deleteTrip(Long tripId) {
+    public void deleteTripById(Long tripId) {
         tripRepository.deleteById(tripId);
     }
 }

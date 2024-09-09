@@ -150,10 +150,12 @@ public class TripController {
         jwtCheckService.checkJwt(request, response);
 
         try {
-            tripRepository.deleteById(tripId);
+            tripPlannerService.deleteTripById(tripId);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e){
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (TripNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
