@@ -110,8 +110,17 @@ public class TripPlannerService {
             throw new InvalidUserException("User Google IDs are invalid");
         }
 
-        // 기존 참여자 목록에 새 참여자 추가
-        trip.getParticipants().addAll(participants);
-        tripRepository.save(trip);
+        // 기존 참여자 목록을 가져온다
+        List<User> existingParticipants = trip.getParticipants();
+
+        // 이미 참여자 목록에 있는 사용자를 제외한 새로운 사용자만 추가한다
+        List<User> newParticipants = participants.stream()
+                .filter(user -> !existingParticipants.contains(user))
+                .collect(Collectors.toList());
+
+        if (!newParticipants.isEmpty()) {
+            existingParticipants.addAll(newParticipants);
+            tripRepository.save(trip);
+        }
     }
 }

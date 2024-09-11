@@ -6,11 +6,6 @@ import com.example.demo.dto.planner.TripResponseDTO;
 import com.example.demo.dto.users.user.UserIdsDTO;
 import com.example.demo.entity.planner.Trip;
 import com.example.demo.exception.InvalidUserException;
-import com.example.demo.repository.planner.AccommodationRepository;
-import com.example.demo.repository.planner.LocationRepository;
-import com.example.demo.repository.planner.TripDateRepository;
-import com.example.demo.repository.planner.TripRepository;
-import com.example.demo.repository.users.user.UserRepository;
 import com.example.demo.service.jwt.JwtCheckService;
 import com.example.demo.service.tripPlanner.TripNotFoundException;
 import com.example.demo.service.tripPlanner.TripPlannerService;
@@ -161,7 +156,7 @@ public class TripPlannerController {
     /*
     다른 유저와 여행 계획 공유 및 초대
     */
-    @PostMapping("/{tripId}/share")
+    @PostMapping("/trip/{tripId}/share")
     public ResponseEntity<String> shareTripPlanWithUser(@PathVariable("tripId") Long tripId,
                                                         @RequestBody UserIdsDTO userIdsDTO,
                                                         HttpServletRequest request,
