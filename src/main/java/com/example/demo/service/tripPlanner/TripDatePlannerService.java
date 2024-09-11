@@ -139,5 +139,42 @@ public class TripDatePlannerService {
         return tripDateRepository.save(tripDate);
     }
 
+    @Transactional
+    public TripDate updateTripDateDetailById(Long tripDateId, TripDatePatchDTO tripDatePatchDTO) {
+        TripDate tripDate = tripDateRepository.findById(tripDateId)
+                .orElseThrow(() -> new TripDateNotFoundException("TripDate with ID " + tripDateId + " not found"));
+
+        // 일자 정보 업데이트 (optional)
+        if (tripDatePatchDTO.getTripDate() != null) {
+            tripDate.setTripDate(tripDatePatchDTO.getTripDate());
+        }
+        if (tripDatePatchDTO.getTripDay() != null) {
+            tripDate.setTripDay(tripDatePatchDTO.getTripDay());
+        }
+        if (tripDatePatchDTO.getBudget() != null){
+            tripDate.setBudget(tripDatePatchDTO.getBudget());
+        }
+
+        // 숙소 정보 업데이트(optional)
+        if (tripDatePatchDTO.getAccommodation() != null) {
+            Accommodation accommodation = tripDate.getAccommodation();
+            accommodation.setAccommodationName(tripDatePatchDTO.getAccommodation().getAccommodationName());
+            accommodation.setAccommodationLocation(tripDatePatchDTO.getAccommodation().getAccommodationLocation());
+            accommodationRepository.save(accommodation);
+        }
+
+        // 위치 정보 업데이트 (옵셔널)
+        if (tripDatePatchDTO.getLocations() != null && !tripDatePatchDTO.getLocations().isEmpty()) {
+            // 기존 위치 정보 삭제
+            locationRepository.deleteAll(tripDate.getLocations());
+            List<Location> updatedLocations = tripDatePatchDTO.getLocations().stream()
+                    .map(locDTO -> new Location(locDTO.getLocationName(), locDTO.getLocationAddress(), tripDate))
+                    .collect(Collectors.toList());
+            locationRepository.saveAll(updatedLocations);
+            tripDate.setLocations(updatedLocations);
+        }
+
+        return tripDateRepository.save(tripDate);
+    }
 
 }

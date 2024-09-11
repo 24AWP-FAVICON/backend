@@ -169,45 +169,14 @@ public class TripDatePlannerController {
                                                              HttpServletResponse response) {
 
         jwtCheckService.checkJwt(request, response);
-        Optional<TripDate> tripDateOptional = tripDateRepository.findById(tripDateId);
 
-        if (tripDateOptional.isPresent()) {
-            TripDate tripDate = tripDateOptional.get();
-
-            // 일자 정보 업데이트 (optional)
-            if (tripDatePatchDTO.getTripDate() != null) {
-                tripDate.setTripDate(tripDatePatchDTO.getTripDate());
-            }
-            if (tripDatePatchDTO.getTripDay() != null) {
-                tripDate.setTripDay(tripDatePatchDTO.getTripDay());
-            }
-            if (tripDatePatchDTO.getBudget() != null){
-                tripDate.setBudget(tripDatePatchDTO.getBudget());
-            }
-
-            // 숙소 정보 업데이트(optional)
-            if (tripDatePatchDTO.getAccommodation() != null) {
-                Accommodation accommodation = tripDate.getAccommodation();
-                accommodation.setAccommodationName(tripDatePatchDTO.getAccommodation().getAccommodationName());
-                accommodation.setAccommodationLocation(tripDatePatchDTO.getAccommodation().getAccommodationLocation());
-                accommodationRepository.save(accommodation);
-            }
-
-            // 위치 정보 업데이트 (옵셔널)
-            if (tripDatePatchDTO.getLocations() != null && !tripDatePatchDTO.getLocations().isEmpty()) {
-                // 기존 위치 정보 삭제
-                locationRepository.deleteAll(tripDate.getLocations());
-                List<Location> updatedLocations = tripDatePatchDTO.getLocations().stream()
-                        .map(locDTO -> new Location(locDTO.getLocationName(), locDTO.getLocationAddress(), tripDate))
-                        .collect(Collectors.toList());
-                locationRepository.saveAll(updatedLocations);
-                tripDate.setLocations(updatedLocations);
-            }
-
-            TripDate updatedTripDate = tripDateRepository.save(tripDate);
+        try {
+            TripDate updatedTripDate = tripDatePlannerService.updateTripDateDetailById(tripDateId, tripDatePatchDTO);
             return new ResponseEntity<>(updatedTripDate, HttpStatus.OK);
-        } else {
+        } catch (TripDateNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
