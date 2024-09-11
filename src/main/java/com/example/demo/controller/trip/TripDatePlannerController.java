@@ -1,6 +1,6 @@
 package com.example.demo.controller.trip;
 
-import com.example.demo.dto.planner.TripDateDetailsDTO;
+import com.example.demo.dto.planner.*;
 import com.example.demo.dto.users.user.UserIdsDTO;
 import com.example.demo.entity.planner.Accommodation;
 import com.example.demo.entity.planner.Location;
@@ -67,55 +67,82 @@ public class TripDatePlannerController {
      */
     @PostMapping("/trip/{tripId}/detail")
     @Transactional
-    ResponseEntity<?> addTripDetail(@PathVariable("tripId") Long tripId,
-                                    @RequestBody TripDateDetailsDTO tripDateDetailsDTO,
-                                    HttpServletRequest request,
-                                    HttpServletResponse response) {
+    public ResponseEntity<TripDateResponseDTO> addTripDetail(@PathVariable("tripId") Long tripId,
+                                                             @RequestBody TripDateCreationDTO tripDateCreationDTO,
+                                                             HttpServletRequest request,
+                                                             HttpServletResponse response) {
 
         jwtCheckService.checkJwt(request, response);
 
         try {
-            Optional<Trip> tripOptional = tripRepository.findById(tripId);
-            if (tripOptional.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-
-            TripDate newTripDate = new TripDate();
-            newTripDate.setTrip(tripOptional.get());
-            newTripDate.setTripDate(tripDateDetailsDTO.getTripDate());
-            newTripDate.setTripDay(tripDateDetailsDTO.getTripDay());
-            newTripDate.setBudget(tripDateDetailsDTO.getBudget());
-
-            // 먼저 위 내용 저장
-            TripDate savedTripDate = tripDateRepository.save(newTripDate);
-
-            // 숙소 처리
-            Accommodation accommodation = new Accommodation();
-            accommodation.setAccommodationName(tripDateDetailsDTO.getAccommodation().getAccommodationName());
-            accommodation.setAccommodationLocation(tripDateDetailsDTO.getAccommodation().getAccommodationLocation());
-            accommodation.setTripDate(savedTripDate);
-            accommodationRepository.save(accommodation);
-            savedTripDate.setAccommodation(accommodation);
-
-            // 장소 처리
-            List<Location> locations = tripDateDetailsDTO.getLocations().stream()
-                    .map(locDTO -> {
-                        Location location = new Location();
-                        location.setLocationName(locDTO.getLocationName());
-                        location.setLocationAddress(locDTO.getLocationAddress());
-                        location.setTripDate(savedTripDate);
-                        return location;
-                    })
-                    .collect(Collectors.toList());
-            locationRepository.saveAll(locations);
-            savedTripDate.setLocations(locations);
-
-            return new ResponseEntity<>(savedTripDate, HttpStatus.CREATED);
+            TripDate createdTripDate = tripDatePlannerService.addTripDetail(tripId, tripDateCreationDTO);
+            TripDateResponseDTO responseDTO = new TripDateResponseDTO();
+            responseDTO.setTripDateId(createdTripDate.getTripDateId());
+            responseDTO.setTripDate(createdTripDate.getTripDate());
+            responseDTO.setTripDay(createdTripDate.getTripDay());
+            responseDTO.setBudget(createdTripDate.getBudget());
+            responseDTO.setAccommodation(new AccommodationResponseDTO(
+                    createdTripDate.getAccommodation().getAccommodationName(),
+                    createdTripDate.getAccommodation().getAccommodationLocation()
+            ));
+            responseDTO.setLocations(createdTripDate.getLocations().stream()
+                    .map(loc -> new LocationResponseDTO(loc.getLocationName(), loc.getLocationAddress()))
+                    .collect(Collectors.toList()));
+            return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>("Internal Server Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+//    ResponseEntity<?> addTripDetail(@PathVariable("tripId") Long tripId,
+//                                    @RequestBody TripDateDetailsDTO tripDateDetailsDTO,
+//                                    HttpServletRequest request,
+//                                    HttpServletResponse response) {
+//
+//        jwtCheckService.checkJwt(request, response);
+//
+//        try {
+//            Optional<Trip> tripOptional = tripRepository.findById(tripId);
+//            if (tripOptional.isEmpty()) {
+//                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//            }
+//
+//            TripDate newTripDate = new TripDate();
+//            newTripDate.setTrip(tripOptional.get());
+//            newTripDate.setTripDate(tripDateDetailsDTO.getTripDate());
+//            newTripDate.setTripDay(tripDateDetailsDTO.getTripDay());
+//            newTripDate.setBudget(tripDateDetailsDTO.getBudget());
+//
+//            // 먼저 위 내용 저장
+//            TripDate savedTripDate = tripDateRepository.save(newTripDate);
+//
+//            // 숙소 처리
+//            Accommodation accommodation = new Accommodation();
+//            accommodation.setAccommodationName(tripDateDetailsDTO.getAccommodation().getAccommodationName());
+//            accommodation.setAccommodationLocation(tripDateDetailsDTO.getAccommodation().getAccommodationLocation());
+//            accommodation.setTripDate(savedTripDate);
+//            accommodationRepository.save(accommodation);
+//            savedTripDate.setAccommodation(accommodation);
+//
+//            // 장소 처리
+//            List<Location> locations = tripDateDetailsDTO.getLocations().stream()
+//                    .map(locDTO -> {
+//                        Location location = new Location();
+//                        location.setLocationName(locDTO.getLocationName());
+//                        location.setLocationAddress(locDTO.getLocationAddress());
+//                        location.setTripDate(savedTripDate);
+//                        return location;
+//                    })
+//                    .collect(Collectors.toList());
+//            locationRepository.saveAll(locations);
+//            savedTripDate.setLocations(locations);
+//
+//            return new ResponseEntity<>(savedTripDate, HttpStatus.CREATED);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return new ResponseEntity<>("Internal Server Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 
     /*
     특정 여행 계획 내 세부 일정 조회

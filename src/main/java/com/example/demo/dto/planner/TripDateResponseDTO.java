@@ -12,11 +12,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TripDateResponseDTO {
+
     private Long tripDateId;
     private LocalDate tripDate;
     private int tripDay;
     private Long budget;
-    private AccommodationDetailsDTO accommodation;
-    private List<LocationDetailsDTO> locations;
-
+    private AccommodationResponseDTO accommodation;
+    private List<LocationResponseDTO> locations;
 }
