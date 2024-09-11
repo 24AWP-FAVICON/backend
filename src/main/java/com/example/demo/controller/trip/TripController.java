@@ -3,6 +3,7 @@ package com.example.demo.controller.trip;
 import com.example.demo.dto.planner.TripCreationDTO;
 import com.example.demo.dto.planner.TripDateDetailsDTO;
 import com.example.demo.dto.planner.TripPatchDTO;
+import com.example.demo.dto.planner.TripResponseDTO;
 import com.example.demo.dto.users.user.UserIdsDTO;
 import com.example.demo.entity.planner.Accommodation;
 import com.example.demo.entity.planner.Location;
@@ -50,14 +51,18 @@ public class TripController {
     전체 여행 계획 조회
      */
     @GetMapping("/trip")
-    public ResponseEntity<List<Trip>> getAllTrips(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<List<TripResponseDTO>> getAllTrips(HttpServletRequest request, HttpServletResponse response) {
         jwtCheckService.checkJwt(request, response);
         try {
             List<Trip> trips = tripPlannerService.getAllTrips();
+            List<TripResponseDTO> responseDTOs = trips.stream()
+                    .map(TripResponseDTO::fromEntity)
+                    .collect(Collectors.toList());
+
             if (trips.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
-            return new ResponseEntity<>(trips, HttpStatus.OK);
+            return new ResponseEntity<>(responseDTOs, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -84,13 +89,15 @@ public class TripController {
     특정 여행 계획 조회
      */
     @GetMapping("/trip/{tripId}")
-    public ResponseEntity<Trip> getTripById(@PathVariable("tripId") Long tripId,
+    public ResponseEntity<TripResponseDTO> getTripById(@PathVariable("tripId") Long tripId,
                                             HttpServletRequest request, HttpServletResponse response) {
         jwtCheckService.checkJwt(request, response);
 
         try {
             Trip trip = tripPlannerService.getTripById(tripId);
-            return new ResponseEntity<>(trip, HttpStatus.OK);
+            TripResponseDTO responseDTO = TripResponseDTO.fromEntity(trip);
+
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         } catch (TripNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
@@ -102,7 +109,7 @@ public class TripController {
     특정 여행 계획 수정
      */
     @PutMapping("/trip/{tripId}")
-    public ResponseEntity<Trip> updateTripById(@PathVariable("tripId") Long tripId,
+    public ResponseEntity<TripResponseDTO> updateTripById(@PathVariable("tripId") Long tripId,
                                                @RequestBody Trip trip,
                                                HttpServletRequest request,
                                                HttpServletResponse response) {
@@ -111,7 +118,9 @@ public class TripController {
 
         try {
             Trip updatedTrip = tripPlannerService.updateTrip(tripId, trip);
-            return new ResponseEntity<>(updatedTrip, HttpStatus.OK);
+            TripResponseDTO responseDTO = TripResponseDTO.fromEntity(updatedTrip);
+
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         } catch (TripNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
@@ -123,7 +132,7 @@ public class TripController {
     특정 여행 계획 일부 수정
      */
     @PatchMapping("/trip/{tripId}")
-    public ResponseEntity<Trip> partialUpdateTripById(@PathVariable("tripId") Long tripId,
+    public ResponseEntity<TripResponseDTO> partialUpdateTripById(@PathVariable("tripId") Long tripId,
                                                       @RequestBody TripPatchDTO tripPatchDTO,
                                                       HttpServletRequest request,
                                                       HttpServletResponse response) {
@@ -132,7 +141,9 @@ public class TripController {
 
         try {
             Trip updatedTrip = tripPlannerService.partialUpdateTrip(tripId, tripPatchDTO);
-            return new ResponseEntity<>(updatedTrip, HttpStatus.OK);
+            TripResponseDTO responseDTO = TripResponseDTO.fromEntity(updatedTrip);
+
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         } catch (TripNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
