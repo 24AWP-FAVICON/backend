@@ -1,6 +1,7 @@
 package com.example.demo.service.tripPlanner;
 
 import com.example.demo.dto.planner.TripDateCreationDTO;
+import com.example.demo.dto.planner.TripDatePatchDTO;
 import com.example.demo.entity.planner.Accommodation;
 import com.example.demo.entity.planner.Location;
 import com.example.demo.entity.planner.Trip;
@@ -81,5 +82,62 @@ public class TripDatePlannerService {
         return tripDateRepository.findById(tripDateId)
                 .orElseThrow(() -> new TripDateNotFoundException("TripDate with ID " + tripDateId + " not found"));
     }
+
+    @Transactional
+    public TripDate updateCompleteTripDateDetailById(Long tripDateId, TripDatePatchDTO tripDatePatchDTO) {
+        TripDate tripDate = tripDateRepository.findById(tripDateId)
+                .orElseThrow(() -> new TripDateNotFoundException("TripDate with ID " + tripDateId + " not found"));
+
+        // 일자 정보 업데이트
+        tripDate.setTripDate(tripDatePatchDTO.getTripDate());
+        tripDate.setTripDay(tripDatePatchDTO.getTripDay());
+        tripDate.setBudget(tripDatePatchDTO.getBudget());
+
+        // 숙소 정보 업데이트
+        Accommodation accommodation = tripDate.getAccommodation();
+        accommodation.setAccommodationName(tripDatePatchDTO.getAccommodation().getAccommodationName());
+        accommodation.setAccommodationLocation(tripDatePatchDTO.getAccommodation().getAccommodationLocation());
+        accommodationRepository.save(accommodation);
+
+        // 위치 정보 업데이트
+        List<Location> existingLocations = tripDate.getLocations();
+        List<Location> newLocations = tripDatePatchDTO.getLocations().stream()
+                .map(locDTO -> new Location(locDTO.getLocationName(), locDTO.getLocationAddress(), tripDate))
+                .collect(Collectors.toList());
+
+        // 기존 Location 업데이트 또는 삭제
+        for (Location existingLocation : existingLocations) {
+            boolean isPresentInNew = newLocations.stream()
+                    .anyMatch(newLoc -> newLoc.getLocationName().equals(existingLocation.getLocationName()));
+
+            if (!isPresentInNew) {
+                locationRepository.delete(existingLocation);
+            } else {
+                Location newLocation = newLocations.stream()
+                        .filter(newLoc -> newLoc.getLocationName().equals(existingLocation.getLocationName()))
+                        .findFirst()
+                        .orElse(null);
+                if (newLocation != null) {
+                    existingLocation.setLocationAddress(newLocation.getLocationAddress());
+                    locationRepository.save(existingLocation);
+                }
+            }
+        }
+
+        // 새로 추가할 Location 저장
+        for (Location newLocation : newLocations) {
+            boolean isExisting = existingLocations.stream()
+                    .anyMatch(existingLoc -> existingLoc.getLocationName().equals(newLocation.getLocationName()));
+
+            if (!isExisting) {
+                locationRepository.save(newLocation);
+            }
+        }
+
+        tripDate.setLocations(locationRepository.findByTripDate_TripDateId(tripDateId));
+
+        return tripDateRepository.save(tripDate);
+    }
+
 
 }

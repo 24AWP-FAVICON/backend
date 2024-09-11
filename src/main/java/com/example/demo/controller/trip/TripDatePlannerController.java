@@ -140,42 +140,21 @@ public class TripDatePlannerController {
     특정 여행 계획 내 세부 일정 전체 수정
      */
     @PutMapping("/trip/{tripId}/detail/{tripDateId}")
-    public ResponseEntity<TripDate> updateCompleteTripDateDetailById( @PathVariable("tripId") Long tripId,
-                                                                      @PathVariable("tripDateId") Long tripDateId,
-                                                                      @RequestBody TripDateDetailsDTO tripDateDetailsDTO,
-                                                                      HttpServletRequest request,
-                                                                      HttpServletResponse response) {
+    public ResponseEntity<TripDate> updateCompleteTripDateDetailById(@PathVariable("tripId") Long tripId,
+                                                                     @PathVariable("tripDateId") Long tripDateId,
+                                                                     @RequestBody TripDatePatchDTO tripDatePatchDTO,
+                                                                     HttpServletRequest request,
+                                                                     HttpServletResponse response) {
 
         jwtCheckService.checkJwt(request, response);
 
-        Optional<TripDate> tripDateOptional = tripDateRepository.findById(tripDateId);
-
-        if (tripDateOptional.isPresent()) {
-            TripDate tripDate = tripDateOptional.get();
-
-            // 일자 정보 업데이트
-            tripDate.setTripDate(tripDateDetailsDTO.getTripDate());
-            tripDate.setTripDay(tripDateDetailsDTO.getTripDay());
-            tripDate.setBudget(tripDateDetailsDTO.getBudget());
-
-            // 숙소 정보 업데이트
-            Accommodation accommodation = tripDate.getAccommodation();
-            accommodation.setAccommodationName(tripDateDetailsDTO.getAccommodation().getAccommodationName());
-            accommodation.setAccommodationLocation(tripDateDetailsDTO.getAccommodation().getAccommodationLocation());
-            accommodationRepository.save(accommodation);
-
-            // 위치 정보 업데이트
-            tripDate.getLocations().clear(); // 기존 위치 정보는 삭제
-            List<Location> newLocations = tripDateDetailsDTO.getLocations().stream()
-                    .map(locDTO -> new Location(locDTO.getLocationName(), locDTO.getLocationAddress(), tripDate))
-                    .collect(Collectors.toList());
-            locationRepository.saveAll(newLocations);
-            tripDate.setLocations(newLocations);
-
-            tripDateRepository.save(tripDate);
-            return new ResponseEntity<>(tripDate, HttpStatus.OK);
-        } else{
+        try {
+            TripDate updatedTripDate = tripDatePlannerService.updateCompleteTripDateDetailById(tripDateId, tripDatePatchDTO);
+            return new ResponseEntity<>(updatedTripDate, HttpStatus.OK);
+        } catch (TripDateNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -185,7 +164,7 @@ public class TripDatePlannerController {
     @PatchMapping("/trip/{tripId}/detail/{tripDateId}")
     public ResponseEntity<TripDate> updateTripDateDetailById(@PathVariable("tripId") Long tripId,
                                                              @PathVariable("tripDateId") Long tripDateId,
-                                                             @RequestBody TripDateDetailsDTO tripDateDetailsDTO,
+                                                             @RequestBody TripDatePatchDTO tripDatePatchDTO,
                                                              HttpServletRequest request,
                                                              HttpServletResponse response) {
 
@@ -196,29 +175,29 @@ public class TripDatePlannerController {
             TripDate tripDate = tripDateOptional.get();
 
             // 일자 정보 업데이트 (optional)
-            if (tripDateDetailsDTO.getTripDate() != null) {
-                tripDate.setTripDate(tripDateDetailsDTO.getTripDate());
+            if (tripDatePatchDTO.getTripDate() != null) {
+                tripDate.setTripDate(tripDatePatchDTO.getTripDate());
             }
-            if (tripDateDetailsDTO.getTripDay() != null) {
-                tripDate.setTripDay(tripDateDetailsDTO.getTripDay());
+            if (tripDatePatchDTO.getTripDay() != null) {
+                tripDate.setTripDay(tripDatePatchDTO.getTripDay());
             }
-            if (tripDateDetailsDTO.getBudget() != null){
-                tripDate.setBudget(tripDateDetailsDTO.getBudget());
+            if (tripDatePatchDTO.getBudget() != null){
+                tripDate.setBudget(tripDatePatchDTO.getBudget());
             }
 
             // 숙소 정보 업데이트(optional)
-            if (tripDateDetailsDTO.getAccommodation() != null) {
+            if (tripDatePatchDTO.getAccommodation() != null) {
                 Accommodation accommodation = tripDate.getAccommodation();
-                accommodation.setAccommodationName(tripDateDetailsDTO.getAccommodation().getAccommodationName());
-                accommodation.setAccommodationLocation(tripDateDetailsDTO.getAccommodation().getAccommodationLocation());
+                accommodation.setAccommodationName(tripDatePatchDTO.getAccommodation().getAccommodationName());
+                accommodation.setAccommodationLocation(tripDatePatchDTO.getAccommodation().getAccommodationLocation());
                 accommodationRepository.save(accommodation);
             }
 
             // 위치 정보 업데이트 (옵셔널)
-            if (tripDateDetailsDTO.getLocations() != null && !tripDateDetailsDTO.getLocations().isEmpty()) {
+            if (tripDatePatchDTO.getLocations() != null && !tripDatePatchDTO.getLocations().isEmpty()) {
                 // 기존 위치 정보 삭제
                 locationRepository.deleteAll(tripDate.getLocations());
-                List<Location> updatedLocations = tripDateDetailsDTO.getLocations().stream()
+                List<Location> updatedLocations = tripDatePatchDTO.getLocations().stream()
                         .map(locDTO -> new Location(locDTO.getLocationName(), locDTO.getLocationAddress(), tripDate))
                         .collect(Collectors.toList());
                 locationRepository.saveAll(updatedLocations);

@@ -14,5 +14,5 @@ public class AccommodationDetailsDTO {
     private String accommodationLocation;
 
     @JsonIgnore // 순환 참조 방지
-    private TripDateDetailsDTO tripDate;
+    private TripDatePatchDTO tripDate;
 }
