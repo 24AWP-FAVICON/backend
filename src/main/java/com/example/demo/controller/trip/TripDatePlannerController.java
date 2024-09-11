@@ -13,6 +13,7 @@ import com.example.demo.repository.planner.TripDateRepository;
 import com.example.demo.repository.planner.TripRepository;
 import com.example.demo.repository.users.user.UserRepository;
 import com.example.demo.service.jwt.JwtCheckService;
+import com.example.demo.service.tripPlanner.TripDateNotFoundException;
 import com.example.demo.service.tripPlanner.TripDatePlannerService;
 import com.example.demo.service.tripPlanner.TripNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -94,60 +95,30 @@ public class TripDatePlannerController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-//    ResponseEntity<?> addTripDetail(@PathVariable("tripId") Long tripId,
-//                                    @RequestBody TripDateDetailsDTO tripDateDetailsDTO,
-//                                    HttpServletRequest request,
-//                                    HttpServletResponse response) {
-//
-//        jwtCheckService.checkJwt(request, response);
-//
-//        try {
-//            Optional<Trip> tripOptional = tripRepository.findById(tripId);
-//            if (tripOptional.isEmpty()) {
-//                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//            }
-//
-//            TripDate newTripDate = new TripDate();
-//            newTripDate.setTrip(tripOptional.get());
-//            newTripDate.setTripDate(tripDateDetailsDTO.getTripDate());
-//            newTripDate.setTripDay(tripDateDetailsDTO.getTripDay());
-//            newTripDate.setBudget(tripDateDetailsDTO.getBudget());
-//
-//            // 먼저 위 내용 저장
-//            TripDate savedTripDate = tripDateRepository.save(newTripDate);
-//
-//            // 숙소 처리
-//            Accommodation accommodation = new Accommodation();
-//            accommodation.setAccommodationName(tripDateDetailsDTO.getAccommodation().getAccommodationName());
-//            accommodation.setAccommodationLocation(tripDateDetailsDTO.getAccommodation().getAccommodationLocation());
-//            accommodation.setTripDate(savedTripDate);
-//            accommodationRepository.save(accommodation);
-//            savedTripDate.setAccommodation(accommodation);
-//
-//            // 장소 처리
-//            List<Location> locations = tripDateDetailsDTO.getLocations().stream()
-//                    .map(locDTO -> {
-//                        Location location = new Location();
-//                        location.setLocationName(locDTO.getLocationName());
-//                        location.setLocationAddress(locDTO.getLocationAddress());
-//                        location.setTripDate(savedTripDate);
-//                        return location;
-//                    })
-//                    .collect(Collectors.toList());
-//            locationRepository.saveAll(locations);
-//            savedTripDate.setLocations(locations);
-//
-//            return new ResponseEntity<>(savedTripDate, HttpStatus.CREATED);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return new ResponseEntity<>("Internal Server Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
 
     /*
     특정 여행 계획 내 세부 일정 조회
      */
     @GetMapping("/trip/{tripId}/detail/{tripDateId}")
+//    public ResponseEntity<TripDate> getTripDateById(@PathVariable("tripId") Long tripId,
+//                                                    @PathVariable("tripDateId") Long tripDateId,
+//                                                    HttpServletRequest request,
+//                                                    HttpServletResponse response) {
+//
+//        jwtCheckService.checkJwt(request, response);
+//
+//        Optional<Trip> tripOptional = tripRepository.findById(tripId);
+//        if (!tripOptional.isPresent()) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+//
+//        Optional<TripDate> tripDateOptional = tripDateRepository.findById(tripDateId);
+//        if (tripDateOptional.isPresent()) {
+//            return new ResponseEntity<>(tripDateOptional.get(), HttpStatus.OK);
+//        }
+//        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//
+//    }
     public ResponseEntity<TripDate> getTripDateById(@PathVariable("tripId") Long tripId,
                                                     @PathVariable("tripDateId") Long tripDateId,
                                                     HttpServletRequest request,
@@ -155,17 +126,14 @@ public class TripDatePlannerController {
 
         jwtCheckService.checkJwt(request, response);
 
-        Optional<Trip> tripOptional = tripRepository.findById(tripId);
-        if (!tripOptional.isPresent()) {
+        try {
+            TripDate tripDate = tripDatePlannerService.getTripDateById(tripId, tripDateId);
+            return new ResponseEntity<>(tripDate, HttpStatus.OK);
+        } catch (TripNotFoundException | TripDateNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        Optional<TripDate> tripDateOptional = tripDateRepository.findById(tripDateId);
-        if (tripDateOptional.isPresent()) {
-            return new ResponseEntity<>(tripDateOptional.get(), HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
     }
 
     /*

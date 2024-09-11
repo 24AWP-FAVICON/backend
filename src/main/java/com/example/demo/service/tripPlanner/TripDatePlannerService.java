@@ -73,4 +73,13 @@ public class TripDatePlannerService {
         return savedTripDate;
     }
 
+    @Transactional(readOnly = true)
+    public TripDate getTripDateById(Long tripId, Long tripDateId) {
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new TripNotFoundException("Trip with ID " + tripId + " not found"));
+
+        return tripDateRepository.findById(tripDateId)
+                .orElseThrow(() -> new TripDateNotFoundException("TripDate with ID " + tripDateId + " not found"));
+    }
+
 }
