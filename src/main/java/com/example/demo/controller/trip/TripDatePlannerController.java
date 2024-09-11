@@ -1,10 +1,7 @@
 package com.example.demo.controller.trip;
 
-import com.example.demo.dto.planner.*;
-import com.example.demo.dto.users.user.UserIdsDTO;
-import com.example.demo.entity.planner.Trip;
+import com.example.demo.dto.planner.tripDate.*;
 import com.example.demo.entity.planner.TripDate;
-import com.example.demo.entity.users.user.User;
 import com.example.demo.repository.planner.AccommodationRepository;
 import com.example.demo.repository.planner.LocationRepository;
 import com.example.demo.repository.planner.TripDateRepository;
@@ -24,7 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController()

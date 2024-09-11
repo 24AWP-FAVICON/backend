@@ -1,4 +1,4 @@
-package com.example.demo.dto.planner;
+package com.example.demo.dto.planner.trip;
 
 import com.example.demo.entity.planner.Trip;
 import com.example.demo.entity.users.user.User;

@@ -1,4 +1,4 @@
-package com.example.demo.dto.planner;
+package com.example.demo.dto.planner.trip;
 
 import lombok.Getter;
 import lombok.Setter;

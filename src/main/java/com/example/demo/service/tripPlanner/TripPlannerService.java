@@ -1,7 +1,7 @@
 package com.example.demo.service.tripPlanner;
 
-import com.example.demo.dto.planner.TripCreationDTO;
-import com.example.demo.dto.planner.TripPatchDTO;
+import com.example.demo.dto.planner.trip.TripCreationDTO;
+import com.example.demo.dto.planner.trip.TripPatchDTO;
 import com.example.demo.entity.planner.Trip;
 import com.example.demo.entity.users.user.User;
 import com.example.demo.exception.InvalidUserException;

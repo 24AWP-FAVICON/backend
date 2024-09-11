@@ -1,4 +1,4 @@
-package com.example.demo.dto.planner;
+package com.example.demo.dto.planner.tripDate;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

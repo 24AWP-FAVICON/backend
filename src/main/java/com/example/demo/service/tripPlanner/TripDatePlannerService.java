@@ -1,7 +1,7 @@
 package com.example.demo.service.tripPlanner;
 
-import com.example.demo.dto.planner.TripDateCreationDTO;
-import com.example.demo.dto.planner.TripDatePatchDTO;
+import com.example.demo.dto.planner.tripDate.TripDateCreationDTO;
+import com.example.demo.dto.planner.tripDate.TripDatePatchDTO;
 import com.example.demo.entity.planner.Accommodation;
 import com.example.demo.entity.planner.Location;
 import com.example.demo.entity.planner.Trip;

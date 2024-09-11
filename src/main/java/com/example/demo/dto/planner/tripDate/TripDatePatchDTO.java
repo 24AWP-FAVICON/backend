@@ -1,6 +1,8 @@
-package com.example.demo.dto.planner;
+package com.example.demo.dto.planner.tripDate;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -9,13 +11,16 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-public class TripDateResponseDTO {
+public class TripDatePatchDTO {
 
-    private Long tripDateId;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate tripDate;
-    private int tripDay;
+
+    private Integer tripDay;
     private Long budget;
+
+    @NotNull
     private AccommodationResponseDTO accommodation;
     private List<LocationResponseDTO> locations;
 }
+

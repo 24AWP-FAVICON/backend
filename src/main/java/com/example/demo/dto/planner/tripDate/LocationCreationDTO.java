@@ -1,4 +1,4 @@
-package com.example.demo.dto.planner;
+package com.example.demo.dto.planner.tripDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccommodationCreationDTO {
-    private String accommodationName;
-    private String accommodationLocation;
+public class LocationCreationDTO {
+    private String locationName;
+    private String locationAddress;
 }
