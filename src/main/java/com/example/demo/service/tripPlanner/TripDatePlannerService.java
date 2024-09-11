@@ -177,4 +177,23 @@ public class TripDatePlannerService {
         return tripDateRepository.save(tripDate);
     }
 
+    @Transactional
+    public void deleteTripDateById(Long tripDateId) {
+        TripDate tripDate = tripDateRepository.findById(tripDateId)
+                .orElseThrow(() -> new TripDateNotFoundException("TripDate with ID " + tripDateId + " not found"));
+
+        // 숙소 정보 삭제 (숙소가 있을 경우)
+        if (tripDate.getAccommodation() != null) {
+            accommodationRepository.delete(tripDate.getAccommodation());
+        }
+
+        // 위치 정보 삭제 (장소 목록이 있을 경우)
+        if (tripDate.getLocations() != null && !tripDate.getLocations().isEmpty()) {
+            locationRepository.deleteAll(tripDate.getLocations());
+        }
+
+        // 세부 일정 삭제
+        tripDateRepository.delete(tripDate);
+    }
+
 }

@@ -2,8 +2,6 @@ package com.example.demo.controller.trip;
 
 import com.example.demo.dto.planner.*;
 import com.example.demo.dto.users.user.UserIdsDTO;
-import com.example.demo.entity.planner.Accommodation;
-import com.example.demo.entity.planner.Location;
 import com.example.demo.entity.planner.Trip;
 import com.example.demo.entity.planner.TripDate;
 import com.example.demo.entity.users.user.User;
@@ -100,25 +98,6 @@ public class TripDatePlannerController {
     특정 여행 계획 내 세부 일정 조회
      */
     @GetMapping("/trip/{tripId}/detail/{tripDateId}")
-//    public ResponseEntity<TripDate> getTripDateById(@PathVariable("tripId") Long tripId,
-//                                                    @PathVariable("tripDateId") Long tripDateId,
-//                                                    HttpServletRequest request,
-//                                                    HttpServletResponse response) {
-//
-//        jwtCheckService.checkJwt(request, response);
-//
-//        Optional<Trip> tripOptional = tripRepository.findById(tripId);
-//        if (!tripOptional.isPresent()) {
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        }
-//
-//        Optional<TripDate> tripDateOptional = tripDateRepository.findById(tripDateId);
-//        if (tripDateOptional.isPresent()) {
-//            return new ResponseEntity<>(tripDateOptional.get(), HttpStatus.OK);
-//        }
-//        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//
-//    }
     public ResponseEntity<TripDate> getTripDateById(@PathVariable("tripId") Long tripId,
                                                     @PathVariable("tripDateId") Long tripDateId,
                                                     HttpServletRequest request,
@@ -192,30 +171,11 @@ public class TripDatePlannerController {
         jwtCheckService.checkJwt(request, response);
 
         try {
-            Optional<TripDate> tripDateOptional = tripDateRepository.findById(tripDateId);
-
-            if (tripDateOptional.isPresent()) {
-                TripDate tripDate = tripDateOptional.get();
-
-                // 숙소 정보 삭제 (숙소가 있을 경우)
-                if (tripDate.getAccommodation() != null) {
-                    accommodationRepository.delete(tripDate.getAccommodation());
-                }
-
-                // 위치 정보 삭제 (장소 목록이 있을 경우)
-                if (tripDate.getLocations() != null && !tripDate.getLocations().isEmpty()) {
-                    locationRepository.deleteAll(tripDate.getLocations());
-                }
-
-                // 세부 일정 삭제
-                tripDateRepository.delete(tripDate);
-
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            } else{
-                return new ResponseEntity<>("Trip Date not found", HttpStatus.NOT_FOUND);
-            }
-        } catch (Exception e){
-            e.printStackTrace();
+            tripDatePlannerService.deleteTripDateById(tripDateId);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (TripDateNotFoundException e) {
+            return new ResponseEntity<>("Trip Date not found", HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
             return new ResponseEntity<>("Error deleting Trip Date: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
