@@ -179,38 +179,4 @@ public class TripDatePlannerController {
             return new ResponseEntity<>("Error deleting Trip Date: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    /*
-    다른 유저와 여행 계획 공유 및 초대
-     */
-    @PostMapping("/trip/{tripId}/share")
-    public ResponseEntity<String> shareTripPlanWithUser(@PathVariable("tripId") Long tripId,
-                                                        @RequestBody UserIdsDTO userIdsDTO,
-                                                        HttpServletRequest request,
-                                                        HttpServletResponse response) {
-
-        jwtCheckService.checkJwt(request, response);
-
-        try {
-            Optional<Trip> tripOptional = tripRepository.findById(tripId);
-            if (tripOptional.isPresent()) {
-                Trip trip = tripOptional.get();
-                List<User> participants = userRepository.findAllByUserIdIn(userIdsDTO.getUserGoogleIds());
-                if (participants.isEmpty()) {
-                    return new ResponseEntity<>("User Google IDs are invalid", HttpStatus.BAD_REQUEST);
-                }
-
-                // 기존 참여자 목록에 새 참여자 추가
-                trip.getParticipants().addAll(participants);
-                tripRepository.save(trip);
-
-                return new ResponseEntity<>("User addes to the trip successfully", HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("Trip not found", HttpStatus.NOT_FOUND);
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-            return new ResponseEntity<>("Error share trip plan: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 }

@@ -4,6 +4,7 @@ import com.example.demo.dto.planner.TripCreationDTO;
 import com.example.demo.dto.planner.TripPatchDTO;
 import com.example.demo.entity.planner.Trip;
 import com.example.demo.entity.users.user.User;
+import com.example.demo.exception.InvalidUserException;
 import com.example.demo.repository.planner.TripRepository;
 import com.example.demo.repository.users.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -97,5 +98,20 @@ public class TripPlannerService {
     @Transactional
     public void deleteTripById(Long tripId) {
         tripRepository.deleteById(tripId);
+    }
+
+    @Transactional
+    public void shareTripPlanWithUser(Long tripId, List<String> userGoogleIds) {
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new TripNotFoundException("Trip with ID " + tripId + " not found"));
+
+        List<User> participants = userRepository.findAllByUserIdIn(userGoogleIds);
+        if (participants.isEmpty()) {
+            throw new InvalidUserException("User Google IDs are invalid");
+        }
+
+        // 기존 참여자 목록에 새 참여자 추가
+        trip.getParticipants().addAll(participants);
+        tripRepository.save(trip);
     }
 }

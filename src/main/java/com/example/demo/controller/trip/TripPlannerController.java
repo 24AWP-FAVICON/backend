@@ -3,7 +3,9 @@ package com.example.demo.controller.trip;
 import com.example.demo.dto.planner.TripCreationDTO;
 import com.example.demo.dto.planner.TripPatchDTO;
 import com.example.demo.dto.planner.TripResponseDTO;
+import com.example.demo.dto.users.user.UserIdsDTO;
 import com.example.demo.entity.planner.Trip;
+import com.example.demo.exception.InvalidUserException;
 import com.example.demo.repository.planner.AccommodationRepository;
 import com.example.demo.repository.planner.LocationRepository;
 import com.example.demo.repository.planner.TripDateRepository;
@@ -153,6 +155,29 @@ public class TripPlannerController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /*
+    다른 유저와 여행 계획 공유 및 초대
+    */
+    @PostMapping("/{tripId}/share")
+    public ResponseEntity<String> shareTripPlanWithUser(@PathVariable("tripId") Long tripId,
+                                                        @RequestBody UserIdsDTO userIdsDTO,
+                                                        HttpServletRequest request,
+                                                        HttpServletResponse response) {
+
+        jwtCheckService.checkJwt(request, response);
+
+        try {
+            tripPlannerService.shareTripPlanWithUser(tripId, userIdsDTO.getUserGoogleIds());
+            return new ResponseEntity<>("User added to the trip successfully", HttpStatus.OK);
+        } catch (TripNotFoundException e) {
+            return new ResponseEntity<>("Trip not found", HttpStatus.NOT_FOUND);
+        } catch (InvalidUserException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error sharing trip plan: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
