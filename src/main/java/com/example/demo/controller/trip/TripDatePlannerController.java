@@ -13,6 +13,8 @@ import com.example.demo.repository.planner.TripDateRepository;
 import com.example.demo.repository.planner.TripRepository;
 import com.example.demo.repository.users.user.UserRepository;
 import com.example.demo.service.jwt.JwtCheckService;
+import com.example.demo.service.tripPlanner.TripDatePlannerService;
+import com.example.demo.service.tripPlanner.TripNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -38,22 +40,26 @@ public class TripDatePlannerController {
     private final AccommodationRepository accommodationRepository;
     private final LocationRepository locationRepository;
     private final JwtCheckService jwtCheckService;
+    private final TripDatePlannerService tripDatePlannerService;
 
     /*
     특정 여행 계획 내 세부 일정 조회
     */
     @GetMapping("/trip/{tripId}/detail")
-    ResponseEntity<List<TripDate>> getTripDetails(@PathVariable("tripId") Long tripId,
-                                                  HttpServletRequest request,
-                                                  HttpServletResponse response) {
+    public ResponseEntity<List<TripDate>> getTripDetails(@PathVariable("tripId") Long tripId,
+                                                         HttpServletRequest request,
+                                                         HttpServletResponse response) {
 
         jwtCheckService.checkJwt(request, response);
-        Optional<Trip> tripDetails = tripRepository.findById(tripId);
-        if (!tripDetails.isPresent()) {
+
+        try {
+            List<TripDate> tripDates = tripDatePlannerService.getTripDates(tripId);
+            return new ResponseEntity<>(tripDates, HttpStatus.OK);
+        } catch (TripNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        List<TripDate> tripDates = tripDetails.get().getTripDates();
-        return new ResponseEntity<>(tripDates, HttpStatus.OK);
     }
 
     /*
