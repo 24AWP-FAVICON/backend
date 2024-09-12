@@ -1,7 +1,7 @@
 package com.example.demo.service.planner;
 
-import com.example.demo.dto.planner.tripDate.TripDateCreationDTO;
-import com.example.demo.dto.planner.tripDate.TripDatePatchDTO;
+import com.example.demo.dto.planner.trip.TripRequestDTO;
+import com.example.demo.dto.planner.tripDate.TripDateRequestDTO;
 import com.example.demo.entity.planner.Accommodation;
 import com.example.demo.entity.planner.Location;
 import com.example.demo.entity.planner.Trip;
@@ -36,7 +36,7 @@ public class TripDatePlannerService {
     }
 
     @Transactional
-    public TripDate addTripDetail(Long tripId, TripDateCreationDTO tripDateDetailsDTO) {
+    public TripDate addTripDetail(Long tripId, TripDateRequestDTO tripDateDetailsDTO) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new TripNotFoundException("Trip with ID " + tripId + " not found"));
 
@@ -84,24 +84,24 @@ public class TripDatePlannerService {
     }
 
     @Transactional
-    public TripDate updateCompleteTripDateDetailById(Long tripDateId, TripDatePatchDTO tripDatePatchDTO) {
+    public TripDate updateCompleteTripDateDetailById(Long tripDateId, TripDateRequestDTO tripDateRequestDTO) {
         TripDate tripDate = tripDateRepository.findById(tripDateId)
                 .orElseThrow(() -> new TripDateNotFoundException("TripDate with ID " + tripDateId + " not found"));
 
         // 일자 정보 업데이트
-        tripDate.setTripDate(tripDatePatchDTO.getTripDate());
-        tripDate.setTripDay(tripDatePatchDTO.getTripDay());
-        tripDate.setBudget(tripDatePatchDTO.getBudget());
+        tripDate.setTripDate(tripDateRequestDTO.getTripDate());
+        tripDate.setTripDay(tripDateRequestDTO.getTripDay());
+        tripDate.setBudget(tripDateRequestDTO.getBudget());
 
         // 숙소 정보 업데이트
         Accommodation accommodation = tripDate.getAccommodation();
-        accommodation.setAccommodationName(tripDatePatchDTO.getAccommodation().getAccommodationName());
-        accommodation.setAccommodationLocation(tripDatePatchDTO.getAccommodation().getAccommodationLocation());
+        accommodation.setAccommodationName(tripDateRequestDTO.getAccommodation().getAccommodationName());
+        accommodation.setAccommodationLocation(tripDateRequestDTO.getAccommodation().getAccommodationLocation());
         accommodationRepository.save(accommodation);
 
         // 위치 정보 업데이트
         List<Location> existingLocations = tripDate.getLocations();
-        List<Location> newLocations = tripDatePatchDTO.getLocations().stream()
+        List<Location> newLocations = tripDateRequestDTO.getLocations().stream()
                 .map(locDTO -> new Location(locDTO.getLocationName(), locDTO.getLocationAddress(), tripDate))
                 .collect(Collectors.toList());
 
@@ -140,34 +140,34 @@ public class TripDatePlannerService {
     }
 
     @Transactional
-    public TripDate updateTripDateDetailById(Long tripDateId, TripDatePatchDTO tripDatePatchDTO) {
+    public TripDate updateTripDateDetailById(Long tripDateId, TripDateRequestDTO tripDateRequestDTO) {
         TripDate tripDate = tripDateRepository.findById(tripDateId)
                 .orElseThrow(() -> new TripDateNotFoundException("TripDate with ID " + tripDateId + " not found"));
 
         // 일자 정보 업데이트 (optional)
-        if (tripDatePatchDTO.getTripDate() != null) {
-            tripDate.setTripDate(tripDatePatchDTO.getTripDate());
+        if (tripDateRequestDTO.getTripDate() != null) {
+            tripDate.setTripDate(tripDateRequestDTO.getTripDate());
         }
-        if (tripDatePatchDTO.getTripDay() != null) {
-            tripDate.setTripDay(tripDatePatchDTO.getTripDay());
+        if (tripDateRequestDTO.getTripDay() != null) {
+            tripDate.setTripDay(tripDateRequestDTO.getTripDay());
         }
-        if (tripDatePatchDTO.getBudget() != null){
-            tripDate.setBudget(tripDatePatchDTO.getBudget());
+        if (tripDateRequestDTO.getBudget() != null){
+            tripDate.setBudget(tripDateRequestDTO.getBudget());
         }
 
         // 숙소 정보 업데이트(optional)
-        if (tripDatePatchDTO.getAccommodation() != null) {
+        if (tripDateRequestDTO.getAccommodation() != null) {
             Accommodation accommodation = tripDate.getAccommodation();
-            accommodation.setAccommodationName(tripDatePatchDTO.getAccommodation().getAccommodationName());
-            accommodation.setAccommodationLocation(tripDatePatchDTO.getAccommodation().getAccommodationLocation());
+            accommodation.setAccommodationName(tripDateRequestDTO.getAccommodation().getAccommodationName());
+            accommodation.setAccommodationLocation(tripDateRequestDTO.getAccommodation().getAccommodationLocation());
             accommodationRepository.save(accommodation);
         }
 
         // 위치 정보 업데이트 (옵셔널)
-        if (tripDatePatchDTO.getLocations() != null && !tripDatePatchDTO.getLocations().isEmpty()) {
+        if (tripDateRequestDTO.getLocations() != null && !tripDateRequestDTO.getLocations().isEmpty()) {
             // 기존 위치 정보 삭제
             locationRepository.deleteAll(tripDate.getLocations());
-            List<Location> updatedLocations = tripDatePatchDTO.getLocations().stream()
+            List<Location> updatedLocations = tripDateRequestDTO.getLocations().stream()
                     .map(locDTO -> new Location(locDTO.getLocationName(), locDTO.getLocationAddress(), tripDate))
                     .collect(Collectors.toList());
             locationRepository.saveAll(updatedLocations);

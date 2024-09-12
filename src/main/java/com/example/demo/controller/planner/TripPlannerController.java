@@ -1,7 +1,6 @@
 package com.example.demo.controller.planner;
 
-import com.example.demo.dto.planner.trip.TripCreationDTO;
-import com.example.demo.dto.planner.trip.TripPatchDTO;
+import com.example.demo.dto.planner.trip.TripRequestDTO;
 import com.example.demo.dto.planner.trip.TripResponseDTO;
 import com.example.demo.dto.users.user.UserIdsDTO;
 import com.example.demo.entity.planner.Trip;
@@ -55,7 +54,7 @@ public class TripPlannerController {
     전체 여행 계획 생성
      */
     @PostMapping("/trip")
-    public ResponseEntity<Trip> addNewTrip(@RequestBody TripCreationDTO tripDTO,
+    public ResponseEntity<Trip> addNewTrip(@RequestBody TripRequestDTO tripDTO,
                                            HttpServletRequest request, HttpServletResponse response) {
         jwtCheckService.checkJwt(request, response);
 
@@ -116,14 +115,14 @@ public class TripPlannerController {
      */
     @PatchMapping("/trip/{tripId}")
     public ResponseEntity<TripResponseDTO> partialUpdateTripById(@PathVariable("tripId") Long tripId,
-                                                      @RequestBody TripPatchDTO tripPatchDTO,
+                                                      @RequestBody TripRequestDTO tripRequestDTO,
                                                       HttpServletRequest request,
                                                       HttpServletResponse response) {
 
         jwtCheckService.checkJwt(request, response);
 
         try {
-            Trip updatedTrip = tripPlannerService.partialUpdateTrip(tripId, tripPatchDTO);
+            Trip updatedTrip = tripPlannerService.partialUpdateTrip(tripId, tripRequestDTO);
             TripResponseDTO responseDTO = TripResponseDTO.fromEntity(updatedTrip);
 
             return new ResponseEntity<>(responseDTO, HttpStatus.OK);

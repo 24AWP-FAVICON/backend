@@ -1,7 +1,6 @@
 package com.example.demo.service.planner;
 
-import com.example.demo.dto.planner.trip.TripCreationDTO;
-import com.example.demo.dto.planner.trip.TripPatchDTO;
+import com.example.demo.dto.planner.trip.TripRequestDTO;
 import com.example.demo.entity.planner.Trip;
 import com.example.demo.entity.users.user.User;
 import com.example.demo.exception.InvalidUserException;
@@ -28,7 +27,7 @@ public class TripPlannerService {
     }
 
     @Transactional
-    public Trip createTrip(TripCreationDTO tripDTO) {
+    public Trip createTrip(TripRequestDTO tripDTO) {
         // 1. 참여자 확인
         List<User> participants = userRepository.findAllById(tripDTO.getParticipantIds());
 
@@ -79,18 +78,18 @@ public class TripPlannerService {
     }
 
     @Transactional
-    public Trip partialUpdateTrip(Long tripId, TripPatchDTO tripPatchDTO) {
+    public Trip partialUpdateTrip(Long tripId, TripRequestDTO tripRequestDTO) {
         Trip updateTrip = getTripById(tripId);
 
-        if (tripPatchDTO.getParticipantIds() != null) {
-            List<User> participants = userRepository.findAllById(tripPatchDTO.getParticipantIds());
+        if (tripRequestDTO.getParticipantIds() != null) {
+            List<User> participants = userRepository.findAllById(tripRequestDTO.getParticipantIds());
             updateTrip.setParticipants(participants);
         }
-        if (tripPatchDTO.getTripName() != null) updateTrip.setTripName(tripPatchDTO.getTripName());
-        if (tripPatchDTO.getStartDate() != null) updateTrip.setStartDate(tripPatchDTO.getStartDate());
-        if (tripPatchDTO.getEndDate() != null) updateTrip.setEndDate(tripPatchDTO.getEndDate());
-        if (tripPatchDTO.getTripArea() != null) updateTrip.setTripArea(tripPatchDTO.getTripArea());
-        if (tripPatchDTO.getBudget() != null) updateTrip.setBudget(tripPatchDTO.getBudget());
+        if (tripRequestDTO.getTripName() != null) updateTrip.setTripName(tripRequestDTO.getTripName());
+        if (tripRequestDTO.getStartDate() != null) updateTrip.setStartDate(tripRequestDTO.getStartDate());
+        if (tripRequestDTO.getEndDate() != null) updateTrip.setEndDate(tripRequestDTO.getEndDate());
+        if (tripRequestDTO.getTripArea() != null) updateTrip.setTripArea(tripRequestDTO.getTripArea());
+        if (tripRequestDTO.getBudget() != null) updateTrip.setBudget(tripRequestDTO.getBudget());
 
         return tripRepository.save(updateTrip);
     }

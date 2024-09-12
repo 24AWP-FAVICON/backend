@@ -1,5 +1,6 @@
 package com.example.demo.controller.planner;
 
+import com.example.demo.dto.planner.tripDate.TripDateRequestDTO;
 import com.example.demo.dto.planner.tripDate.*;
 import com.example.demo.entity.planner.TripDate;
 import com.example.demo.repository.planner.AccommodationRepository;
@@ -63,14 +64,14 @@ public class TripDatePlannerController {
     @PostMapping("/trip/{tripId}/detail")
     @Transactional
     public ResponseEntity<TripDateResponseDTO> addTripDetail(@PathVariable("tripId") Long tripId,
-                                                             @RequestBody TripDateCreationDTO tripDateCreationDTO,
+                                                             @RequestBody TripDateRequestDTO tripDateRequestDTO,
                                                              HttpServletRequest request,
                                                              HttpServletResponse response) {
 
         jwtCheckService.checkJwt(request, response);
 
         try {
-            TripDate createdTripDate = tripDatePlannerService.addTripDetail(tripId, tripDateCreationDTO);
+            TripDate createdTripDate = tripDatePlannerService.addTripDetail(tripId, tripDateRequestDTO);
             TripDateResponseDTO responseDTO = new TripDateResponseDTO();
             responseDTO.setTripDateId(createdTripDate.getTripDateId());
             responseDTO.setTripDate(createdTripDate.getTripDate());
@@ -117,7 +118,7 @@ public class TripDatePlannerController {
     @PutMapping("/trip/{tripId}/detail/{tripDateId}")
     public ResponseEntity<TripDate> updateCompleteTripDateDetailById(@PathVariable("tripId") Long tripId,
                                                                      @PathVariable("tripDateId") Long tripDateId,
-                                                                     @RequestBody TripDatePatchDTO tripDatePatchDTO,
+                                                                     @RequestBody TripDateRequestDTO tripDatePatchDTO,
                                                                      HttpServletRequest request,
                                                                      HttpServletResponse response) {
 
@@ -139,14 +140,14 @@ public class TripDatePlannerController {
     @PatchMapping("/trip/{tripId}/detail/{tripDateId}")
     public ResponseEntity<TripDate> updateTripDateDetailById(@PathVariable("tripId") Long tripId,
                                                              @PathVariable("tripDateId") Long tripDateId,
-                                                             @RequestBody TripDatePatchDTO tripDatePatchDTO,
+                                                             @RequestBody TripDateRequestDTO tripDateRequestDTO,
                                                              HttpServletRequest request,
                                                              HttpServletResponse response) {
 
         jwtCheckService.checkJwt(request, response);
 
         try {
-            TripDate updatedTripDate = tripDatePlannerService.updateTripDateDetailById(tripDateId, tripDatePatchDTO);
+            TripDate updatedTripDate = tripDatePlannerService.updateTripDateDetailById(tripDateId, tripDateRequestDTO);
             return new ResponseEntity<>(updatedTripDate, HttpStatus.OK);
         } catch (TripDateNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

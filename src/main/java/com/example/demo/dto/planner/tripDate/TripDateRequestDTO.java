@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TripDateCreationDTO {
+public class TripDateRequestDTO {
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate tripDate;
@@ -23,7 +23,7 @@ public class TripDateCreationDTO {
     private Long budget;
 
     @NotNull
-    private AccommodationCreationDTO accommodation;
-    private List<LocationCreationDTO> locations;
+    private AccommodationRequestDTO accommodation;
+    private List<LocationRequestDTO> locations;
 
 }
