@@ -1,6 +1,5 @@
 package com.example.demo.service.planner;
 
-import com.example.demo.dto.planner.trip.TripRequestDTO;
 import com.example.demo.dto.planner.tripDate.TripDateRequestDTO;
 import com.example.demo.entity.planner.Accommodation;
 import com.example.demo.entity.planner.Location;
@@ -10,7 +9,6 @@ import com.example.demo.repository.planner.AccommodationRepository;
 import com.example.demo.repository.planner.LocationRepository;
 import com.example.demo.repository.planner.TripDateRepository;
 import com.example.demo.repository.planner.TripRepository;
-import com.example.demo.repository.users.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +16,19 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * 이 서비스 클래스는 여행 계획의 세부 일정과 관련된 비즈니스 로직을 처리합니다.
+ * 일정의 조회, 추가, 수정, 삭제 기능을 제공합니다.
+ * @author minjeong
+ * @see TripRepository 여행 계획을 저장하고 조회하는 리포지토리
+ * @see TripDateRepository 여행 계획 내의 세부 일정을 저장하고 조회하는 리포지토리
+ * @see AccommodationRepository 숙소 정보를 저장하고 조회하는 리포지토리
+ * @see LocationRepository 위치(장소) 정보를 저장하고 조회하는 리포지토리
+ * @see TripDateRequestDTO 세부 일정 요청 데이터를 담고 있는 DTO
+ * @see TripDate 여행 계획 내의 세부 일정을 나타내는 엔티티 클래스
+ * @see Accommodation 여행 계획 내의 숙소 정보를 나타내는 엔티티 클래스
+ * @see Location 여행 계획 내의 위치(장소) 정보를 나타내는 엔티티 클래스
+ */
 @Service
 @RequiredArgsConstructor
 public class TripDatePlannerService {
@@ -26,8 +37,15 @@ public class TripDatePlannerService {
     private final TripDateRepository tripDateRepository;
     private final AccommodationRepository accommodationRepository;
     private final LocationRepository locationRepository;
-    private final UserRepository userRepository;
 
+    /**
+     * 특정 여행 계획의 모든 세부 일정을 조회합니다.
+     * 주어진 여행 ID에 해당하는 모든 일정을 가져옵니다.
+     *
+     * @param tripId 조회할 여행 계획의 ID
+     * @return 해당 여행 계획에 속한 모든 세부 일정 리스트
+     * @throws TripNotFoundException 여행 계획을 찾을 수 없는 경우 발생
+     */
     @Transactional(readOnly = true)
     public List<TripDate> getTripDates(Long tripId) {
         Trip trip = tripRepository.findById(tripId)
@@ -35,6 +53,15 @@ public class TripDatePlannerService {
         return trip.getTripDates();
     }
 
+    /**
+     * 새로운 세부 일정을 추가합니다.
+     * 주어진 여행 계획 ID와 세부 일정 정보를 사용하여 새로운 일정을 생성합니다.
+     *
+     * @param tripId             추가할 세부 일정이 속한 여행 계획의 ID
+     * @param tripDateDetailsDTO 추가할 세부 일정 정보가 담긴 DTO
+     * @return 생성된 세부 일정 객체
+     * @throws TripNotFoundException 여행 계획을 찾을 수 없는 경우 발생
+     */
     @Transactional
     public TripDate addTripDetail(Long tripId, TripDateRequestDTO tripDateDetailsDTO) {
         Trip trip = tripRepository.findById(tripId)
@@ -74,6 +101,16 @@ public class TripDatePlannerService {
         return savedTripDate;
     }
 
+    /**
+     * 특정 세부 일정을 조회합니다.
+     * 주어진 여행 계획 ID와 세부 일정 ID를 사용하여 일정을 조회합니다.
+     *
+     * @param tripId     조회할 세부 일정이 속한 여행 계획의 ID
+     * @param tripDateId 조회할 세부 일정의 ID
+     * @return 조회된 세부 일정 객체
+     * @throws TripNotFoundException    여행 계획을 찾을 수 없는 경우 발생
+     * @throws TripDateNotFoundException 세부 일정을 찾을 수 없는 경우 발생
+     */
     @Transactional(readOnly = true)
     public TripDate getTripDateById(Long tripId, Long tripDateId) {
         Trip trip = tripRepository.findById(tripId)
@@ -83,6 +120,15 @@ public class TripDatePlannerService {
                 .orElseThrow(() -> new TripDateNotFoundException("TripDate with ID " + tripDateId + " not found"));
     }
 
+    /**
+     * 특정 세부 일정의 모든 정보를 수정합니다.
+     * 주어진 세부 일정 ID와 수정할 정보를 사용하여 일정을 업데이트합니다.
+     *
+     * @param tripDateId         수정할 세부 일정의 ID
+     * @param tripDateRequestDTO 수정할 정보가 담긴 DTO
+     * @return 수정된 세부 일정 객체
+     * @throws TripDateNotFoundException 세부 일정을 찾을 수 없는 경우 발생
+     */
     @Transactional
     public TripDate updateCompleteTripDateDetailById(Long tripDateId, TripDateRequestDTO tripDateRequestDTO) {
         TripDate tripDate = tripDateRepository.findById(tripDateId)
@@ -139,6 +185,15 @@ public class TripDatePlannerService {
         return tripDateRepository.save(tripDate);
     }
 
+    /**
+     * 특정 세부 일정의 일부 정보를 수정합니다.
+     * 주어진 세부 일정 ID와 부분적으로 수정할 정보를 사용하여 일정을 업데이트합니다.
+     *
+     * @param tripDateId         수정할 세부 일정의 ID
+     * @param tripDateRequestDTO 수정할 정보가 담긴 DTO
+     * @return 수정된 세부 일정 객체
+     * @throws TripDateNotFoundException 세부 일정을 찾을 수 없는 경우 발생
+     */
     @Transactional
     public TripDate updateTripDateDetailById(Long tripDateId, TripDateRequestDTO tripDateRequestDTO) {
         TripDate tripDate = tripDateRepository.findById(tripDateId)
@@ -177,6 +232,13 @@ public class TripDatePlannerService {
         return tripDateRepository.save(tripDate);
     }
 
+    /**
+     * 특정 세부 일정을 삭제합니다.
+     * 주어진 세부 일정 ID를 사용하여 일정을 삭제합니다.
+     *
+     * @param tripDateId 삭제할 세부 일정의 ID
+     * @throws TripDateNotFoundException 세부 일정을 찾을 수 없는 경우 발생
+     */
     @Transactional
     public void deleteTripDateById(Long tripDateId) {
         TripDate tripDate = tripDateRepository.findById(tripDateId)

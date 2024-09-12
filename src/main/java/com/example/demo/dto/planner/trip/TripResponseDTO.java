@@ -9,9 +9,14 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * 여행 계획에 대한 응답 데이터를 담고 있는 DTO입니다.
+ * 서버에서 클라이언트로 여행 계획 정보를 전달할 때 사용됩니다.
+ */
 @Getter
 @Setter
 public class TripResponseDTO {
+
     private Long tripId;
     private String tripName;
     private String tripArea;
@@ -20,6 +25,12 @@ public class TripResponseDTO {
     private Long budget;
     private List<String> participantIds;
 
+    /**
+     * 주어진 Trip 엔티티를 기반으로 TripResponseDTO를 생성합니다.
+     *
+     * @param trip Trip 엔티티 객체
+     * @return 생성된 TripResponseDTO 객체
+     */
     public static TripResponseDTO fromEntity(Trip trip) {
         TripResponseDTO dto = new TripResponseDTO();
         dto.setTripId(trip.getTripId());

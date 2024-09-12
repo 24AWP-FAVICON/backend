@@ -3,11 +3,6 @@ package com.example.demo.controller.planner;
 import com.example.demo.dto.planner.tripDate.TripDateRequestDTO;
 import com.example.demo.dto.planner.tripDate.*;
 import com.example.demo.entity.planner.TripDate;
-import com.example.demo.repository.planner.AccommodationRepository;
-import com.example.demo.repository.planner.LocationRepository;
-import com.example.demo.repository.planner.TripDateRepository;
-import com.example.demo.repository.planner.TripRepository;
-import com.example.demo.repository.users.user.UserRepository;
 import com.example.demo.service.jwt.JwtCheckService;
 import com.example.demo.service.planner.TripDateNotFoundException;
 import com.example.demo.service.planner.TripDatePlannerService;
@@ -24,23 +19,38 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * TripDatePlannerController | 이 컨트롤러는 여행 계획의 세부 일정과 관련된 요청을 처리합니다.
+ * 사용자가 특정 여행 계획 내에서 일정을 조회, 작성, 수정, 삭제할 수 있도록 합니다.
+ * @author minjeong
+ * @see TripDatePlannerService 여행 계획의 세부 일정을 관리하는 서비스로, 이 컨트롤러의 요청을 처리
+ * @see TripDateRequestDTO 세부 일정 작성 및 수정 요청에 사용되는 DTO
+ * @see TripDate 여행 계획 내의 세부 일정을 나타내는 엔티티 클래스
+ * @see AccommodationResponseDTO 숙소 정보를 응답하기 위한 DTO
+ * @see LocationResponseDTO 위치(장소) 정보를 응답하기 위한 DTO
+ * @see JwtCheckService JWT 토큰을 검증하여 요청의 유효성을 검사하는 서비스
+ * @see TripNotFoundException 여행 계획이 존재하지 않을 때 발생하는 예외
+ * @see TripDateNotFoundException 세부 일정이 존재하지 않을 때 발생하는 예외
+ */
 @RestController()
 @RequestMapping("/planner")
 @RequiredArgsConstructor
 @Slf4j
 public class TripDatePlannerController {
 
-    private final TripRepository tripRepository;
-    private final UserRepository userRepository;
-    private final TripDateRepository tripDateRepository;
-    private final AccommodationRepository accommodationRepository;
-    private final LocationRepository locationRepository;
     private final JwtCheckService jwtCheckService;
     private final TripDatePlannerService tripDatePlannerService;
 
-    /*
-    특정 여행 계획 내 세부 일정 조회
-    */
+    /**
+     * 특정 여행 계획 내의 모든 세부 일정을 조회합니다.
+     * 주어진 여행 ID를 사용하여 해당 여행의 모든 일정을 가져옵니다.
+     *
+     * @param tripId   조회할 여행 계획의 ID
+     * @param request  HTTP 요청 객체
+     * @param response HTTP 응답 객체
+     * @return 여행 계획의 세부 일정 목록과 상태 코드를 포함한 응답 엔티티
+     * @throws TripNotFoundException    여행 일정이 없는 경우 404 예외를 발생
+     */
     @GetMapping("/trip/{tripId}/detail")
     public ResponseEntity<List<TripDate>> getTripDetails(@PathVariable("tripId") Long tripId,
                                                          HttpServletRequest request,
@@ -58,8 +68,15 @@ public class TripDatePlannerController {
         }
     }
 
-    /*
-    특정 여행 계획 내 세부 일정 작성
+    /**
+     * 특정 여행 계획 내에서 새로운 세부 일정을 작성합니다.
+     * 주어진 여행 ID와 일정 정보를 사용하여 새로운 일정을 생성합니다.
+     *
+     * @param tripId            작성할 세부 일정이 속한 여행 계획의 ID
+     * @param tripDateRequestDTO 생성할 세부 일정 정보가 담긴 DTO
+     * @param request           HTTP 요청 객체
+     * @param response          HTTP 응답 객체
+     * @return 생성된 세부 일정과 상태 코드를 포함한 응답 엔티티
      */
     @PostMapping("/trip/{tripId}/detail")
     @Transactional
@@ -91,8 +108,16 @@ public class TripDatePlannerController {
         }
     }
 
-    /*
-    특정 여행 계획 내 세부 일정 조회
+    /**
+     * 특정 여행 계획 내의 특정 세부 일정을 조회합니다.
+     * 주어진 여행 ID와 세부 일정 ID를 사용하여 일정을 조회합니다.
+     *
+     * @param tripId      조회할 여행 계획의 ID
+     * @param tripDateId  조회할 세부 일정의 ID
+     * @param request     HTTP 요청 객체
+     * @param response    HTTP 응답 객체
+     * @return 조회된 세부 일정과 상태 코드를 포함한 응답 엔티티
+     * @throws TripDateNotFoundException    여행 내 세부 일정이 없는 경우 404 예외를 발생
      */
     @GetMapping("/trip/{tripId}/detail/{tripDateId}")
     public ResponseEntity<TripDate> getTripDateById(@PathVariable("tripId") Long tripId,
@@ -112,8 +137,17 @@ public class TripDatePlannerController {
         }
     }
 
-    /*
-    특정 여행 계획 내 세부 일정 전체 수정
+    /**
+     * 특정 여행 계획 내의 특정 세부 일정을 전체 수정합니다.
+     * 주어진 여행 ID와 세부 일정 ID, 그리고 수정할 정보를 사용하여 일정을 업데이트합니다.
+     *
+     * @param tripId            수정할 세부 일정이 속한 여행 계획의 ID
+     * @param tripDateId        수정할 세부 일정의 ID
+     * @param tripDatePatchDTO  수정할 세부 일정 정보가 담긴 DTO
+     * @param request           HTTP 요청 객체
+     * @param response          HTTP 응답 객체
+     * @return 수정된 세부 일정과 상태 코드를 포함한 응답 엔티티
+     * @throws TripDateNotFoundException    여행 내 세부 일정이 없는 경우 404 예외를 발생
      */
     @PutMapping("/trip/{tripId}/detail/{tripDateId}")
     public ResponseEntity<TripDate> updateCompleteTripDateDetailById(@PathVariable("tripId") Long tripId,
@@ -134,8 +168,17 @@ public class TripDatePlannerController {
         }
     }
 
-    /*
-    특정 여행 계획 내 세부 일정 일부만 수정
+    /**
+     * 특정 여행 계획 내의 특정 세부 일정을 부분적으로 수정합니다.
+     * 주어진 여행 ID와 세부 일정 ID, 그리고 수정할 정보를 사용하여 일정을 부분적으로 업데이트합니다.
+     *
+     * @param tripId            수정할 세부 일정이 속한 여행 계획의 ID
+     * @param tripDateId        수정할 세부 일정의 ID
+     * @param tripDateRequestDTO 부분 수정할 세부 일정 정보가 담긴 DTO
+     * @param request           HTTP 요청 객체
+     * @param response          HTTP 응답 객체
+     * @return 수정된 세부 일정과 상태 코드를 포함한 응답 엔티티
+     * @throws TripDateNotFoundException    여행 내 세부 일정이 없는 경우 404 예외를 발생
      */
     @PatchMapping("/trip/{tripId}/detail/{tripDateId}")
     public ResponseEntity<TripDate> updateTripDateDetailById(@PathVariable("tripId") Long tripId,
@@ -156,8 +199,16 @@ public class TripDatePlannerController {
         }
     }
 
-    /*
-    특정 여행 계획 내 세부 일정 삭제
+    /**
+     * 특정 여행 계획 내의 특정 세부 일정을 삭제합니다.
+     * 주어진 여행 ID와 세부 일정 ID를 사용하여 일정을 삭제합니다.
+     *
+     * @param tripId      삭제할 세부 일정이 속한 여행 계획의 ID
+     * @param tripDateId  삭제할 세부 일정의 ID
+     * @param request     HTTP 요청 객체
+     * @param response    HTTP 응답 객체
+     * @return 상태 코드를 포함한 응답 엔티티
+     * @throws TripDateNotFoundException    여행 내 세부 일정이 없는 경우 404 예외를 발생
      */
     @DeleteMapping("/trip/{tripId}/detail/{tripDateId}")
     public ResponseEntity<String> deleteTripDateById(@PathVariable("tripId") Long tripId,
