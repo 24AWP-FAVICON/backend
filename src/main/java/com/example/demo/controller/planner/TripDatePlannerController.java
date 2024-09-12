@@ -1,4 +1,4 @@
-package com.example.demo.controller.trip;
+package com.example.demo.controller.planner;
 
 import com.example.demo.dto.planner.tripDate.*;
 import com.example.demo.entity.planner.TripDate;
@@ -8,9 +8,9 @@ import com.example.demo.repository.planner.TripDateRepository;
 import com.example.demo.repository.planner.TripRepository;
 import com.example.demo.repository.users.user.UserRepository;
 import com.example.demo.service.jwt.JwtCheckService;
-import com.example.demo.service.tripPlanner.TripDateNotFoundException;
-import com.example.demo.service.tripPlanner.TripDatePlannerService;
-import com.example.demo.service.tripPlanner.TripNotFoundException;
+import com.example.demo.service.planner.TripDateNotFoundException;
+import com.example.demo.service.planner.TripDatePlannerService;
+import com.example.demo.service.planner.TripNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;

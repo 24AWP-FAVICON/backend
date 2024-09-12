@@ -1,4 +1,4 @@
-package com.example.demo.controller.trip;
+package com.example.demo.controller.planner;
 
 import com.example.demo.dto.planner.trip.TripCreationDTO;
 import com.example.demo.dto.planner.trip.TripPatchDTO;
@@ -7,8 +7,8 @@ import com.example.demo.dto.users.user.UserIdsDTO;
 import com.example.demo.entity.planner.Trip;
 import com.example.demo.exception.InvalidUserException;
 import com.example.demo.service.jwt.JwtCheckService;
-import com.example.demo.service.tripPlanner.TripNotFoundException;
-import com.example.demo.service.tripPlanner.TripPlannerService;
+import com.example.demo.service.planner.TripNotFoundException;
+import com.example.demo.service.planner.TripPlannerService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 

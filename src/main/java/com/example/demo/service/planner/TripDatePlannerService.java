@@ -1,4 +1,4 @@
-package com.example.demo.service.tripPlanner;
+package com.example.demo.service.planner;
 
 import com.example.demo.dto.planner.tripDate.TripDateCreationDTO;
 import com.example.demo.dto.planner.tripDate.TripDatePatchDTO;
