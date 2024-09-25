@@ -73,43 +73,44 @@ public class TripDatePlannerController {
      * 주어진 여행 ID와 일정 정보를 사용하여 새로운 일정을 생성합니다.
      *
      * @param tripId            작성할 세부 일정이 속한 여행 계획의 ID
-     * @param tripDateRequestDTO 생성할 세부 일정 정보가 담긴 DTO
+     * @param tripDateRequestDTOs 생성할 세부 일정 정보 리스트가 담긴 DTO
      * @param request           HTTP 요청 객체
      * @param response          HTTP 응답 객체
      * @return 생성된 세부 일정과 상태 코드를 포함한 응답 엔티티
      */
     @PostMapping("/trip/{tripId}/detail")
     @Transactional
-    public ResponseEntity<TripDateResponseDTO> addTripDetail(@PathVariable("tripId") Long tripId,
-                                                             @RequestBody TripDateRequestDTO tripDateRequestDTO,
-                                                             HttpServletRequest request,
-                                                             HttpServletResponse response) {
-
-        jwtCheckService.checkJwt(request, response);
-
+    public ResponseEntity<List<TripDateResponseDTO>> addMultipleTripDetails(@PathVariable("tripId") Long tripId,
+                                                                            @RequestBody List<TripDateRequestDTO> tripDateRequestDTOs,
+                                                                            HttpServletRequest request,
+                                                                            HttpServletResponse response) {
         try {
-            TripDate createdTripDate = tripDatePlannerService.addTripDetail(tripId, tripDateRequestDTO);
-            TripDateResponseDTO responseDTO = new TripDateResponseDTO();
-            responseDTO.setTripDateId(createdTripDate.getTripDateId());
-            responseDTO.setTripDate(createdTripDate.getTripDate());
-            responseDTO.setTripDay(createdTripDate.getTripDay());
-            responseDTO.setBudget(createdTripDate.getBudget());
+            List<TripDateResponseDTO> responseDTOs = tripDateRequestDTOs.stream().map(tripDateRequestDTO -> {
+                TripDate createdTripDate = tripDatePlannerService.addTripDetail(tripId, tripDateRequestDTO);
 
-            // accommodation이 null인지 체크
-            if (createdTripDate.getAccommodation() != null) {
-                responseDTO.setAccommodation(new AccommodationResponseDTO(
-                        createdTripDate.getAccommodation().getAccommodationName(),
-                        createdTripDate.getAccommodation().getAccommodationLocation()
-                ));
-            } else {
-                responseDTO.setAccommodation(null);  // 숙소가 없을 경우 null로 설정
-            }
+                TripDateResponseDTO responseDTO = new TripDateResponseDTO();
+                responseDTO.setTripDateId(createdTripDate.getTripDateId());
+                responseDTO.setTripDate(createdTripDate.getTripDate());
+                responseDTO.setTripDay(createdTripDate.getTripDay());
+                responseDTO.setBudget(createdTripDate.getBudget());
 
-            responseDTO.setLocations(createdTripDate.getLocations().stream()
-                    .map(loc -> new LocationResponseDTO(loc.getLocationName(), loc.getLocationAddress()))
-                    .collect(Collectors.toList()));
+                if (createdTripDate.getAccommodation() != null) {
+                    responseDTO.setAccommodation(new AccommodationResponseDTO(
+                            createdTripDate.getAccommodation().getAccommodationName(),
+                            createdTripDate.getAccommodation().getAccommodationLocation()
+                    ));
+                } else {
+                    responseDTO.setAccommodation(null);  // 숙소가 없을 경우 null로 설정
+                }
 
-            return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+                responseDTO.setLocations(createdTripDate.getLocations().stream()
+                        .map(loc -> new LocationResponseDTO(loc.getLocationName(), loc.getLocationAddress()))
+                        .collect(Collectors.toList()));
+
+                return responseDTO;
+            }).collect(Collectors.toList());
+
+            return new ResponseEntity<>(responseDTOs, HttpStatus.CREATED);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
