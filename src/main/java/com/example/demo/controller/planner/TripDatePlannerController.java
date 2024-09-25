@@ -94,13 +94,21 @@ public class TripDatePlannerController {
             responseDTO.setTripDate(createdTripDate.getTripDate());
             responseDTO.setTripDay(createdTripDate.getTripDay());
             responseDTO.setBudget(createdTripDate.getBudget());
-            responseDTO.setAccommodation(new AccommodationResponseDTO(
-                    createdTripDate.getAccommodation().getAccommodationName(),
-                    createdTripDate.getAccommodation().getAccommodationLocation()
-            ));
+
+            // accommodation이 null인지 체크
+            if (createdTripDate.getAccommodation() != null) {
+                responseDTO.setAccommodation(new AccommodationResponseDTO(
+                        createdTripDate.getAccommodation().getAccommodationName(),
+                        createdTripDate.getAccommodation().getAccommodationLocation()
+                ));
+            } else {
+                responseDTO.setAccommodation(null);  // 숙소가 없을 경우 null로 설정
+            }
+
             responseDTO.setLocations(createdTripDate.getLocations().stream()
                     .map(loc -> new LocationResponseDTO(loc.getLocationName(), loc.getLocationAddress()))
                     .collect(Collectors.toList()));
+
             return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
         } catch (Exception e) {
             e.printStackTrace();

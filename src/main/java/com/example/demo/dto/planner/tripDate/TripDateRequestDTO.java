@@ -25,7 +25,6 @@ public class TripDateRequestDTO {
     private Integer tripDay;
     private Long budget;
 
-    @NotNull
     private AccommodationRequestDTO accommodation;
     private List<LocationRequestDTO> locations;
 
