@@ -19,7 +19,7 @@ public class Accommodation {
     private Long accommodationId;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "trip_date_id", nullable = false)
+    @JoinColumn(name = "trip_date_id")
     private TripDate tripDate;
 
     private String accommodationName;

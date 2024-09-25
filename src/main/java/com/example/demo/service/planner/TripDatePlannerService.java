@@ -77,13 +77,15 @@ public class TripDatePlannerService {
         // TripDate 저장
         TripDate savedTripDate = tripDateRepository.save(newTripDate);
 
-        // 숙소 처리
-        Accommodation accommodation = new Accommodation();
-        accommodation.setAccommodationName(tripDateDetailsDTO.getAccommodation().getAccommodationName());
-        accommodation.setAccommodationLocation(tripDateDetailsDTO.getAccommodation().getAccommodationLocation());
-        accommodation.setTripDate(savedTripDate);
-        accommodationRepository.save(accommodation);
-        savedTripDate.setAccommodation(accommodation);
+        // 숙소 정보가 있는 경우에만 처리
+        if (tripDateDetailsDTO.getAccommodation() != null) {
+            Accommodation accommodation = new Accommodation();
+            accommodation.setAccommodationName(tripDateDetailsDTO.getAccommodation().getAccommodationName());
+            accommodation.setAccommodationLocation(tripDateDetailsDTO.getAccommodation().getAccommodationLocation());
+            accommodation.setTripDate(savedTripDate);
+            accommodationRepository.save(accommodation);
+            savedTripDate.setAccommodation(accommodation);
+        }
 
         // 장소 처리
         List<Location> locations = tripDateDetailsDTO.getLocations().stream()
@@ -139,11 +141,16 @@ public class TripDatePlannerService {
         tripDate.setTripDay(tripDateRequestDTO.getTripDay());
         tripDate.setBudget(tripDateRequestDTO.getBudget());
 
-        // 숙소 정보 업데이트
-        Accommodation accommodation = tripDate.getAccommodation();
-        accommodation.setAccommodationName(tripDateRequestDTO.getAccommodation().getAccommodationName());
-        accommodation.setAccommodationLocation(tripDateRequestDTO.getAccommodation().getAccommodationLocation());
-        accommodationRepository.save(accommodation);
+        // 숙소 정보가 존재할 때만 업데이트
+        if (tripDateRequestDTO.getAccommodation() != null) {
+            Accommodation accommodation = tripDate.getAccommodation();
+            if (accommodation != null) {
+                accommodation.setAccommodationName(tripDateRequestDTO.getAccommodation().getAccommodationName());
+                accommodation.setAccommodationLocation(tripDateRequestDTO.getAccommodation().getAccommodationLocation());
+                accommodationRepository.save(accommodation);
+            }
+        }
+
 
         // 위치 정보 업데이트
         List<Location> existingLocations = tripDate.getLocations();
