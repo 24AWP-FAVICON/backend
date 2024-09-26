@@ -44,12 +44,12 @@ public class TripDatePlannerService {
      *
      * @param tripId 조회할 여행 계획의 ID
      * @return 해당 여행 계획에 속한 모든 세부 일정 리스트
-     * @throws TripNotFoundException 여행 계획을 찾을 수 없는 경우 발생
+     * @throws ComponentNotFoundException 여행 계획을 찾을 수 없는 경우 발생
      */
     @Transactional(readOnly = true)
     public List<TripDate> getTripDates(Long tripId) {
         Trip trip = tripRepository.findById(tripId)
-                .orElseThrow(() -> new TripNotFoundException("Trip with ID " + tripId + " not found"));
+                .orElseThrow(() -> new ComponentNotFoundException("Trip with ID " + tripId + " not found"));
         return trip.getTripDates();
     }
 
@@ -60,12 +60,12 @@ public class TripDatePlannerService {
      * @param tripId             추가할 세부 일정이 속한 여행 계획의 ID
      * @param tripDateDetailsDTO 추가할 세부 일정 정보가 담긴 DTO
      * @return 생성된 세부 일정 객체
-     * @throws TripNotFoundException 여행 계획을 찾을 수 없는 경우 발생
+     * @throws ComponentNotFoundException 여행 계획을 찾을 수 없는 경우 발생
      */
     @Transactional
     public TripDate addTripDetail(Long tripId, TripDateRequestDTO tripDateDetailsDTO) {
         Trip trip = tripRepository.findById(tripId)
-                .orElseThrow(() -> new TripNotFoundException("Trip with ID " + tripId + " not found"));
+                .orElseThrow(() -> new ComponentNotFoundException("Trip with ID " + tripId + " not found"));
 
         // 새로운 TripDate 생성
         TripDate newTripDate = new TripDate();
@@ -110,16 +110,15 @@ public class TripDatePlannerService {
      * @param tripId     조회할 세부 일정이 속한 여행 계획의 ID
      * @param tripDateId 조회할 세부 일정의 ID
      * @return 조회된 세부 일정 객체
-     * @throws TripNotFoundException    여행 계획을 찾을 수 없는 경우 발생
-     * @throws TripDateNotFoundException 세부 일정을 찾을 수 없는 경우 발생
+     * @throws ComponentNotFoundException    여행 계획 또는 세부 일정을 찾을 수 없는 경우 발생
      */
     @Transactional(readOnly = true)
     public TripDate getTripDateById(Long tripId, Long tripDateId) {
         Trip trip = tripRepository.findById(tripId)
-                .orElseThrow(() -> new TripNotFoundException("Trip with ID " + tripId + " not found"));
+                .orElseThrow(() -> new ComponentNotFoundException("Trip with ID " + tripId + " not found"));
 
         return tripDateRepository.findById(tripDateId)
-                .orElseThrow(() -> new TripDateNotFoundException("TripDate with ID " + tripDateId + " not found"));
+                .orElseThrow(() -> new ComponentNotFoundException("TripDate with ID " + tripDateId + " not found"));
     }
 
     /**
@@ -129,12 +128,12 @@ public class TripDatePlannerService {
      * @param tripDateId         수정할 세부 일정의 ID
      * @param tripDateRequestDTO 수정할 정보가 담긴 DTO
      * @return 수정된 세부 일정 객체
-     * @throws TripDateNotFoundException 세부 일정을 찾을 수 없는 경우 발생
+     * @throws ComponentNotFoundException 세부 일정을 찾을 수 없는 경우 발생
      */
     @Transactional
     public TripDate updateCompleteTripDateDetailById(Long tripDateId, TripDateRequestDTO tripDateRequestDTO) {
         TripDate tripDate = tripDateRepository.findById(tripDateId)
-                .orElseThrow(() -> new TripDateNotFoundException("TripDate with ID " + tripDateId + " not found"));
+                .orElseThrow(() -> new ComponentNotFoundException("TripDate with ID " + tripDateId + " not found"));
 
         // 일자 정보 업데이트
         tripDate.setTripDate(tripDateRequestDTO.getTripDate());
@@ -199,12 +198,12 @@ public class TripDatePlannerService {
      * @param tripDateId         수정할 세부 일정의 ID
      * @param tripDateRequestDTO 수정할 정보가 담긴 DTO
      * @return 수정된 세부 일정 객체
-     * @throws TripDateNotFoundException 세부 일정을 찾을 수 없는 경우 발생
+     * @throws ComponentNotFoundException 세부 일정을 찾을 수 없는 경우 발생
      */
     @Transactional
     public TripDate updateTripDateDetailById(Long tripDateId, TripDateRequestDTO tripDateRequestDTO) {
         TripDate tripDate = tripDateRepository.findById(tripDateId)
-                .orElseThrow(() -> new TripDateNotFoundException("TripDate with ID " + tripDateId + " not found"));
+                .orElseThrow(() -> new ComponentNotFoundException("TripDate with ID " + tripDateId + " not found"));
 
         // 일자 정보 업데이트 (optional)
         if (tripDateRequestDTO.getTripDate() != null) {
@@ -244,12 +243,12 @@ public class TripDatePlannerService {
      * 주어진 세부 일정 ID를 사용하여 일정을 삭제합니다.
      *
      * @param tripDateId 삭제할 세부 일정의 ID
-     * @throws TripDateNotFoundException 세부 일정을 찾을 수 없는 경우 발생
+     * @throws ComponentNotFoundException 세부 일정을 찾을 수 없는 경우 발생
      */
     @Transactional
     public void deleteTripDateById(Long tripDateId) {
         TripDate tripDate = tripDateRepository.findById(tripDateId)
-                .orElseThrow(() -> new TripDateNotFoundException("TripDate with ID " + tripDateId + " not found"));
+                .orElseThrow(() -> new ComponentNotFoundException("TripDate with ID " + tripDateId + " not found"));
 
         // 숙소 정보 삭제 (숙소가 있을 경우)
         if (tripDate.getAccommodation() != null) {

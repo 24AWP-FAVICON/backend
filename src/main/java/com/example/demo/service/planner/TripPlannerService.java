@@ -71,12 +71,12 @@ public class TripPlannerService {
      *
      * @param tripId 조회할 여행 계획의 ID
      * @return 조회된 여행 계획 객체
-     * @throws TripNotFoundException 여행 계획을 찾을 수 없는 경우 발생
+     * @throws ComponentNotFoundException 여행 계획을 찾을 수 없는 경우 발생
      */
     @Transactional(readOnly = true)
     public Trip getTripById(Long tripId) {
         return tripRepository.findById(tripId)
-                .orElseThrow(() -> new TripNotFoundException("Trip with ID " + tripId + " not found"));
+                .orElseThrow(() -> new ComponentNotFoundException("Trip with ID " + tripId + " not found"));
     }
 
     /**
@@ -86,11 +86,11 @@ public class TripPlannerService {
      * @param tripId 수정할 여행 계획의 ID
      * @param trip   수정할 여행 계획 객체
      * @return 수정된 여행 계획 객체
-     * @throws TripNotFoundException 여행 계획을 찾을 수 없는 경우 발생
+     * @throws ComponentNotFoundException 여행 계획을 찾을 수 없는 경우 발생
      *
      */
     @Transactional
-    public Trip updateTrip(Long tripId, Trip trip) throws TripNotFoundException {
+    public Trip updateTrip(Long tripId, Trip trip) throws ComponentNotFoundException {
         Optional<Trip> tripOptional = tripRepository.findById(tripId);
 
         if (tripOptional.isPresent()) {
@@ -112,7 +112,7 @@ public class TripPlannerService {
             // 데이터베이스에 저장
             return tripRepository.save(updateTrip);
         } else {
-            throw new TripNotFoundException("Trip with ID " + tripId + " not found");
+            throw new ComponentNotFoundException("Trip with ID " + tripId + " not found");
         }
     }
 
@@ -163,7 +163,7 @@ public class TripPlannerService {
     @Transactional
     public void shareTripPlanWithUser(Long tripId, List<String> userGoogleIds) {
         Trip trip = tripRepository.findById(tripId)
-                .orElseThrow(() -> new TripNotFoundException("Trip with ID " + tripId + " not found"));
+                .orElseThrow(() -> new ComponentNotFoundException("Trip with ID " + tripId + " not found"));
 
         List<User> participants = userRepository.findAllByUserIdIn(userGoogleIds);
         if (participants.isEmpty()) {
