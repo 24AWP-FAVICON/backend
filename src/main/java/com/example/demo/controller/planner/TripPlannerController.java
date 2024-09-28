@@ -1,5 +1,6 @@
 package com.example.demo.controller.planner;
 
+import com.example.demo.converter.DtoConverter;
 import com.example.demo.dto.planner.trip.TripRequestDTO;
 import com.example.demo.dto.planner.trip.TripResponseDTO;
 import com.example.demo.dto.users.user.UserIdsDTO;
@@ -54,9 +55,11 @@ public class TripPlannerController {
         jwtCheckService.checkJwt(request, response);
         try {
             List<Trip> trips = tripPlannerService.getAllTrips();
-            List<TripResponseDTO> responseDTOs = trips.stream()
-                    .map(TripResponseDTO::fromEntity)
-                    .collect(Collectors.toList());
+            List<TripResponseDTO> responseDTOs = DtoConverter.convertEntityListToDtoList(trips, TripResponseDTO::fromEntity);
+
+//            List<TripResponseDTO> responseDTOs = trips.stream()
+//                    .map(TripResponseDTO::fromEntity)
+//                    .collect(Collectors.toList());
 
             if (trips.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
