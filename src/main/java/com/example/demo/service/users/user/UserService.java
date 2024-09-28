@@ -31,11 +31,7 @@ public class UserService {
     public UserInfoDto getUserInfo(String userId,String requestedUserId) {
         userRepository.findById(userId).orElseThrow(() -> new ComponentNotFoundException("USER_NOT_FOUND"));
         User requestedUser = userRepository.findById(requestedUserId).orElseThrow(() -> new ComponentNotFoundException("USER_NOT_FOUND"));
-
-        //다른 사용자가 요청했을때 비공개글은 필터링
-        UserInfoDto userInfoDto = UserInfoDto.toDto(requestedUser);
-        List<Post> openPostList = userInfoDto.getPostList().stream().filter(Post::isOpen).toList();
-        userInfoDto.setPostList(openPostList);
-        return userInfoDto;
+        
+        return UserInfoDto.toDto(requestedUser);
     }
 }
