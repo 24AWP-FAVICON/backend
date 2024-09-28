@@ -18,9 +18,9 @@ import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
 
-@Component
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
+@Component
 public class CustomLogoutFilter extends GenericFilterBean {
 
     private final JwtUtil jwtUtil;
@@ -32,14 +32,12 @@ public class CustomLogoutFilter extends GenericFilterBean {
     }
 
     private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
-        // /users/logout 으로 GET 요청이 왔을 때 필터 로직 시작
+
         String requestUri = request.getRequestURI();
-        if (!requestUri.matches("^\\/users\\/logout$")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
         String requestMethod = request.getMethod();
-        if (!requestMethod.equals("GET")) {
+
+        log.info("request uri: {}", requestUri);
+        if (!requestUri.matches("^\\/users\\/logout$") || !requestMethod.equals("GET")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -57,15 +55,9 @@ public class CustomLogoutFilter extends GenericFilterBean {
             return;
         }
 
-        // get refresh token
-        String refreshToken = jwtUtil.getRefreshToken(request);
-
-        // 리프레시 토큰 유효성 체크
-        if (!checkRefreshTokenValid(response, refreshToken)) return;
-
         // 리프레시 토큰이 디비에 저장되어 있지 않다면
         String data = redisUtil.getData(accessToken);
-        if (!redisUtil.checkIfKeyExists(accessToken) && (data == null || !data.equals(refreshToken))) {
+        if (!redisUtil.checkIfKeyExists(accessToken) && data == null) {
             setFailResponse(response, "LOGOUT_FAIL", HttpStatus.BAD_REQUEST);
             return;
         }
@@ -98,24 +90,13 @@ public class CustomLogoutFilter extends GenericFilterBean {
      * refresh 토큰의 유효성 검사
      */
     private boolean checkRefreshTokenValid(HttpServletResponse response, String refreshToken) throws IOException {
-        if (refreshToken == null) {
-            //response status code
-            setFailResponse(response, "LOGOUT_FAIL", HttpStatus.BAD_REQUEST);
+        if (refreshToken == null || jwtUtil.isExpired(refreshToken)) {
             return false;
         }
-        // expired check
-        try {
-            jwtUtil.isExpired(refreshToken);
-        } catch (ExpiredJwtException e) {
-            // response status code
-            setFailResponse(response, "LOGOUT_FAIL", HttpStatus.BAD_REQUEST);
-            return false;
-        }
+
         // 토큰이 refresh인지 확인 (발급 시 페이로드에 명시)
         String category = jwtUtil.getCategory(refreshToken);
         if (!category.equals("refresh")) {
-            // response status code
-            setFailResponse(response, "LOGOUT_FAIL", HttpStatus.BAD_REQUEST);
             return false;
         }
         return true;
