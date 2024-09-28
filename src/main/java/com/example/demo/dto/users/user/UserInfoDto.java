@@ -1,5 +1,6 @@
 package com.example.demo.dto.users.user;
 
+import com.example.demo.dto.community.post.PostResponseDto;
 import com.example.demo.entity.community.block.Block;
 import com.example.demo.entity.community.follow.Follow;
 import com.example.demo.entity.community.post.Post;
@@ -19,20 +20,14 @@ public class UserInfoDto {
     private String userId;
     private String nickname;
     private List<Trip> trips;
-    private List<Post> postList;
-    private List<Follow> followerList;
-    private List<Follow> followingList;
-    private List<Block> blockList;
+    private List<PostResponseDto> postResponseDtoList;
 
-    public static UserInfoDto toDto(User user){
+    public static UserInfoDto toDto(User user) {
         return new UserInfoDto(
-          user.getUserId(),
-          user.getNickname(),
-          user.getTripList(),
-          user.getPostList(),
-          user.getFollowerList(),
-          user.getFollowingList(),
-          user.getBlockList()
+                user.getUserId(),
+                user.getNickname(),
+                user.getTripList(),
+                user.getPostList().stream().map(PostResponseDto::toDto).toList()
         );
     }
 
