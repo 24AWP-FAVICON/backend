@@ -1,0 +1,196 @@
+package com.example.demo.service;
+
+import com.example.demo.dto.planner.trip.TripRequestDTO;
+import com.example.demo.entity.planner.Trip;
+import com.example.demo.entity.users.user.Role;
+import com.example.demo.entity.users.user.User;
+import com.example.demo.repository.planner.TripRepository;
+import com.example.demo.repository.users.user.UserRepository;
+import com.example.demo.service.planner.TripPlannerService;
+import com.example.demo.exception.InvalidUserException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+class TripServiceTest {
+
+    @Mock
+    private TripRepository tripRepository;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @InjectMocks
+    private TripPlannerService tripPlannerService;
+
+    private Trip trip;
+    private TripRequestDTO tripRequestDTO;
+    private List<User> participants;
+
+    @BeforeEach
+    void setUp() {
+        try (AutoCloseable closeable = MockitoAnnotations.openMocks(this)) {
+            // User 객체 생성
+            User user1 = new User();
+            user1.setUserId("minbory925@gmail.com");
+            user1.setNickname("Minjeong");
+            user1.setRole(Role.ROLE_USER);
+            user1.setRecentConnect(LocalDateTime.now());
+            user1.setCreatedAt(LocalDate.now());
+
+            User user2 = new User();
+            user2.setUserId("deepdevming@gmail.com");
+            user2.setNickname("Mingguriguri");
+            user2.setRole(Role.ROLE_USER);
+            user2.setRecentConnect(LocalDateTime.now());
+            user2.setCreatedAt(LocalDate.now());
+
+            participants = Arrays.asList(user1, user2);
+
+            // Trip 엔티티 객체 초기화 (수정 가능한 리스트로 변경)
+            trip = new Trip();
+            trip.setTripId(1L);
+            trip.setTripName("Summer Trip");
+            trip.setTripArea("Seoul");
+            trip.setStartDate(LocalDate.now());
+            trip.setEndDate(LocalDate.now().plusDays(5));
+            trip.setBudget(100000L);
+            trip.setParticipants(new ArrayList<>()); // 수정 가능한 ArrayList로 설정
+
+            // TripRequestDTO 객체 초기화
+            tripRequestDTO = new TripRequestDTO();
+            tripRequestDTO.setTripName("Summer Trip");
+            tripRequestDTO.setTripArea("Seoul");
+            tripRequestDTO.setStartDate(LocalDate.now());
+            tripRequestDTO.setEndDate(LocalDate.now().plusDays(5));
+            tripRequestDTO.setBudget(100000L);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Test
+    @DisplayName("새로운 여행 계획 생성 성공 테스트")
+    void testCreateTrip() {
+        when(userRepository.findAllById(tripRequestDTO.getParticipantIds())).thenReturn(participants);
+        when(tripRepository.save(any(Trip.class))).thenReturn(trip);
+
+        Trip createdTrip = tripPlannerService.createTrip(tripRequestDTO);
+
+        assertNotNull(createdTrip);
+        assertEquals(tripRequestDTO.getTripName(), createdTrip.getTripName());
+        assertEquals(tripRequestDTO.getTripArea(), createdTrip.getTripArea());
+        verify(tripRepository, times(1)).save(any(Trip.class));
+    }
+
+    @Test
+    @DisplayName("특정 ID의 여행 계획 조회 성공 테스트")
+    void testGetTripById() {
+        when(tripRepository.findById(1L)).thenReturn(Optional.of(trip));
+
+        Trip foundTrip = tripPlannerService.getTripById(1L);
+
+        assertNotNull(foundTrip);
+        assertEquals(1L, foundTrip.getTripId());
+        assertEquals("Summer Trip", foundTrip.getTripName());
+        verify(tripRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    @DisplayName("여행 계획 수정 성공 테스트")
+    void testUpdateTrip() {
+        when(tripRepository.findById(1L)).thenReturn(Optional.of(trip));
+        when(userRepository.findAllById(any())).thenReturn(participants);
+        when(tripRepository.save(any(Trip.class))).thenReturn(trip);
+
+        Trip updatedTrip = tripPlannerService.updateTrip(1L, trip);
+
+        assertNotNull(updatedTrip);
+        assertEquals(trip.getTripName(), updatedTrip.getTripName());
+        assertEquals(trip.getTripArea(), updatedTrip.getTripArea());
+        verify(tripRepository, times(1)).save(any(Trip.class));
+    }
+
+    @Test
+    @DisplayName("여행 계획 삭제 성공 테스트")
+    void testDeleteTripById() {
+        doNothing().when(tripRepository).deleteById(1L);
+
+        tripPlannerService.deleteTripById(1L);
+
+        verify(tripRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    @DisplayName("전체 여행 계획 조회 성공 테스트")
+    void testGetAllTrips() {
+        // 여행 계획이 있는 경우
+        when(tripRepository.findAll()).thenReturn(Collections.singletonList(trip));
+
+        List<Trip> trips = tripPlannerService.getAllTrips();
+
+        assertNotNull(trips);
+        assertEquals(1, trips.size());
+        assertEquals(trip.getTripName(), trips.get(0).getTripName());
+        verify(tripRepository, times(1)).findAll();
+    }
+
+    @Test
+    @DisplayName("여행 계획 공유 성공 테스트")
+    void testShareTripPlanWithUser() {
+
+        // TripRepository에서 해당 여행 계획을 찾을 수 있도록 설정
+        when(tripRepository.findById(1L)).thenReturn(Optional.of(trip));
+
+        // UserRepository에서 공유할 참여자를 찾을 수 있도록 설정
+        when(userRepository.findAllByUserIdIn(Arrays.asList("minbory925@gmail.com", "deepdevming@gmail.com")))
+                .thenReturn(participants);
+
+        // 테스트할 메서드 호출
+        tripPlannerService.shareTripPlanWithUser(1L, Arrays.asList("minbory925@gmail.com", "deepdevming@gmail.com"));
+
+        // 새 참여자가 추가되었는지 확인
+        List<User> addedParticipants = trip.getParticipants();
+        assertNotNull(addedParticipants);
+        assertEquals(2, addedParticipants.size()); // 참여자 수 확인
+
+        // 참여자의 ID가 예상대로 추가되었는지 확인
+        List<String> participantIds = addedParticipants.stream().map(User::getUserId).toList();
+        assertTrue(participantIds.containsAll(Arrays.asList("minbory925@gmail.com", "deepdevming@gmail.com")));
+
+        // TripRepository의 save 메서드가 호출되었는지 확인
+        verify(tripRepository, times(1)).save(any(Trip.class));
+    }
+
+    @Test
+    @DisplayName("유효하지 않은 사용자로 인해 여행 계획 공유 실패 테스트")
+    void testShareTripPlanWithInvalidUser() {
+        // 여행 계획에 참여자가 비어있는 상태로 설정
+        trip.setParticipants(Collections.emptyList());
+
+        // TripRepository에서 여행 계획을 찾을 수 있도록 설정
+        when(tripRepository.findById(1L)).thenReturn(Optional.of(trip));
+
+        // UserRepository에서 유효한 사용자가 없는 상황을 설정
+        when(userRepository.findAllByUserIdIn(anyList())).thenReturn(Collections.emptyList());
+
+        // InvalidUserException이 발생하는지 확인
+        assertThrows(InvalidUserException.class, () -> {
+            tripPlannerService.shareTripPlanWithUser(1L, Arrays.asList("invalidUser@gmail.com"));
+        });
+
+        // TripRepository의 save 메서드가 호출되지 않았는지 확인
+        verify(tripRepository, times(0)).save(any(Trip.class));
+    }
+}
