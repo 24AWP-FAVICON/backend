@@ -1,4 +1,4 @@
-package com.example.demo.service;
+package com.example.demo.service.planner;
 
 import com.example.demo.dto.planner.trip.TripRequestDTO;
 import com.example.demo.entity.planner.Trip;
@@ -6,7 +6,6 @@ import com.example.demo.entity.users.user.Role;
 import com.example.demo.entity.users.user.User;
 import com.example.demo.repository.planner.TripRepository;
 import com.example.demo.repository.users.user.UserRepository;
-import com.example.demo.service.planner.TripPlannerService;
 import com.example.demo.exception.InvalidUserException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
