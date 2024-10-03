@@ -1,6 +1,7 @@
 package com.example.demo.config;
 
 import com.example.demo.filter.CustomLogoutFilter;
+import com.example.demo.filter.JwtExceptionFilter;
 import com.example.demo.filter.JwtFilter;
 import com.example.demo.service.jwt.JwtUtil;
 import com.example.demo.service.RedisUtil;
@@ -83,6 +84,7 @@ public class SecurityConfig {
 
         http.addFilterBefore(new CustomLogoutFilter(jwtUtil, redisUtil), LogoutFilter.class);
         http.addFilterBefore(new JwtFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JwtExceptionFilter(), JwtFilter.class);
 
         //세션 설정
         http
