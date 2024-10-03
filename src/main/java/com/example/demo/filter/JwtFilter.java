@@ -57,9 +57,6 @@ public class JwtFilter extends GenericFilter {
             log.info("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", SecurityContextHolder.getContext().getAuthentication().getPrincipal(), requestURI);
             //다음 필터로 넘기기
             chain.doFilter(request, response);
-        } else {
-            log.info("There Is Not Valid Jwt. requestURI : {}", requestURI);
-            throw new TokenInvalidException(jwtToken);
         }
     }
 }
