@@ -5,8 +5,6 @@ import com.example.demo.dto.planner.trip.TripResponseDTO;
 import com.example.demo.dto.users.user.UserIdsDTO;
 import com.example.demo.entity.planner.Trip;
 import com.example.demo.exception.InvalidUserException;
-import com.example.demo.service.jwt.JwtCheckService;
-import com.example.demo.service.planner.TripDateNotFoundException;
 import com.example.demo.service.planner.TripNotFoundException;
 import com.example.demo.service.planner.TripPlannerService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +25,6 @@ import java.util.stream.Collectors;
  * @see TripPlannerService 여행 계획과 관련된 비즈니스 로직을 처리하는 서비스 클래스
  * @see TripRequestDTO 여행 계획 생성 요청 데이터를 담고 있는 DTO
  * @see TripResponseDTO 여행 계획 응답 데이터를 담고 있는 DTO
- * @see JwtCheckService JWT 토큰을 검증하여 요청의 유효성을 검사하는 서비스
  * @see TripNotFoundException 여행 계획이 존재하지 않을 때 발생하는 예외
  * @author minjeong
  */
@@ -37,7 +34,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class TripPlannerController {
 
-    private final JwtCheckService jwtCheckService;
     private final TripPlannerService tripPlannerService;
 
     /**
@@ -51,7 +47,6 @@ public class TripPlannerController {
      */
     @GetMapping("/trip")
     public ResponseEntity<List<TripResponseDTO>> getAllTrips(HttpServletRequest request, HttpServletResponse response) {
-        jwtCheckService.checkJwt(request, response);
         try {
             List<Trip> trips = tripPlannerService.getAllTrips();
             List<TripResponseDTO> responseDTOs = trips.stream()
@@ -79,7 +74,6 @@ public class TripPlannerController {
     @PostMapping("/trip")
     public ResponseEntity<Trip> addNewTrip(@RequestBody TripRequestDTO tripDTO,
                                            HttpServletRequest request, HttpServletResponse response) {
-        jwtCheckService.checkJwt(request, response);
 
         try {
             Trip createdTrip = tripPlannerService.createTrip(tripDTO);
@@ -103,7 +97,6 @@ public class TripPlannerController {
     @GetMapping("/trip/{tripId}")
     public ResponseEntity<TripResponseDTO> getTripById(@PathVariable("tripId") Long tripId,
                                             HttpServletRequest request, HttpServletResponse response) {
-        jwtCheckService.checkJwt(request, response);
 
         try {
             Trip trip = tripPlannerService.getTripById(tripId);
@@ -134,8 +127,6 @@ public class TripPlannerController {
                                                HttpServletRequest request,
                                                HttpServletResponse response) {
 
-        jwtCheckService.checkJwt(request, response);
-
         try {
             Trip updatedTrip = tripPlannerService.updateTrip(tripId, trip);
             TripResponseDTO responseDTO = TripResponseDTO.fromEntity(updatedTrip);
@@ -165,8 +156,6 @@ public class TripPlannerController {
                                                       HttpServletRequest request,
                                                       HttpServletResponse response) {
 
-        jwtCheckService.checkJwt(request, response);
-
         try {
             Trip updatedTrip = tripPlannerService.partialUpdateTrip(tripId, tripRequestDTO);
             TripResponseDTO responseDTO = TripResponseDTO.fromEntity(updatedTrip);
@@ -193,8 +182,6 @@ public class TripPlannerController {
     public ResponseEntity<String> deleteTripById(@PathVariable("tripId") Long tripId,
                                                  HttpServletRequest request,
                                                  HttpServletResponse response) {
-        jwtCheckService.checkJwt(request, response);
-
         try {
             tripPlannerService.deleteTripById(tripId);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -222,8 +209,6 @@ public class TripPlannerController {
                                                         @RequestBody UserIdsDTO userIdsDTO,
                                                         HttpServletRequest request,
                                                         HttpServletResponse response) {
-
-        jwtCheckService.checkJwt(request, response);
 
         try {
             tripPlannerService.shareTripPlanWithUser(tripId, userIdsDTO.getUserGoogleIds());
