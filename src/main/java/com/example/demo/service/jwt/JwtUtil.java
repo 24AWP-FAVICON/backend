@@ -2,12 +2,13 @@ package com.example.demo.service.jwt;
 
 import com.example.demo.entity.users.user.User;
 import com.example.demo.exception.ComponentNotFoundException;
+import com.example.demo.repository.users.user.UserRepository;
 import com.example.demo.service.RedisUtil;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import com.example.demo.repository.users.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,7 +52,11 @@ public class JwtUtil {
      * jwt 검증 후 email 가져오기
      */
     public String getUserId(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("userId", String.class);
+        try{
+            return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("userId", String.class);
+        }catch (ExpiredJwtException e){
+            return e.getClaims().get("userId", String.class);
+        }
     }
 
     /**
@@ -67,7 +72,11 @@ public class JwtUtil {
      */
     public Boolean isExpired(String token) {
 
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
+        try{
+            return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
+        }catch(ExpiredJwtException e){
+            return Boolean.TRUE;
+        }
     }
 
     /**
