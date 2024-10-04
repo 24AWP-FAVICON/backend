@@ -1,11 +1,12 @@
 package com.example.demo.controller.planner;
 
+import com.example.demo.converter.DtoConverter;
 import com.example.demo.dto.planner.trip.TripRequestDTO;
 import com.example.demo.dto.planner.trip.TripResponseDTO;
 import com.example.demo.dto.users.user.UserIdsDTO;
 import com.example.demo.entity.planner.Trip;
 import com.example.demo.exception.InvalidUserException;
-import com.example.demo.service.planner.TripNotFoundException;
+import com.example.demo.service.planner.ComponentNotFoundException;
 import com.example.demo.service.planner.TripPlannerService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * TripPlannerController | 이 컨트롤러는 여행 계획과 관련된 요청을 처리합니다.
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * @see TripPlannerService 여행 계획과 관련된 비즈니스 로직을 처리하는 서비스 클래스
  * @see TripRequestDTO 여행 계획 생성 요청 데이터를 담고 있는 DTO
  * @see TripResponseDTO 여행 계획 응답 데이터를 담고 있는 DTO
- * @see TripNotFoundException 여행 계획이 존재하지 않을 때 발생하는 예외
+ * @see ComponentNotFoundException 여행 계획이 존재하지 않을 때 발생하는 예외
  * @author minjeong
  */
 @RestController()
@@ -49,9 +49,11 @@ public class TripPlannerController {
     public ResponseEntity<List<TripResponseDTO>> getAllTrips(HttpServletRequest request, HttpServletResponse response) {
         try {
             List<Trip> trips = tripPlannerService.getAllTrips();
-            List<TripResponseDTO> responseDTOs = trips.stream()
-                    .map(TripResponseDTO::fromEntity)
-                    .collect(Collectors.toList());
+            List<TripResponseDTO> responseDTOs = DtoConverter.convertEntityListToDtoList(trips, TripResponseDTO::fromEntity);
+
+//            List<TripResponseDTO> responseDTOs = trips.stream()
+//                    .map(TripResponseDTO::fromEntity)
+//                    .collect(Collectors.toList());
 
             if (trips.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -92,7 +94,7 @@ public class TripPlannerController {
      * @param request  HTTP 요청 객체
      * @param response HTTP 응답 객체
      * @return 조회된 여행 계획과 상태 코드를 포함한 응답 엔티티
-     * @throws TripNotFoundException    여행 계획이 없는 경우 404 예외를 발생
+     * @throws ComponentNotFoundException    여행 계획이 없는 경우 404 예외를 발생
      */
     @GetMapping("/trip/{tripId}")
     public ResponseEntity<TripResponseDTO> getTripById(@PathVariable("tripId") Long tripId,
@@ -103,7 +105,7 @@ public class TripPlannerController {
             TripResponseDTO responseDTO = TripResponseDTO.fromEntity(trip);
 
             return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-        } catch (TripNotFoundException e) {
+        } catch (ComponentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -119,7 +121,7 @@ public class TripPlannerController {
      * @param request  HTTP 요청 객체
      * @param response HTTP 응답 객체
      * @return 수정된 여행 계획과 상태 코드를 포함한 응답 엔티티
-     * @throws TripNotFoundException    여행 계획이 없는 경우 404 예외를 발생
+     * @throws ComponentNotFoundException    여행 계획이 없는 경우 404 예외를 발생
      */
     @PutMapping("/trip/{tripId}")
     public ResponseEntity<TripResponseDTO> updateTripById(@PathVariable("tripId") Long tripId,
@@ -132,7 +134,7 @@ public class TripPlannerController {
             TripResponseDTO responseDTO = TripResponseDTO.fromEntity(updatedTrip);
 
             return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-        } catch (TripNotFoundException e) {
+        } catch (ComponentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -148,7 +150,7 @@ public class TripPlannerController {
      * @param request         HTTP 요청 객체
      * @param response        HTTP 응답 객체
      * @return 수정된 여행 계획과 상태 코드를 포함한 응답 엔티티
-     * @throws TripNotFoundException    여행 계획이 없는 경우 404 예외를 발생
+     * @throws ComponentNotFoundException    여행 계획이 없는 경우 404 예외를 발생
      */
     @PatchMapping("/trip/{tripId}")
     public ResponseEntity<TripResponseDTO> partialUpdateTripById(@PathVariable("tripId") Long tripId,
@@ -161,7 +163,7 @@ public class TripPlannerController {
             TripResponseDTO responseDTO = TripResponseDTO.fromEntity(updatedTrip);
 
             return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-        } catch (TripNotFoundException e) {
+        } catch (ComponentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -176,7 +178,7 @@ public class TripPlannerController {
      * @param request  HTTP 요청 객체
      * @param response HTTP 응답 객체
      * @return 상태 코드를 포함한 응답 엔티티
-     * @throws TripNotFoundException    여행 계획이 없는 경우 404 예외를 발생
+     * @throws ComponentNotFoundException    여행 계획이 없는 경우 404 예외를 발생
      */
     @DeleteMapping("/trip/{tripId}")
     public ResponseEntity<String> deleteTripById(@PathVariable("tripId") Long tripId,
@@ -185,7 +187,7 @@ public class TripPlannerController {
         try {
             tripPlannerService.deleteTripById(tripId);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (TripNotFoundException e) {
+        } catch (ComponentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -201,7 +203,7 @@ public class TripPlannerController {
      * @param request       HTTP 요청 객체
      * @param response      HTTP 응답 객체
      * @return 상태 코드를 포함한 응답 엔티티
-     * @throws TripNotFoundException    여행 계획이 없는 경우 404 예외를 발생
+     * @throws ComponentNotFoundException    여행 계획이 없는 경우 404 예외를 발생
      * @throws InvalidUserException 주어진 사용자 ID가 유효하지 않은 경우 400 예외를 발생
      */
     @PostMapping("/trip/{tripId}/share")
@@ -213,7 +215,7 @@ public class TripPlannerController {
         try {
             tripPlannerService.shareTripPlanWithUser(tripId, userIdsDTO.getUserGoogleIds());
             return new ResponseEntity<>("User added to the trip successfully", HttpStatus.OK);
-        } catch (TripNotFoundException e) {
+        } catch (ComponentNotFoundException e) {
             return new ResponseEntity<>("Trip not found", HttpStatus.NOT_FOUND);
         } catch (InvalidUserException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
