@@ -17,6 +17,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 이 컨트롤러 클래스는 채팅방 관련 API 요청을 처리합니다.
+ * 채팅방 생성, 조회, 메시지 관리, 사용자 초대 및 채팅방 나가기와 같은 기능을 제공합니다.
+ * JWT 토큰을 기반으로 사용자의 인증을 처리합니다.
+ */
 @RestController()
 @RequestMapping("/messenger")
 @RequiredArgsConstructor
@@ -26,7 +31,15 @@ public class ChatRoomController {
     private final ChatRoomService chatRoomService;
     private static final Logger logger = LoggerFactory.getLogger(ChatRoomController.class);
 
-    // 채팅방 생성
+    /**
+     * 새로운 채팅방을 생성합니다.
+     * 클라이언트에서 받은 요청 데이터를 기반으로 채팅방을 생성하고, 해당 방 정보를 반환합니다.
+     *
+     * @param requestDTO 채팅방 생성 요청 데이터를 담은 DTO
+     * @param request HttpServletRequest 객체 (JWT 검증에 사용)
+     * @param response HttpServletResponse 객체 (JWT 검증에 사용)
+     * @return 생성된 채팅방 정보와 함께 200 OK 응답
+     */
     @PostMapping("/chatRoom")
     public ResponseEntity<ChatRoomResponseDTO> createChatRoom(@RequestBody ChatRoomRequestDTO.CreateDTO requestDTO,
                                                               HttpServletRequest request,
@@ -40,7 +53,14 @@ public class ChatRoomController {
         }
     }
 
-    // 사용자가 참여한 모든 채팅방 조회
+    /**
+     * 사용자가 참여한 모든 채팅방을 조회합니다.
+     * 사용자가 참여 중인 채팅방 목록을 반환합니다.
+     *
+     * @param request HttpServletRequest 객체 (JWT 검증에 사용)
+     * @param response HttpServletResponse 객체 (JWT 검증에 사용)
+     * @return 사용자가 참여한 채팅방 목록과 함께 200 OK 응답
+     */
     @GetMapping("/chatRooms")
     public ResponseEntity<List<ChatRoomResponseDTO>> getAllChatRooms(HttpServletRequest request,
                                                                      HttpServletResponse response,
@@ -57,7 +77,14 @@ public class ChatRoomController {
         }
     }
 
-    // 특정 채팅방 정보 조회
+    /**
+     * 특정 채팅방의 정보를 조회합니다.
+     *
+     * @param roomId 조회할 채팅방의 ID
+     * @param request HttpServletRequest 객체 (JWT 검증에 사용)
+     * @param response HttpServletResponse 객체 (JWT 검증에 사용)
+     * @return 채팅방 정보와 함께 200 OK 응답
+     */
     @GetMapping("/chatRoom/{roomId}")
     public ResponseEntity<ChatRoomResponseDTO> getChatRoomById(@PathVariable("roomId") Long roomId,
                                                                HttpServletRequest request,
@@ -71,7 +98,14 @@ public class ChatRoomController {
         }
     }
 
-    // 특정 채팅방 내 대화 내역 조회
+    /**
+     * 특정 채팅방 내 모든 메시지를 조회합니다.
+     *
+     * @param roomId 조회할 채팅방의 ID
+     * @param request HttpServletRequest 객체 (JWT 검증에 사용)
+     * @param response HttpServletResponse 객체 (JWT 검증에 사용)
+     * @return 채팅방 메시지 목록과 함께 200 OK 응답
+     */
     @GetMapping("/chatRoom/{roomId}/messages")
     public ResponseEntity<List<ChatMessageDTO>> getChatRoomMessagesById(@PathVariable("roomId") Long roomId,
                                                                HttpServletRequest request,
@@ -84,7 +118,16 @@ public class ChatRoomController {
             return ResponseEntity.internalServerError().body(null);
         }
     }
-    // 특정 채팅방 이름 변경
+
+    /**
+     * 특정 채팅방의 이름을 변경합니다.
+     *
+     * @param roomId 변경할 채팅방의 ID
+     * @param updateDTO 새 채팅방 이름이 담긴 DTO
+     * @param request HttpServletRequest 객체 (JWT 검증에 사용)
+     * @param response HttpServletResponse 객체 (JWT 검증에 사용)
+     * @return 성공적으로 변경된 경우 200 OK 응답
+     */
     @PutMapping("/chatRoom/{roomId}/name")
     public ResponseEntity<Void> updateChatRoomName(@PathVariable("roomId") Long roomId,
                                                    @RequestBody ChatRoomRequestDTO.UpdateDTO updateDTO,
@@ -98,7 +141,16 @@ public class ChatRoomController {
             return ResponseEntity.internalServerError().build();
         }
     }
-    // 특정 채팅방에 사용자 초대
+
+    /**
+     * 특정 채팅방에 사용자를 초대합니다.
+     *
+     * @param roomId 초대할 채팅방의 ID
+     * @param inviteRequest 초대할 사용자 정보가 담긴 DTO
+     * @param request HttpServletRequest 객체 (JWT 검증에 사용)
+     * @param response HttpServletResponse 객체 (JWT 검증에 사용)
+     * @return 성공적으로 초대된 경우 200 OK 응답
+     */
     @PostMapping("/chatRoom/{roomId}")
     public ResponseEntity<Void> inviteUserToChatRoom(@PathVariable("roomId") Long roomId,
                                                      @RequestBody ChatRoomRequestDTO.InviteDTO inviteRequest,
@@ -113,7 +165,15 @@ public class ChatRoomController {
         }
     }
 
-    // 특정 채팅방 나가기 (사용자 삭제)
+
+    /**
+     * 특정 채팅방에서 사용자가 나가도록 처리합니다.
+     *
+     * @param roomId 채팅방의 ID
+     * @param request HttpServletRequest 객체 (JWT 검증에 사용)
+     * @param response HttpServletResponse 객체 (JWT 검증에 사용)
+     * @return 성공적으로 나간 경우 200 OK 응답
+     */
     @DeleteMapping("/chatRoom/{roomId}")
     public ResponseEntity<Void> leaveChatRoom(@PathVariable("roomId") Long roomId,
                                               HttpServletRequest request,
