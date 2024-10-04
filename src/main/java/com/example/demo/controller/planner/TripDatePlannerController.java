@@ -4,9 +4,8 @@ import com.example.demo.dto.planner.tripDate.TripDateRequestDTO;
 import com.example.demo.dto.planner.tripDate.*;
 import com.example.demo.entity.planner.TripDate;
 import com.example.demo.service.jwt.JwtCheckService;
-import com.example.demo.service.planner.TripDateNotFoundException;
+import com.example.demo.service.planner.ComponentNotFoundException;
 import com.example.demo.service.planner.TripDatePlannerService;
-import com.example.demo.service.planner.TripNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -29,8 +28,7 @@ import java.util.stream.Collectors;
  * @see AccommodationResponseDTO 숙소 정보를 응답하기 위한 DTO
  * @see LocationResponseDTO 위치(장소) 정보를 응답하기 위한 DTO
  * @see JwtCheckService JWT 토큰을 검증하여 요청의 유효성을 검사하는 서비스
- * @see TripNotFoundException 여행 계획이 존재하지 않을 때 발생하는 예외
- * @see TripDateNotFoundException 세부 일정이 존재하지 않을 때 발생하는 예외
+ * @see ComponentNotFoundException 여행 계획 또는 세부 일정이 존재하지 않을 때 발생하는 예외
  */
 @RestController()
 @RequestMapping("/planner")
@@ -49,7 +47,7 @@ public class TripDatePlannerController {
      * @param request  HTTP 요청 객체
      * @param response HTTP 응답 객체
      * @return 여행 계획의 세부 일정 목록과 상태 코드를 포함한 응답 엔티티
-     * @throws TripNotFoundException    여행 일정이 없는 경우 404 예외를 발생
+     * @throws ComponentNotFoundException    여행 일정이 없는 경우 404 예외를 발생
      */
     @GetMapping("/trip/{tripId}/detail")
     public ResponseEntity<List<TripDate>> getTripDetails(@PathVariable("tripId") Long tripId,
@@ -61,7 +59,7 @@ public class TripDatePlannerController {
         try {
             List<TripDate> tripDates = tripDatePlannerService.getTripDates(tripId);
             return new ResponseEntity<>(tripDates, HttpStatus.OK);
-        } catch (TripNotFoundException e) {
+        } catch (ComponentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -73,43 +71,44 @@ public class TripDatePlannerController {
      * 주어진 여행 ID와 일정 정보를 사용하여 새로운 일정을 생성합니다.
      *
      * @param tripId            작성할 세부 일정이 속한 여행 계획의 ID
-     * @param tripDateRequestDTO 생성할 세부 일정 정보가 담긴 DTO
+     * @param tripDateRequestDTOs 생성할 세부 일정 정보 리스트가 담긴 DTO
      * @param request           HTTP 요청 객체
      * @param response          HTTP 응답 객체
      * @return 생성된 세부 일정과 상태 코드를 포함한 응답 엔티티
      */
     @PostMapping("/trip/{tripId}/detail")
     @Transactional
-    public ResponseEntity<TripDateResponseDTO> addTripDetail(@PathVariable("tripId") Long tripId,
-                                                             @RequestBody TripDateRequestDTO tripDateRequestDTO,
-                                                             HttpServletRequest request,
-                                                             HttpServletResponse response) {
-
-        jwtCheckService.checkJwt(request, response);
-
+    public ResponseEntity<List<TripDateResponseDTO>> addMultipleTripDetails(@PathVariable("tripId") Long tripId,
+                                                                            @RequestBody List<TripDateRequestDTO> tripDateRequestDTOs,
+                                                                            HttpServletRequest request,
+                                                                            HttpServletResponse response) {
         try {
-            TripDate createdTripDate = tripDatePlannerService.addTripDetail(tripId, tripDateRequestDTO);
-            TripDateResponseDTO responseDTO = new TripDateResponseDTO();
-            responseDTO.setTripDateId(createdTripDate.getTripDateId());
-            responseDTO.setTripDate(createdTripDate.getTripDate());
-            responseDTO.setTripDay(createdTripDate.getTripDay());
-            responseDTO.setBudget(createdTripDate.getBudget());
+            List<TripDateResponseDTO> responseDTOs = tripDateRequestDTOs.stream().map(tripDateRequestDTO -> {
+                TripDate createdTripDate = tripDatePlannerService.addTripDetail(tripId, tripDateRequestDTO);
 
-            // accommodation이 null인지 체크
-            if (createdTripDate.getAccommodation() != null) {
-                responseDTO.setAccommodation(new AccommodationResponseDTO(
-                        createdTripDate.getAccommodation().getAccommodationName(),
-                        createdTripDate.getAccommodation().getAccommodationLocation()
-                ));
-            } else {
-                responseDTO.setAccommodation(null);  // 숙소가 없을 경우 null로 설정
-            }
+                TripDateResponseDTO responseDTO = new TripDateResponseDTO();
+                responseDTO.setTripDateId(createdTripDate.getTripDateId());
+                responseDTO.setTripDate(createdTripDate.getTripDate());
+                responseDTO.setTripDay(createdTripDate.getTripDay());
+                responseDTO.setBudget(createdTripDate.getBudget());
 
-            responseDTO.setLocations(createdTripDate.getLocations().stream()
-                    .map(loc -> new LocationResponseDTO(loc.getLocationName(), loc.getLocationAddress()))
-                    .collect(Collectors.toList()));
+                if (createdTripDate.getAccommodation() != null) {
+                    responseDTO.setAccommodation(new AccommodationResponseDTO(
+                            createdTripDate.getAccommodation().getAccommodationName(),
+                            createdTripDate.getAccommodation().getAccommodationLocation()
+                    ));
+                } else {
+                    responseDTO.setAccommodation(null);  // 숙소가 없을 경우 null로 설정
+                }
 
-            return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+                responseDTO.setLocations(createdTripDate.getLocations().stream()
+                        .map(loc -> new LocationResponseDTO(loc.getLocationName(), loc.getLocationAddress()))
+                        .collect(Collectors.toList()));
+
+                return responseDTO;
+            }).collect(Collectors.toList());
+
+            return new ResponseEntity<>(responseDTOs, HttpStatus.CREATED);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -125,7 +124,7 @@ public class TripDatePlannerController {
      * @param request     HTTP 요청 객체
      * @param response    HTTP 응답 객체
      * @return 조회된 세부 일정과 상태 코드를 포함한 응답 엔티티
-     * @throws TripDateNotFoundException    여행 내 세부 일정이 없는 경우 404 예외를 발생
+     * @throws ComponentNotFoundException    여행 내 세부 일정이 없는 경우 404 예외를 발생
      */
     @GetMapping("/trip/{tripId}/detail/{tripDateId}")
     public ResponseEntity<TripDate> getTripDateById(@PathVariable("tripId") Long tripId,
@@ -138,7 +137,7 @@ public class TripDatePlannerController {
         try {
             TripDate tripDate = tripDatePlannerService.getTripDateById(tripId, tripDateId);
             return new ResponseEntity<>(tripDate, HttpStatus.OK);
-        } catch (TripNotFoundException | TripDateNotFoundException e) {
+        } catch (ComponentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -155,7 +154,7 @@ public class TripDatePlannerController {
      * @param request           HTTP 요청 객체
      * @param response          HTTP 응답 객체
      * @return 수정된 세부 일정과 상태 코드를 포함한 응답 엔티티
-     * @throws TripDateNotFoundException    여행 내 세부 일정이 없는 경우 404 예외를 발생
+     * @throws ComponentNotFoundException    여행 내 세부 일정이 없는 경우 404 예외를 발생
      */
     @PutMapping("/trip/{tripId}/detail/{tripDateId}")
     public ResponseEntity<TripDate> updateCompleteTripDateDetailById(@PathVariable("tripId") Long tripId,
@@ -169,7 +168,7 @@ public class TripDatePlannerController {
         try {
             TripDate updatedTripDate = tripDatePlannerService.updateCompleteTripDateDetailById(tripDateId, tripDatePatchDTO);
             return new ResponseEntity<>(updatedTripDate, HttpStatus.OK);
-        } catch (TripDateNotFoundException e) {
+        } catch (ComponentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -186,7 +185,7 @@ public class TripDatePlannerController {
      * @param request           HTTP 요청 객체
      * @param response          HTTP 응답 객체
      * @return 수정된 세부 일정과 상태 코드를 포함한 응답 엔티티
-     * @throws TripDateNotFoundException    여행 내 세부 일정이 없는 경우 404 예외를 발생
+     * @throws ComponentNotFoundException    여행 내 세부 일정이 없는 경우 404 예외를 발생
      */
     @PatchMapping("/trip/{tripId}/detail/{tripDateId}")
     public ResponseEntity<TripDate> updateTripDateDetailById(@PathVariable("tripId") Long tripId,
@@ -200,7 +199,7 @@ public class TripDatePlannerController {
         try {
             TripDate updatedTripDate = tripDatePlannerService.updateTripDateDetailById(tripDateId, tripDateRequestDTO);
             return new ResponseEntity<>(updatedTripDate, HttpStatus.OK);
-        } catch (TripDateNotFoundException e) {
+        } catch (ComponentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -216,7 +215,7 @@ public class TripDatePlannerController {
      * @param request     HTTP 요청 객체
      * @param response    HTTP 응답 객체
      * @return 상태 코드를 포함한 응답 엔티티
-     * @throws TripDateNotFoundException    여행 내 세부 일정이 없는 경우 404 예외를 발생
+     * @throws ComponentNotFoundException    여행 내 세부 일정이 없는 경우 404 예외를 발생
      */
     @DeleteMapping("/trip/{tripId}/detail/{tripDateId}")
     public ResponseEntity<String> deleteTripDateById(@PathVariable("tripId") Long tripId,
@@ -229,7 +228,7 @@ public class TripDatePlannerController {
         try {
             tripDatePlannerService.deleteTripDateById(tripDateId);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (TripDateNotFoundException e) {
+        } catch (ComponentNotFoundException e) {
             return new ResponseEntity<>("Trip Date not found", HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>("Error deleting Trip Date: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
