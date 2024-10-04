@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-
 @Slf4j
 @Component
 public class JwtUtil {
@@ -35,55 +34,73 @@ public class JwtUtil {
     private RedisUtil redisUtil;
     private SecretKey secretKey;
 
+    /**
+     * JwtUtil 생성자.
+     * @param secret JWT의 시크릿 키
+     */
     public JwtUtil(@Value("${spring.jwt.secret}") String secret) {
         // 시크릿 키 생성
         secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
     /**
-     * jwt 검증 후 토큰의 category 가져오기
+     * JWT에서 카테고리를 추출합니다.
+     *
+     * @param token JWT 토큰
+     * @return 카테고리 문자열
      */
     public String getCategory(String token) {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("category", String.class);
     }
 
-
     /**
-     * jwt 검증 후 email 가져오기
+     * JWT에서 사용자 ID를 추출합니다.
+     *
+     * @param token JWT 토큰
+     * @return 사용자 ID 문자열
      */
     public String getUserId(String token) {
-        try{
+        try {
             return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("userId", String.class);
-        }catch (ExpiredJwtException e){
+        } catch (ExpiredJwtException e) {
             return e.getClaims().get("userId", String.class);
         }
     }
 
     /**
-     * jwt 검증 후 role 가져오기
+     * JWT에서 역할(role)을 추출합니다.
+     *
+     * @param token JWT 토큰
+     * @return 역할 문자열
      */
     public String getRole(String token) {
-
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("role", String.class);
     }
 
     /**
-     * jwt가 만료됐는지 확인
+     * JWT가 만료되었는지 확인합니다.
+     *
+     * @param token JWT 토큰
+     * @return 만료 여부
      */
     public Boolean isExpired(String token) {
-
-        try{
+        try {
             return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
-        }catch(ExpiredJwtException e){
+        } catch (ExpiredJwtException e) {
             return Boolean.TRUE;
         }
     }
 
     /**
-     * Token 생성
+     * 새로운 JWT 토큰을 생성합니다.
+     *
+     * @param category 카테고리
+     * @param userId 사용자 ID
+     * @param role 역할
+     * @param expiredMs 만료 시간 (밀리초)
+     * @return 생성된 JWT 토큰
      */
     public String createToken(String category, String userId, String role, Long expiredMs) {
-
         String nickname = userRepository.findById(userId).get().getNickname();
 
         return Jwts.builder()
@@ -98,22 +115,29 @@ public class JwtUtil {
     }
 
     /**
-     * Access Token 가져오는 메서드
+     * HTTP 요청에서 Access Token을 가져옵니다.
+     *
+     * @param request HTTP 요청
+     * @return Access Token 문자열
      */
     public String getAccessToken(HttpServletRequest request) {
-        //request에서 Authorization 헤더를 찾음
+        // request에서 Authorization 헤더를 찾음
         String authorization = request.getHeader("Authorization");
 
-        //Authorization 헤더 검증
+        // Authorization 헤더 검증
         if (authorization == null || !authorization.startsWith("Bearer ")) {
             return null;
         }
-        //Bearer 부분 제거 후 순수 액세스 토큰만 획득
+        // Bearer 부분 제거 후 순수 액세스 토큰만 획득
         return authorization.split(" ")[1];
     }
 
     /**
-     * Refresh Token 가져오는 메서드
+     * HTTP 요청에서 Refresh Token을 가져옵니다.
+     *
+     * @param request HTTP 요청
+     * @return Refresh Token 문자열
+     * @throws ComponentNotFoundException Refresh Token이 없는 경우 예외 발생
      */
     public String getRefreshToken(HttpServletRequest request) {
         String refreshToken = null;
@@ -126,23 +150,22 @@ public class JwtUtil {
                 }
             }
         } catch (NullPointerException e) {
-
             String accessToken = getAccessToken(request);
-            //Refresh 토큰 redis에서 제거
+            // Refresh 토큰 Redis에서 제거
             redisUtil.deleteData(accessToken);
-
             throw new ComponentNotFoundException("REFRESH_TOKEN_NOT_FOUND");
-
         }
 
         return refreshToken;
     }
 
     /**
-     * Access Token 으로 인증객체를 만드는 메서드
+     * Access Token으로 인증 객체를 생성합니다.
+     *
+     * @param token Access Token
+     * @return Authentication 객체
      */
     public Authentication getAuthentication(String token) {
-
         Claims claims = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
 
         String userId = claims.get("userId", String.class);
@@ -155,5 +178,4 @@ public class JwtUtil {
 
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
-
 }
