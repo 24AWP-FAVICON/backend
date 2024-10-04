@@ -45,7 +45,7 @@ class TripDatePlannerServiceTest {
 
     @Test
     @DisplayName("TripDate 생성 성공 테스트")
-    void test_addTripDetail_success() {
+    void addTripDetail_success() {
         // Given: TripDateRequestDTO 생성
         TripDateRequestDTO tripDateRequestDTO = new TripDateRequestDTO();
         tripDateRequestDTO.setTripDate(LocalDate.now());
@@ -80,7 +80,7 @@ class TripDatePlannerServiceTest {
 
     @Test
     @DisplayName("TripDate 추가 실패 - Trip not found")
-    void test_addTripDetail_Fail_TripNotFound() {
+    void addTripDetail_tripNotFound() {
         // given
         TripDateRequestDTO requestDTO = new TripDateRequestDTO();
         when(tripRepository.findById(1L)).thenReturn(Optional.empty());
@@ -92,7 +92,7 @@ class TripDatePlannerServiceTest {
 
     @Test
     @DisplayName("모든 TripDate 조회 성공")
-    void test_getTripDates_Success() {
+    void getTripDates_success() {
         // given
         Trip trip = new Trip();
         trip.setTripId(1L);
@@ -112,7 +112,7 @@ class TripDatePlannerServiceTest {
 
     @Test
     @DisplayName("TripDate 조회 실패 - Trip not found")
-    void test_getTripDates_Fail_TripNotFound() {
+    void getTripDates_tripNotFound() {
         // given
         when(tripRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -122,7 +122,7 @@ class TripDatePlannerServiceTest {
 
     @Test
     @DisplayName("특정 TripDate 조회 성공")
-    void test_getTripDateById_Success() {
+    void getTripDateById_success() {
         // given
         Trip trip = new Trip();
         trip.setTripId(1L);
@@ -142,7 +142,7 @@ class TripDatePlannerServiceTest {
 
     @Test
     @DisplayName("TripDate 수정 성공 테스트")
-    void test_updateTripDetail_success() {
+    void updateTripDetail_success() {
         // Given: 기존 TripDate 데이터 설정
         TripDate tripDate = new TripDate();
         tripDate.setTripDateId(1L);
@@ -189,12 +189,9 @@ class TripDatePlannerServiceTest {
         assertEquals("New Address 3", result.getLocations().get(1).getLocationAddress());  // 두 번째 Location 주소 확인
     }
 
-
-
-
     @Test
     @DisplayName("TripDate 삭제 성공")
-    void test_deleteTripDateById_Success() {
+    void deleteTripDateById_success() {
         // given
         TripDate tripDate = new TripDate();
         tripDate.setTripDateId(1L);
@@ -210,7 +207,7 @@ class TripDatePlannerServiceTest {
 
     @Test
     @DisplayName("TripDate 삭제 실패 - TripDate not found")
-    void test_deleteTripDateById_Fail_TripDateNotFound() {
+    void deleteTripDateById_tripDateNotFound() {
         // given
         when(tripDateRepository.findById(1L)).thenReturn(Optional.empty());
 

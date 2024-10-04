@@ -81,7 +81,7 @@ class TripServiceTest {
 
     @Test
     @DisplayName("새로운 여행 계획 생성 성공 테스트")
-    void testCreateTrip() {
+    void createTrip_success() {
         when(userRepository.findAllById(tripRequestDTO.getParticipantIds())).thenReturn(participants);
         when(tripRepository.save(any(Trip.class))).thenReturn(trip);
 
@@ -95,7 +95,7 @@ class TripServiceTest {
 
     @Test
     @DisplayName("특정 ID의 여행 계획 조회 성공 테스트")
-    void testGetTripById() {
+    void getTripById_success() {
         when(tripRepository.findById(1L)).thenReturn(Optional.of(trip));
 
         Trip foundTrip = tripPlannerService.getTripById(1L);
@@ -108,7 +108,7 @@ class TripServiceTest {
 
     @Test
     @DisplayName("여행 계획 수정 성공 테스트")
-    void testUpdateTrip() {
+    void updateTrip_success() {
         when(tripRepository.findById(1L)).thenReturn(Optional.of(trip));
         when(userRepository.findAllById(any())).thenReturn(participants);
         when(tripRepository.save(any(Trip.class))).thenReturn(trip);
@@ -123,7 +123,7 @@ class TripServiceTest {
 
     @Test
     @DisplayName("여행 계획 삭제 성공 테스트")
-    void testDeleteTripById() {
+    void deleteTripById_success() {
         doNothing().when(tripRepository).deleteById(1L);
 
         tripPlannerService.deleteTripById(1L);
@@ -133,7 +133,7 @@ class TripServiceTest {
 
     @Test
     @DisplayName("전체 여행 계획 조회 성공 테스트")
-    void testGetAllTrips() {
+    void getAllTrips_success() {
         // 여행 계획이 있는 경우
         when(tripRepository.findAll()).thenReturn(Collections.singletonList(trip));
 
@@ -147,7 +147,7 @@ class TripServiceTest {
 
     @Test
     @DisplayName("여행 계획 공유 성공 테스트")
-    void testShareTripPlanWithUser() {
+    void shareTripPlan_success() {
 
         // TripRepository에서 해당 여행 계획을 찾을 수 있도록 설정
         when(tripRepository.findById(1L)).thenReturn(Optional.of(trip));
@@ -174,7 +174,7 @@ class TripServiceTest {
 
     @Test
     @DisplayName("유효하지 않은 사용자로 인해 여행 계획 공유 실패 테스트")
-    void testShareTripPlanWithInvalidUser() {
+    void shareTripPlan_invalidUser() {
         // 여행 계획에 참여자가 비어있는 상태로 설정
         trip.setParticipants(Collections.emptyList());
 
