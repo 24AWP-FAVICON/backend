@@ -1,9 +1,11 @@
 package com.example.demo.controller.messenger;
 
-import com.example.demo.service.jwt.JwtCheckService;
+
+import com.example.demo.entity.users.user.User;
 import com.example.demo.service.messenger.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,14 +19,14 @@ import jakarta.servlet.http.HttpServletResponse;
 public class MessageController {
 
     private final ChatMessageService chatMessageService;
-    private final JwtCheckService jwtCheckService;
 
     // 메시지 읽음 여부 표시
     @PutMapping("/messages/read/{roomId}")
     public void markMessagesAsRead(@PathVariable Long roomId,
                                    HttpServletRequest request,
-                                   HttpServletResponse response) {
-        String userId = jwtCheckService.checkJwt(request, response);
+                                   HttpServletResponse response,
+                                   Authentication authentication) {
+        String userId = ((User) authentication.getPrincipal()).getUserId();
         chatMessageService.markMessagesAsRead(roomId, userId);
     }
 }

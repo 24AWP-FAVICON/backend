@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * Google 사용자 가입 및 업데이트 서비스를 제공하는 클래스.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -23,30 +26,32 @@ public class GoogleJoinService {
     private final AlarmSettingsRepository alarmSettingsRepository;
 
     /**
-     * 구글 회원 회원가입 로직
+     * 구글 사용자 가입 프로세스를 수행합니다.
+     *
+     * @param joinGoogleUserDTO 구글 사용자 정보 DTO
      */
-
     @Transactional
-    public boolean joinGoogleProcess(JoinGoogleUserDTO joinGoogleUserDTO) {
+    public void joinGoogleProcess(JoinGoogleUserDTO joinGoogleUserDTO) {
         User newUser = setGoogleUserEntity(joinGoogleUserDTO);
         AlarmSettings alarmSettings = new AlarmSettings();
         alarmSettings.setUser(newUser);
         newUser.setAlarmSettings(alarmSettings);
 
-        log.info(newUser.getUserId());
+        log.info("New User Is Created. {}", newUser);
 
         try {
             alarmSettingsRepository.save(alarmSettings);
             userRepository.save(newUser);
         } catch (Exception e) {
             log.error(e.toString());
-            return false;
         }
-        return true;
     }
 
     /**
-     * 회원 엔티티 생성
+     * 새로운 사용자 엔티티를 생성합니다.
+     *
+     * @param joinGoogleUserDTO 구글 사용자 정보 DTO
+     * @return 생성된 사용자 엔티티
      */
     private static User setGoogleUserEntity(JoinGoogleUserDTO joinGoogleUserDTO) {
         User newUser = new User();
@@ -60,9 +65,14 @@ public class GoogleJoinService {
         return newUser;
     }
 
-
+    /**
+     * 기존 구글 사용자의 정보를 업데이트합니다.
+     *
+     * @param joinGoogleUserDTO 구글 사용자 정보 DTO
+     */
     public void updateGoogleUser(JoinGoogleUserDTO joinGoogleUserDTO) {
-        User user = userRepository.findById(joinGoogleUserDTO.getUserId()).orElseThrow(() -> new ComponentNotFoundException("USER_NOT_FOUND"));
+        User user = userRepository.findById(joinGoogleUserDTO.getUserId())
+                .orElseThrow(() -> new ComponentNotFoundException("USER_NOT_FOUND"));
         user.setNickname(joinGoogleUserDTO.getNickname());
         userRepository.save(user);
     }

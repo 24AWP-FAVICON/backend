@@ -3,7 +3,6 @@ package com.example.demo.controller.planner;
 import com.example.demo.dto.planner.tripDate.TripDateRequestDTO;
 import com.example.demo.dto.planner.tripDate.*;
 import com.example.demo.entity.planner.TripDate;
-import com.example.demo.service.jwt.JwtCheckService;
 import com.example.demo.service.planner.ComponentNotFoundException;
 import com.example.demo.service.planner.TripDatePlannerService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +26,6 @@ import java.util.stream.Collectors;
  * @see TripDate 여행 계획 내의 세부 일정을 나타내는 엔티티 클래스
  * @see AccommodationResponseDTO 숙소 정보를 응답하기 위한 DTO
  * @see LocationResponseDTO 위치(장소) 정보를 응답하기 위한 DTO
- * @see JwtCheckService JWT 토큰을 검증하여 요청의 유효성을 검사하는 서비스
  * @see ComponentNotFoundException 여행 계획 또는 세부 일정이 존재하지 않을 때 발생하는 예외
  */
 @RestController()
@@ -36,7 +34,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class TripDatePlannerController {
 
-    private final JwtCheckService jwtCheckService;
     private final TripDatePlannerService tripDatePlannerService;
 
     /**
@@ -53,8 +50,6 @@ public class TripDatePlannerController {
     public ResponseEntity<List<TripDate>> getTripDetails(@PathVariable("tripId") Long tripId,
                                                          HttpServletRequest request,
                                                          HttpServletResponse response) {
-
-        jwtCheckService.checkJwt(request, response);
 
         try {
             List<TripDate> tripDates = tripDatePlannerService.getTripDates(tripId);
@@ -131,9 +126,6 @@ public class TripDatePlannerController {
                                                     @PathVariable("tripDateId") Long tripDateId,
                                                     HttpServletRequest request,
                                                     HttpServletResponse response) {
-
-        jwtCheckService.checkJwt(request, response);
-
         try {
             TripDate tripDate = tripDatePlannerService.getTripDateById(tripId, tripDateId);
             return new ResponseEntity<>(tripDate, HttpStatus.OK);
@@ -163,8 +155,6 @@ public class TripDatePlannerController {
                                                                      HttpServletRequest request,
                                                                      HttpServletResponse response) {
 
-        jwtCheckService.checkJwt(request, response);
-
         try {
             TripDate updatedTripDate = tripDatePlannerService.updateCompleteTripDateDetailById(tripDateId, tripDatePatchDTO);
             return new ResponseEntity<>(updatedTripDate, HttpStatus.OK);
@@ -193,9 +183,6 @@ public class TripDatePlannerController {
                                                              @RequestBody TripDateRequestDTO tripDateRequestDTO,
                                                              HttpServletRequest request,
                                                              HttpServletResponse response) {
-
-        jwtCheckService.checkJwt(request, response);
-
         try {
             TripDate updatedTripDate = tripDatePlannerService.updateTripDateDetailById(tripDateId, tripDateRequestDTO);
             return new ResponseEntity<>(updatedTripDate, HttpStatus.OK);
@@ -222,9 +209,6 @@ public class TripDatePlannerController {
                                                      @PathVariable("tripDateId") Long tripDateId,
                                                      HttpServletRequest request,
                                                      HttpServletResponse response) {
-
-        jwtCheckService.checkJwt(request, response);
-
         try {
             tripDatePlannerService.deleteTripDateById(tripDateId);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);

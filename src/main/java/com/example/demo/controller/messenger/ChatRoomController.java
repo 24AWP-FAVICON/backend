@@ -3,7 +3,7 @@ package com.example.demo.controller.messenger;
 import com.example.demo.dto.messenger.ChatMessageDTO;
 import com.example.demo.dto.messenger.ChatRoomRequestDTO;
 import com.example.demo.dto.messenger.ChatRoomResponseDTO;
-import com.example.demo.service.jwt.JwtCheckService;
+import com.example.demo.entity.users.user.User;
 import com.example.demo.service.messenger.ChatRoomService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +23,6 @@ import java.util.List;
 @Slf4j
 public class ChatRoomController {
 
-    private final JwtCheckService jwtCheckService;
     private final ChatRoomService chatRoomService;
     private static final Logger logger = LoggerFactory.getLogger(ChatRoomController.class);
 
@@ -32,7 +32,6 @@ public class ChatRoomController {
                                                               HttpServletRequest request,
                                                               HttpServletResponse response) {
         try {
-            jwtCheckService.checkJwt(request, response);
             ChatRoomResponseDTO responseDTO = chatRoomService.createChatRoom(requestDTO);
             return ResponseEntity.ok(responseDTO);
         } catch (Exception e) {
@@ -44,11 +43,12 @@ public class ChatRoomController {
     // 사용자가 참여한 모든 채팅방 조회
     @GetMapping("/chatRooms")
     public ResponseEntity<List<ChatRoomResponseDTO>> getAllChatRooms(HttpServletRequest request,
-                                                                     HttpServletResponse response) {
+                                                                     HttpServletResponse response,
+                                                                     Authentication authentication) {
         logger.info("Received request to get all chat rooms");
 
         try {
-            String userId = jwtCheckService.checkJwt(request, response);
+            String userId = ((User) authentication.getPrincipal()).getUserId();
             List<ChatRoomResponseDTO> responseDTOList = chatRoomService.findAllChatRoomsByUserId(userId);
             return ResponseEntity.ok(responseDTOList);
         } catch (Exception e) {
@@ -63,7 +63,6 @@ public class ChatRoomController {
                                                                HttpServletRequest request,
                                                                HttpServletResponse response) {
         try {
-            jwtCheckService.checkJwt(request, response);
             ChatRoomResponseDTO responseDTO = chatRoomService.findChatRoomById(roomId);
             return ResponseEntity.ok(responseDTO);
         } catch (Exception e) {
@@ -78,7 +77,6 @@ public class ChatRoomController {
                                                                HttpServletRequest request,
                                                                HttpServletResponse response) {
         try {
-            jwtCheckService.checkJwt(request, response);
             List<ChatMessageDTO> messages = chatRoomService.getChatMessagesByRoomId(roomId);
             return ResponseEntity.ok(messages);
         } catch (Exception e) {
@@ -93,7 +91,6 @@ public class ChatRoomController {
                                                    HttpServletRequest request,
                                                    HttpServletResponse response) {
         try {
-            jwtCheckService.checkJwt(request, response);
             chatRoomService.updateChatRoomName(roomId, updateDTO.getName());
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -108,7 +105,6 @@ public class ChatRoomController {
                                                      HttpServletRequest request,
                                                      HttpServletResponse response) {
         try {
-            jwtCheckService.checkJwt(request, response);
             chatRoomService.inviteUserToChatRoom(roomId, inviteRequest);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -121,9 +117,10 @@ public class ChatRoomController {
     @DeleteMapping("/chatRoom/{roomId}")
     public ResponseEntity<Void> leaveChatRoom(@PathVariable("roomId") Long roomId,
                                               HttpServletRequest request,
-                                              HttpServletResponse response) {
+                                              HttpServletResponse response,
+                                              Authentication authentication) {
         try {
-            String userId = jwtCheckService.checkJwt(request, response);
+            String userId = ((User) authentication.getPrincipal()).getUserId();
             chatRoomService.leaveChatRoom(roomId, userId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
