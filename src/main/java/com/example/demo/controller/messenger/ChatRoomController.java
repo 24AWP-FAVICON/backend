@@ -36,14 +36,10 @@ public class ChatRoomController {
      * 클라이언트에서 받은 요청 데이터를 기반으로 채팅방을 생성하고, 해당 방 정보를 반환합니다.
      *
      * @param requestDTO 채팅방 생성 요청 데이터를 담은 DTO
-     * @param request HttpServletRequest 객체 (JWT 검증에 사용)
-     * @param response HttpServletResponse 객체 (JWT 검증에 사용)
      * @return 생성된 채팅방 정보와 함께 200 OK 응답
      */
     @PostMapping("/chatRoom")
-    public ResponseEntity<ChatRoomResponseDTO> createChatRoom(@RequestBody ChatRoomRequestDTO.CreateDTO requestDTO,
-                                                              HttpServletRequest request,
-                                                              HttpServletResponse response) {
+    public ResponseEntity<ChatRoomResponseDTO> createChatRoom(@RequestBody ChatRoomRequestDTO.CreateDTO requestDTO) {
         try {
             ChatRoomResponseDTO responseDTO = chatRoomService.createChatRoom(requestDTO);
             return ResponseEntity.ok(responseDTO);
@@ -57,14 +53,10 @@ public class ChatRoomController {
      * 사용자가 참여한 모든 채팅방을 조회합니다.
      * 사용자가 참여 중인 채팅방 목록을 반환합니다.
      *
-     * @param request HttpServletRequest 객체 (JWT 검증에 사용)
-     * @param response HttpServletResponse 객체 (JWT 검증에 사용)
      * @return 사용자가 참여한 채팅방 목록과 함께 200 OK 응답
      */
     @GetMapping("/chatRooms")
-    public ResponseEntity<List<ChatRoomResponseDTO>> getAllChatRooms(HttpServletRequest request,
-                                                                     HttpServletResponse response,
-                                                                     Authentication authentication) {
+    public ResponseEntity<List<ChatRoomResponseDTO>> getAllChatRooms(Authentication authentication) {
         logger.info("Received request to get all chat rooms");
 
         try {
@@ -81,14 +73,10 @@ public class ChatRoomController {
      * 특정 채팅방의 정보를 조회합니다.
      *
      * @param roomId 조회할 채팅방의 ID
-     * @param request HttpServletRequest 객체 (JWT 검증에 사용)
-     * @param response HttpServletResponse 객체 (JWT 검증에 사용)
      * @return 채팅방 정보와 함께 200 OK 응답
      */
     @GetMapping("/chatRoom/{roomId}")
-    public ResponseEntity<ChatRoomResponseDTO> getChatRoomById(@PathVariable("roomId") Long roomId,
-                                                               HttpServletRequest request,
-                                                               HttpServletResponse response) {
+    public ResponseEntity<ChatRoomResponseDTO> getChatRoomById(@PathVariable("roomId") Long roomId) {
         try {
             ChatRoomResponseDTO responseDTO = chatRoomService.findChatRoomById(roomId);
             return ResponseEntity.ok(responseDTO);
@@ -102,14 +90,10 @@ public class ChatRoomController {
      * 특정 채팅방 내 모든 메시지를 조회합니다.
      *
      * @param roomId 조회할 채팅방의 ID
-     * @param request HttpServletRequest 객체 (JWT 검증에 사용)
-     * @param response HttpServletResponse 객체 (JWT 검증에 사용)
      * @return 채팅방 메시지 목록과 함께 200 OK 응답
      */
     @GetMapping("/chatRoom/{roomId}/messages")
-    public ResponseEntity<List<ChatMessageDTO>> getChatRoomMessagesById(@PathVariable("roomId") Long roomId,
-                                                               HttpServletRequest request,
-                                                               HttpServletResponse response) {
+    public ResponseEntity<List<ChatMessageDTO>> getChatRoomMessagesById(@PathVariable("roomId") Long roomId) {
         try {
             List<ChatMessageDTO> messages = chatRoomService.getChatMessagesByRoomId(roomId);
             return ResponseEntity.ok(messages);
@@ -124,15 +108,11 @@ public class ChatRoomController {
      *
      * @param roomId 변경할 채팅방의 ID
      * @param updateDTO 새 채팅방 이름이 담긴 DTO
-     * @param request HttpServletRequest 객체 (JWT 검증에 사용)
-     * @param response HttpServletResponse 객체 (JWT 검증에 사용)
      * @return 성공적으로 변경된 경우 200 OK 응답
      */
     @PutMapping("/chatRoom/{roomId}/name")
     public ResponseEntity<Void> updateChatRoomName(@PathVariable("roomId") Long roomId,
-                                                   @RequestBody ChatRoomRequestDTO.UpdateDTO updateDTO,
-                                                   HttpServletRequest request,
-                                                   HttpServletResponse response) {
+                                                   @RequestBody ChatRoomRequestDTO.UpdateDTO updateDTO) {
         try {
             chatRoomService.updateChatRoomName(roomId, updateDTO.getName());
             return ResponseEntity.ok().build();
@@ -147,15 +127,11 @@ public class ChatRoomController {
      *
      * @param roomId 초대할 채팅방의 ID
      * @param inviteRequest 초대할 사용자 정보가 담긴 DTO
-     * @param request HttpServletRequest 객체 (JWT 검증에 사용)
-     * @param response HttpServletResponse 객체 (JWT 검증에 사용)
      * @return 성공적으로 초대된 경우 200 OK 응답
      */
     @PostMapping("/chatRoom/{roomId}")
     public ResponseEntity<Void> inviteUserToChatRoom(@PathVariable("roomId") Long roomId,
-                                                     @RequestBody ChatRoomRequestDTO.InviteDTO inviteRequest,
-                                                     HttpServletRequest request,
-                                                     HttpServletResponse response) {
+                                                     @RequestBody ChatRoomRequestDTO.InviteDTO inviteRequest) {
         try {
             chatRoomService.inviteUserToChatRoom(roomId, inviteRequest);
             return ResponseEntity.ok().build();

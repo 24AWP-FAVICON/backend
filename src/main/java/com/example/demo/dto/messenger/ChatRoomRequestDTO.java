@@ -9,7 +9,6 @@ import java.util.List;
 
 @Getter
 @Setter
-
 @ToString
 public class ChatRoomRequestDTO {
 
@@ -39,6 +38,7 @@ public class ChatRoomRequestDTO {
     }
 
     @Getter
+    @NoArgsConstructor
     public static class InviteDTO {
         private String inviteUserId;
 
