@@ -69,7 +69,6 @@ public class TripPlannerController {
      */
     @PostMapping("/trip")
     public ResponseEntity<Trip> addNewTrip(@RequestBody TripRequestDTO tripDTO) {
-
         try {
             Trip createdTrip = tripPlannerService.createTrip(tripDTO);
             return new ResponseEntity<>(createdTrip, HttpStatus.CREATED);
@@ -89,7 +88,6 @@ public class TripPlannerController {
      */
     @GetMapping("/trip/{tripId}")
     public ResponseEntity<TripResponseDTO> getTripById(@PathVariable("tripId") Long tripId) {
-
         try {
             Trip trip = tripPlannerService.getTripById(tripId);
             TripResponseDTO responseDTO = TripResponseDTO.fromEntity(trip);

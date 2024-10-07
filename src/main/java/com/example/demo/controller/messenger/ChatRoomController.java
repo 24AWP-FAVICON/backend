@@ -57,6 +57,7 @@ public class ChatRoomController {
      */
     @GetMapping("/chatRooms")
     public ResponseEntity<List<ChatRoomResponseDTO>> getAllChatRooms(Authentication authentication) {
+
         logger.info("Received request to get all chat rooms");
 
         try {

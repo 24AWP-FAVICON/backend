@@ -44,7 +44,6 @@ public class TripDatePlannerController {
      */
     @GetMapping("/trip/{tripId}/detail")
     public ResponseEntity<List<TripDate>> getTripDetails(@PathVariable("tripId") Long tripId) {
-
         try {
             List<TripDate> tripDates = tripDatePlannerService.getTripDates(tripId);
             return new ResponseEntity<>(tripDates, HttpStatus.OK);
@@ -161,6 +160,7 @@ public class TripDatePlannerController {
     public ResponseEntity<TripDate> updateTripDateDetailById(@PathVariable("tripId") Long tripId,
                                                              @PathVariable("tripDateId") Long tripDateId,
                                                              @RequestBody TripDateRequestDTO tripDateRequestDTO) {
+
         try {
             TripDate updatedTripDate = tripDatePlannerService.updateTripDateDetailById(tripDateId, tripDateRequestDTO);
             return new ResponseEntity<>(updatedTripDate, HttpStatus.OK);
@@ -183,6 +183,7 @@ public class TripDatePlannerController {
     @DeleteMapping("/trip/{tripId}/detail/{tripDateId}")
     public ResponseEntity<String> deleteTripDateById(@PathVariable("tripId") Long tripId,
                                                      @PathVariable("tripDateId") Long tripDateId) {
+
         try {
             tripDatePlannerService.deleteTripDateById(tripDateId);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
