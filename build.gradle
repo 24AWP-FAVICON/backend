@@ -59,19 +59,25 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
+// jacoco
 jacoco {
-	toolVersion = "0.8.8"
-	// reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
-	// default report Directory: layout.buildDirectory.dir("reports/jacoco")
+	toolVersion = "0.8.10"
 }
 
-jacocoTestReport {
+tasks.jacocoTestReport {
 	dependsOn test // tests are required to run before generating the report
 
 	reports {
 		xml.required = true
 		csv.required = false
-		html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+		html.required = true
+	}
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: [
+
+			])
+		}))
 	}
 }
 
