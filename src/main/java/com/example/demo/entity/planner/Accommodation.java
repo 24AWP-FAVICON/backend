@@ -27,7 +27,9 @@ public class Accommodation {
     @Column(length = 100)
     private String accommodationLocation;
 
-    public Accommodation(String name) {
-        this.accommodationName = name;
+    // 생성자 추가
+    public Accommodation(String accommodationName, String accommodationLocation) {
+        this.accommodationName = accommodationName;
+        this.accommodationLocation = accommodationLocation;
     }
 }

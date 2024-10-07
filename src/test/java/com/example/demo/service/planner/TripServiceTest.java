@@ -80,7 +80,7 @@ class TripServiceTest {
 
 
     @Test
-    @DisplayName("새로운 여행 계획 생성 성공 테스트")
+    @DisplayName("createTrip 성공 - 새로운 여행 계획을 생성할 수 있다")
     void createTrip_success() {
         when(userRepository.findAllById(tripRequestDTO.getParticipantIds())).thenReturn(participants);
         when(tripRepository.save(any(Trip.class))).thenReturn(trip);
@@ -94,7 +94,7 @@ class TripServiceTest {
     }
 
     @Test
-    @DisplayName("특정 ID의 여행 계획 조회 성공 테스트")
+    @DisplayName("getTripById 성공 - 특정 ID의 여행 계획을 조회할 수 있다")
     void getTripById_success() {
         when(tripRepository.findById(1L)).thenReturn(Optional.of(trip));
 
@@ -107,7 +107,7 @@ class TripServiceTest {
     }
 
     @Test
-    @DisplayName("여행 계획 수정 성공 테스트")
+    @DisplayName("updateTrip 성공 - 여행 계획을 수정할 수 있다")
     void updateTrip_success() {
         when(tripRepository.findById(1L)).thenReturn(Optional.of(trip));
         when(userRepository.findAllById(any())).thenReturn(participants);
@@ -122,7 +122,61 @@ class TripServiceTest {
     }
 
     @Test
-    @DisplayName("여행 계획 삭제 성공 테스트")
+    @DisplayName("partialUpdateTrip 성공 - 부분적으로 여행 계획을 수정할 수 있다")
+    void partialUpdateTrip_success() {
+        when(tripRepository.findById(anyLong())).thenReturn(Optional.of(trip));
+        when(userRepository.findAllById(anyList())).thenReturn(participants);
+        when(tripRepository.save(any(Trip.class))).thenReturn(trip);
+
+        Trip updatedTrip = tripPlannerService.partialUpdateTrip(1L, tripRequestDTO);
+
+        assertNotNull(updatedTrip);
+        assertEquals(tripRequestDTO.getTripName(), updatedTrip.getTripName());
+        assertEquals(tripRequestDTO.getTripArea(), updatedTrip.getTripArea());
+        verify(tripRepository, times(1)).save(any(Trip.class));
+    }
+
+    @Test
+    @DisplayName("partialUpdateTrip 실패 - 여행 계획을 찾을 수 없을 때 ComponentNotFoundException 발생")
+    void partialUpdateTrip_notFound() {
+        when(tripRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        // 여행 계획이 없을 때 ComponentNotFoundException이 발생하는지 확인
+        assertThrows(ComponentNotFoundException.class, () -> {
+            tripPlannerService.partialUpdateTrip(1L, tripRequestDTO);
+        });
+
+        verify(tripRepository, times(0)).save(any(Trip.class));
+    }
+
+    @Test
+    @DisplayName("getTripById 실패 - 여행 계획을 찾을 수 없을 때 ComponentNotFoundException 발생")
+    void getTripById_notFound() {
+        when(tripRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        // 여행 계획이 없을 때 ComponentNotFoundException이 발생하는지 확인
+        assertThrows(ComponentNotFoundException.class, () -> {
+            tripPlannerService.getTripById(1L);
+        });
+
+        verify(tripRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    @DisplayName("updateTrip 실패 - 존재하지 않는 여행 계획을 수정하려 할 때 ComponentNotFoundException 발생")
+    void updateTrip_notFound() {
+        when(tripRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        // 여행 계획이 없을 때 ComponentNotFoundException이 발생하는지 확인
+        assertThrows(ComponentNotFoundException.class, () -> {
+            tripPlannerService.updateTrip(1L, trip);
+        });
+
+        verify(tripRepository, times(0)).save(any(Trip.class));
+    }
+
+    @Test
+    @DisplayName("deleteTripById 성공 - 여행 계획을 삭제할 수 있다")
     void deleteTripById_success() {
         doNothing().when(tripRepository).deleteById(1L);
 
@@ -132,7 +186,7 @@ class TripServiceTest {
     }
 
     @Test
-    @DisplayName("전체 여행 계획 조회 성공 테스트")
+    @DisplayName("getAllTrips 성공 - 모든 여행 계획을 조회할 수 있다")
     void getAllTrips_success() {
         // 여행 계획이 있는 경우
         when(tripRepository.findAll()).thenReturn(Collections.singletonList(trip));
@@ -146,7 +200,7 @@ class TripServiceTest {
     }
 
     @Test
-    @DisplayName("여행 계획 공유 성공 테스트")
+    @DisplayName("shareTripPlan 성공 - 여행 계획을 다른 사용자와 공유할 수 있다")
     void shareTripPlan_success() {
 
         // TripRepository에서 해당 여행 계획을 찾을 수 있도록 설정
@@ -173,7 +227,7 @@ class TripServiceTest {
     }
 
     @Test
-    @DisplayName("유효하지 않은 사용자로 인해 여행 계획 공유 실패 테스트")
+    @DisplayName("shareTripPlan 실패 - 유효하지 않은 사용자로 인해 여행 계획을 공유할 수 없다")
     void shareTripPlan_invalidUser() {
         // 여행 계획에 참여자가 비어있는 상태로 설정
         trip.setParticipants(Collections.emptyList());

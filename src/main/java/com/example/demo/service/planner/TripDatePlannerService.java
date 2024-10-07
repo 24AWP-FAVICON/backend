@@ -1,5 +1,6 @@
 package com.example.demo.service.planner;
 
+import com.example.demo.dto.planner.tripDate.LocationRequestDTO;
 import com.example.demo.dto.planner.tripDate.TripDateRequestDTO;
 import com.example.demo.entity.planner.Accommodation;
 import com.example.demo.entity.planner.Location;
@@ -13,7 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -87,8 +90,11 @@ public class TripDatePlannerService {
             savedTripDate.setAccommodation(accommodation);
         }
 
-        // 장소 처리
-        List<Location> locations = tripDateDetailsDTO.getLocations().stream()
+        // 위치 정보 처리 (locations가 null인 경우 빈 리스트로 처리)
+        List<LocationRequestDTO> locationRequestDTOS = Optional.ofNullable(tripDateDetailsDTO.getLocations())
+                .orElse(Collections.emptyList());
+
+        List<Location> locations = locationRequestDTOS.stream()
                 .map(locDTO -> {
                     Location location = new Location();
                     location.setLocationName(locDTO.getLocationName());
@@ -97,11 +103,13 @@ public class TripDatePlannerService {
                     return location;
                 })
                 .collect(Collectors.toList());
+
         locationRepository.saveAll(locations);
         savedTripDate.setLocations(locations);
 
         return savedTripDate;
     }
+
 
     /**
      * 특정 세부 일정을 조회합니다.
@@ -150,46 +158,20 @@ public class TripDatePlannerService {
             }
         }
 
-
-        // 위치 정보 업데이트
-        List<Location> existingLocations = tripDate.getLocations();
-        List<Location> newLocations = tripDateRequestDTO.getLocations().stream()
-                .map(locDTO -> new Location(locDTO.getLocationName(), locDTO.getLocationAddress(), tripDate))
-                .collect(Collectors.toList());
-
-        // 기존 Location 업데이트 또는 삭제
-        for (Location existingLocation : existingLocations) {
-            boolean isPresentInNew = newLocations.stream()
-                    .anyMatch(newLoc -> newLoc.getLocationName().equals(existingLocation.getLocationName()));
-
-            if (!isPresentInNew) {
-                locationRepository.delete(existingLocation);
-            } else {
-                Location newLocation = newLocations.stream()
-                        .filter(newLoc -> newLoc.getLocationName().equals(existingLocation.getLocationName()))
-                        .findFirst()
-                        .orElse(null);
-                if (newLocation != null) {
-                    existingLocation.setLocationAddress(newLocation.getLocationAddress());
-                    locationRepository.save(existingLocation);
-                }
-            }
+        // 위치 정보 업데이트 (null 체크 추가)
+        if (tripDateRequestDTO.getLocations() != null && !tripDateRequestDTO.getLocations().isEmpty()) {
+            // 기존 위치 정보 삭제
+            locationRepository.deleteAll(tripDate.getLocations());
+            List<Location> updatedLocations = tripDateRequestDTO.getLocations().stream()
+                    .map(locDTO -> new Location(locDTO.getLocationName(), locDTO.getLocationAddress(), tripDate))
+                    .collect(Collectors.toList());
+            locationRepository.saveAll(updatedLocations);
+            tripDate.setLocations(updatedLocations);
         }
-
-        // 새로 추가할 Location 저장
-        for (Location newLocation : newLocations) {
-            boolean isExisting = existingLocations.stream()
-                    .anyMatch(existingLoc -> existingLoc.getLocationName().equals(newLocation.getLocationName()));
-
-            if (!isExisting) {
-                locationRepository.save(newLocation);
-            }
-        }
-
-        tripDate.setLocations(locationRepository.findByTripDate_TripDateId(tripDateId));
 
         return tripDateRepository.save(tripDate);
     }
+
 
     /**
      * 특정 세부 일정의 일부 정보를 수정합니다.
@@ -229,6 +211,7 @@ public class TripDatePlannerService {
             // 기존 위치 정보 삭제
             locationRepository.deleteAll(tripDate.getLocations());
             List<Location> updatedLocations = tripDateRequestDTO.getLocations().stream()
+                    .filter(locDTO -> locDTO.getLocationName() != null && locDTO.getLocationAddress() != null) // null 값 필터링
                     .map(locDTO -> new Location(locDTO.getLocationName(), locDTO.getLocationAddress(), tripDate))
                     .collect(Collectors.toList());
             locationRepository.saveAll(updatedLocations);
