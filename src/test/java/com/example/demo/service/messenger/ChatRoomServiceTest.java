@@ -1,12 +1,15 @@
 package com.example.demo.service.messenger;
 
+import com.example.demo.dto.messenger.ChatMessageDTO;
 import com.example.demo.dto.messenger.ChatRoomRequestDTO;
 import com.example.demo.dto.messenger.ChatRoomResponseDTO;
 import com.example.demo.entity.messenger.ChatJoin;
+import com.example.demo.entity.messenger.ChatMessage;
 import com.example.demo.entity.messenger.ChatRoom;
 import com.example.demo.entity.users.user.Role;
 import com.example.demo.entity.users.user.User;
 import com.example.demo.repository.messenger.ChatJoinRepository;
+import com.example.demo.repository.messenger.ChatMessageRepository;
 import com.example.demo.repository.messenger.ChatRoomRepository;
 import com.example.demo.repository.users.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +34,10 @@ class ChatRoomServiceTest {
 
     @Mock
     private ChatRoomRepository chatRoomRepository;
+
+    @Mock
+    private ChatMessageRepository chatMessageRepository;
+
 
     @Mock
     private ChatJoinRepository chatJoinRepository;
@@ -66,7 +73,7 @@ class ChatRoomServiceTest {
     }
 
     @Test
-    @DisplayName("ChatRoom 생성 성공 테스트")
+    @DisplayName("createChatRoom 성공 - 사용자는 채팅방을 생성할 수 있다")
     void createChatRoom_success() {
         // Given: 채팅방 생성 DTO 설정
         ChatRoomRequestDTO.CreateDTO requestDTO = ChatRoomRequestDTO.CreateDTO.builder()
@@ -103,7 +110,7 @@ class ChatRoomServiceTest {
 
 
     @Test
-    @DisplayName("사용자가 참여한 모든 채팅방 조회 성공 테스트")
+    @DisplayName("findAllChatRoomsByUserId 성공 - 사용자가 참여한 모든 채팅방 조회할 수 있다")
     void findAllChatRoomsByUserId_success() {
         // Given
         ChatJoin chatJoin = new ChatJoin("user1", 1L);
@@ -124,7 +131,7 @@ class ChatRoomServiceTest {
     }
 
     @Test
-    @DisplayName("ChatRoom 정보 조회 성공 테스트")
+    @DisplayName("findChatRoomById - 사용자는 특정 채팅방의 정보를 조회할 수 있다")
     void findChatRoomById_success() {
         // Given
         ChatRoom chatRoom = new ChatRoom();
@@ -142,7 +149,30 @@ class ChatRoomServiceTest {
     }
 
     @Test
-    @DisplayName("ChatRoom에 사용자 초대 성공 테스트")
+    @DisplayName("getChatMessagesByRoomId 성공 - 특정 채팅방의 메시지를 조회할 수 있다")
+    void getChatMessagesByRoomId_success() {
+        // Given: ChatMessage 리스트 생성
+        User user1 = new User();
+        ChatRoom room = new ChatRoom();
+        ChatMessage message1 = new ChatMessage(1L, user1, room, "Hello", LocalDateTime.now(), 0);
+        ChatMessage message2 = new ChatMessage(2L, user1, room, "Hi", LocalDateTime.now(), 0);
+
+        // Mock 설정: 채팅방 ID에 따른 메시지 반환
+        when(chatMessageRepository.findByRoom_RoomId(1L)).thenReturn(Arrays.asList(message1, message2));
+
+        // When: 서비스 호출
+        List<ChatMessageDTO> result = chatRoomService.getChatMessagesByRoomId(1L);
+
+        // Then: 메시지 리스트 검증
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals("Hello", result.get(0).getContent());
+        assertEquals("Hi", result.get(1).getContent());
+    }
+
+
+    @Test
+    @DisplayName("inviteUserToChatRoom 성공 - 채팅방에 다른 사용자를 초대할 수 있다")
     void inviteUserToChatRoom_success() {
         // Given
         ChatRoom chatRoom = new ChatRoom();
@@ -162,7 +192,7 @@ class ChatRoomServiceTest {
     }
 
     @Test
-    @DisplayName("ChatRoom 나가기 성공 테스트")
+    @DisplayName("leaveChatRoom 성공 - 사용자는 채팅방을 나갈 수 있다")
     void leaveChatRoom_success() {
         // Given
         ChatJoin chatJoin = new ChatJoin("user1", 1L);
@@ -175,4 +205,38 @@ class ChatRoomServiceTest {
         // Then
         verify(chatJoinRepository, times(1)).delete(chatJoin);
     }
+
+    @Test
+    @DisplayName("updateChatRoomName 성공 - 채팅방 이름을 수정할 수 있다")
+    void updateChatRoomName_success() {
+        // Given: 기존 ChatRoom 설정
+        ChatRoom chatRoom = new ChatRoom();
+        chatRoom.setRoomId(1L);
+        chatRoom.setName("Old Room Name");
+
+        // Mock 설정: 채팅방 찾기 및 저장 동작
+        when(chatRoomRepository.findById(1L)).thenReturn(Optional.of(chatRoom));
+
+        // When: 채팅방 이름 수정
+        chatRoomService.updateChatRoomName(1L, "New Room Name");
+
+        // Then: 채팅방 이름이 수정되었는지 확인
+        assertEquals("New Room Name", chatRoom.getName());
+        verify(chatRoomRepository, times(1)).save(chatRoom);
+    }
+
+
+    @Test
+    @DisplayName("isUserInChatRoom 성공 - 사용자가 채팅방에 존재하는지 확인할 수 있다")
+    void isUserInChatRoom_success() {
+        // Mock 설정: 사용자가 채팅방에 존재하는 경우
+        when(chatJoinRepository.existsByRoomIdAndUserId(1L, "user1")).thenReturn(true);
+
+        // When: 서비스 호출
+        boolean result = chatRoomService.isUserInChatRoom(1L, "user1");
+
+        // Then: 결과 검증
+        assertTrue(result);
+    }
+
 }

@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 public class ChatMessage {
@@ -39,5 +38,15 @@ public class ChatMessage {
                 this.unreadCount
         );
     }
+
+    public ChatMessage(Long messageId, User user, ChatRoom room, String content, LocalDateTime sendAt, int unreadCount) {
+        this.messageId = messageId;
+        this.user = user;
+        this.room = room;
+        this.content = content;
+        this.sendAt = sendAt;
+        this.unreadCount = unreadCount;
+    }
+
 
 }
