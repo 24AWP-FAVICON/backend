@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {com.example.demo.filter.CustomLogoutFilter.class})
 }) // CustomLogoutFilter를 테스트에서 제외
 @AutoConfigureMockMvc(addFilters = false) // Spring Security 필터 비활성화
-class TripDateControllerTest {
+class TripDatePlannerControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
