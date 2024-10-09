@@ -5,8 +5,6 @@ import com.example.demo.dto.planner.tripDate.*;
 import com.example.demo.entity.planner.TripDate;
 import com.example.demo.service.planner.ComponentNotFoundException;
 import com.example.demo.service.planner.TripDatePlannerService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,16 +39,11 @@ public class TripDatePlannerController {
      * 주어진 여행 ID를 사용하여 해당 여행의 모든 일정을 가져옵니다.
      *
      * @param tripId   조회할 여행 계획의 ID
-     * @param request  HTTP 요청 객체
-     * @param response HTTP 응답 객체
      * @return 여행 계획의 세부 일정 목록과 상태 코드를 포함한 응답 엔티티
      * @throws ComponentNotFoundException    여행 일정이 없는 경우 404 예외를 발생
      */
     @GetMapping("/trip/{tripId}/detail")
-    public ResponseEntity<List<TripDate>> getTripDetails(@PathVariable("tripId") Long tripId,
-                                                         HttpServletRequest request,
-                                                         HttpServletResponse response) {
-
+    public ResponseEntity<List<TripDate>> getTripDetails(@PathVariable("tripId") Long tripId) {
         try {
             List<TripDate> tripDates = tripDatePlannerService.getTripDates(tripId);
             return new ResponseEntity<>(tripDates, HttpStatus.OK);
@@ -67,16 +60,12 @@ public class TripDatePlannerController {
      *
      * @param tripId            작성할 세부 일정이 속한 여행 계획의 ID
      * @param tripDateRequestDTOs 생성할 세부 일정 정보 리스트가 담긴 DTO
-     * @param request           HTTP 요청 객체
-     * @param response          HTTP 응답 객체
      * @return 생성된 세부 일정과 상태 코드를 포함한 응답 엔티티
      */
     @PostMapping("/trip/{tripId}/detail")
     @Transactional
     public ResponseEntity<List<TripDateResponseDTO>> addMultipleTripDetails(@PathVariable("tripId") Long tripId,
-                                                                            @RequestBody List<TripDateRequestDTO> tripDateRequestDTOs,
-                                                                            HttpServletRequest request,
-                                                                            HttpServletResponse response) {
+                                                                            @RequestBody List<TripDateRequestDTO> tripDateRequestDTOs) {
         try {
             List<TripDateResponseDTO> responseDTOs = tripDateRequestDTOs.stream().map(tripDateRequestDTO -> {
                 TripDate createdTripDate = tripDatePlannerService.addTripDetail(tripId, tripDateRequestDTO);
@@ -116,16 +105,12 @@ public class TripDatePlannerController {
      *
      * @param tripId      조회할 여행 계획의 ID
      * @param tripDateId  조회할 세부 일정의 ID
-     * @param request     HTTP 요청 객체
-     * @param response    HTTP 응답 객체
      * @return 조회된 세부 일정과 상태 코드를 포함한 응답 엔티티
      * @throws ComponentNotFoundException    여행 내 세부 일정이 없는 경우 404 예외를 발생
      */
     @GetMapping("/trip/{tripId}/detail/{tripDateId}")
     public ResponseEntity<TripDate> getTripDateById(@PathVariable("tripId") Long tripId,
-                                                    @PathVariable("tripDateId") Long tripDateId,
-                                                    HttpServletRequest request,
-                                                    HttpServletResponse response) {
+                                                    @PathVariable("tripDateId") Long tripDateId) {
         try {
             TripDate tripDate = tripDatePlannerService.getTripDateById(tripId, tripDateId);
             return new ResponseEntity<>(tripDate, HttpStatus.OK);
@@ -143,17 +128,13 @@ public class TripDatePlannerController {
      * @param tripId            수정할 세부 일정이 속한 여행 계획의 ID
      * @param tripDateId        수정할 세부 일정의 ID
      * @param tripDatePatchDTO  수정할 세부 일정 정보가 담긴 DTO
-     * @param request           HTTP 요청 객체
-     * @param response          HTTP 응답 객체
      * @return 수정된 세부 일정과 상태 코드를 포함한 응답 엔티티
      * @throws ComponentNotFoundException    여행 내 세부 일정이 없는 경우 404 예외를 발생
      */
     @PutMapping("/trip/{tripId}/detail/{tripDateId}")
     public ResponseEntity<TripDate> updateCompleteTripDateDetailById(@PathVariable("tripId") Long tripId,
                                                                      @PathVariable("tripDateId") Long tripDateId,
-                                                                     @RequestBody TripDateRequestDTO tripDatePatchDTO,
-                                                                     HttpServletRequest request,
-                                                                     HttpServletResponse response) {
+                                                                     @RequestBody TripDateRequestDTO tripDatePatchDTO) {
 
         try {
             TripDate updatedTripDate = tripDatePlannerService.updateCompleteTripDateDetailById(tripDateId, tripDatePatchDTO);
@@ -172,17 +153,14 @@ public class TripDatePlannerController {
      * @param tripId            수정할 세부 일정이 속한 여행 계획의 ID
      * @param tripDateId        수정할 세부 일정의 ID
      * @param tripDateRequestDTO 부분 수정할 세부 일정 정보가 담긴 DTO
-     * @param request           HTTP 요청 객체
-     * @param response          HTTP 응답 객체
      * @return 수정된 세부 일정과 상태 코드를 포함한 응답 엔티티
      * @throws ComponentNotFoundException    여행 내 세부 일정이 없는 경우 404 예외를 발생
      */
     @PatchMapping("/trip/{tripId}/detail/{tripDateId}")
     public ResponseEntity<TripDate> updateTripDateDetailById(@PathVariable("tripId") Long tripId,
                                                              @PathVariable("tripDateId") Long tripDateId,
-                                                             @RequestBody TripDateRequestDTO tripDateRequestDTO,
-                                                             HttpServletRequest request,
-                                                             HttpServletResponse response) {
+                                                             @RequestBody TripDateRequestDTO tripDateRequestDTO) {
+
         try {
             TripDate updatedTripDate = tripDatePlannerService.updateTripDateDetailById(tripDateId, tripDateRequestDTO);
             return new ResponseEntity<>(updatedTripDate, HttpStatus.OK);
@@ -199,16 +177,13 @@ public class TripDatePlannerController {
      *
      * @param tripId      삭제할 세부 일정이 속한 여행 계획의 ID
      * @param tripDateId  삭제할 세부 일정의 ID
-     * @param request     HTTP 요청 객체
-     * @param response    HTTP 응답 객체
      * @return 상태 코드를 포함한 응답 엔티티
      * @throws ComponentNotFoundException    여행 내 세부 일정이 없는 경우 404 예외를 발생
      */
     @DeleteMapping("/trip/{tripId}/detail/{tripDateId}")
     public ResponseEntity<String> deleteTripDateById(@PathVariable("tripId") Long tripId,
-                                                     @PathVariable("tripDateId") Long tripDateId,
-                                                     HttpServletRequest request,
-                                                     HttpServletResponse response) {
+                                                     @PathVariable("tripDateId") Long tripDateId) {
+
         try {
             tripDatePlannerService.deleteTripDateById(tripDateId);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);

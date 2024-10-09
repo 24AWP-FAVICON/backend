@@ -16,6 +16,10 @@ import java.util.List;
 
 import java.util.logging.Logger;
 
+/**
+ * 이 서비스 클래스는 채팅 메시지와 관련된 주요 비즈니스 로직을 처리합니다.
+ * 메시지 저장, 읽음 상태 처리 및 읽지 않은 메시지 수 관리를 위한 기능을 제공합니다.
+ */
 @Service
 @RequiredArgsConstructor
 public class ChatMessageService {
@@ -24,21 +28,26 @@ public class ChatMessageService {
     private final ChatJoinRepository chatJoinRepository;
     private final UnreadMemberRepository unreadMemberRepository;
 
-    // 메시지를 DB에 저장
-    // 이때 사용자가 읽었는지 유무 판단하여 unreadCount계산
+    /**
+     * 새로운 채팅 메시지를 저장하고 읽지 않은 사용자 목록을 업데이트합니다.
+     * 메시지 전송 시간을 현재 시간으로 설정하고, 채팅방 내 메시지를 읽지 않은 사용자 수를 계산하여 저장합니다.
+     *
+     * @param message 저장할 채팅 메시지 객체
+     * @return 저장된 채팅 메시지 객체
+     */
     @Transactional
     public ChatMessage saveMessage(ChatMessage message) {
 
-        message.setSendAt(LocalDateTime.now()); // 시간대는 메시지 전송하는 시간대로 설정
+        message.setSendAt(LocalDateTime.now()); // 메시지 전송 시간을 현재 시간으로 설정
 
-        // 해당 채팅방에 있는 사용자 수에서 메시지를 보낸 사람을 제외한 수로 unreadCount를 설정
+        // 채팅방 내 사용자 수에서 메시지를 보낸 사람을 제외한 사용자 수로 unreadCount 설정
         int unreadCount = chatJoinRepository.countByRoomId(message.getRoom().getRoomId()) - 1;
         message.setUnreadCount(unreadCount);
 
-        // 메시지 -> DB 저장
+        // 메시지를 데이터베이스에 저장
         ChatMessage savedMessage = chatMessageRepository.save(message);
 
-        // 메시지 보낸 사람 제외하고 같은 채팅방에 있는 모든 사람들을 unread한 것으로 처리
+        // 메시지를 보낸 사람을 제외한 모든 채팅방 참여자를 읽지 않은 사용자로 처리
         // => 현재 채팅방의 사용자 정보를 가져오고, 메시지를 보낸 사람 제외 나머지 사용자들은 UnreadMember에 집어넣음
         List<ChatJoin> chatJoins = chatJoinRepository.findAllByRoomId(message.getRoom().getRoomId());
         for (ChatJoin chatJoin : chatJoins) {
@@ -52,18 +61,22 @@ public class ChatMessageService {
 
     }
 
-    // 메시지 읽음 표시
-    // 사용자가 특정 채팅방에 참여하면 모두 읽게 되는 것이므로 채팅방 ID 기반으로 추적
+    /**
+     * 특정 채팅방에서 사용자가 읽지 않은 모든 메시지를 읽음으로 표시합니다.
+     * 사용자가 채팅방에 참여하면 해당 채팅방의 모든 메시지가 읽음으로 처리됩니다.
+     *
+     * @param roomId 읽음 처리할 채팅방의 ID
+     * @param userId 읽음 처리할 사용자의 ID
+     */
     @Transactional
     public void markMessagesAsRead(Long roomId, String userId) {
-        // 특정 채팅방에서 특정 사용자가 읽지 않은(Unread) 메시지(UnreadMember) 목록 조회
+        // 읽지 않은(UnreadMember) 메시지 목록 조회
         List<UnreadMember> unreadMembers = unreadMemberRepository.findByRoomIdAndUserId(roomId, userId);
 
-        // 조회된 UnreadMembers를 반복하면서 UnreadMember 엔티티 삭제. (메시지 읽엇으니까 더이상 UnreadMember 목록에 존재할 필요 없음)
+        // 각 메시지를 읽음으로 처리하고 unreadCount를 감소시킴
         for (UnreadMember unreadMember : unreadMembers) {
             unreadMemberRepository.delete(unreadMember);
 
-            // UnreadMember 엔티티가 참조하는 ChatMessage 가져와서 unreadcount 줄이기
             ChatMessage message = unreadMember.getChatMessage();
             message.setUnreadCount(message.getUnreadCount() - 1);
 

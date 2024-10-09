@@ -9,19 +9,21 @@ import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @ToString
 public class ChatRoomRequestDTO {
 
-
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    // 기본 생성자 수동 정의
+    public ChatRoomRequestDTO() {
+        // 필요한 초기화 작업이 있으면 여기에 추가
+    }
     @Getter
+    @Builder // Builder 패턴 사용
     public static class CreateDTO {
         private String name;
         private String creatorUserId;
         private List<String> participantIds;
 
-        public ChatRoom toEntity(User user){
+        public ChatRoom toEntity(User user) {
             return ChatRoom.builder()
                     .name(name)
                     .createAt(LocalDateTime.now())
@@ -29,15 +31,14 @@ public class ChatRoomRequestDTO {
         }
     }
 
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @Getter
     public static class UpdateDTO {
         private String name;
         private String creatorUserId;
     }
 
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @Getter
+    @NoArgsConstructor
     public static class InviteDTO {
         private String inviteUserId;
 
