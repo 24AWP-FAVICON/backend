@@ -30,11 +30,22 @@ jobs:
 
     # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
     # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+    - name: Build with Gradle
+      uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+      with:
+        arguments: build
 
-    - name: Build with Gradle Wrapper
-      run: ./gradlew build
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: cicdsample
+        path: build/libs/*.jar
+        
+    # - name: Cleanning with Gradle Wrapper
+    #   run: ./gradlew clean
+      
+    # - name: Build with Gradle Wrapper
+    #   run: ./gradlew build
 
   dependency-submission:
 
