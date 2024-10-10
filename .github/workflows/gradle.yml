@@ -79,5 +79,6 @@ jobs:
         key: ${{ secrets.PRIVATE_KEY }}
         script: |
           docker pull ${{secrets.DOCKERHUB_ID}}/${{secrets.IMAGENAME}}:latest
-          docker stop server
+          docker stop server || true # 기존 컨테이너 멈추기. 없다면 true 반환
+          docker rm server || true  # 기존 컨테이너 삭제. 없다면 true 반환
           docker run -d --rm --name server -p 8080:8080 ${{secrets.DOCKERHUB_ID}}/${{secrets.IMAGENAME}}:latest
