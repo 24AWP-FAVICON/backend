@@ -10,23 +10,37 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
     - uses: actions/checkout@v4
-
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-
+    
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
+        
+    - name: Grant chmod to make gradlew executable
+      run: chmod +x gradlew
 
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+    - name: Build with Gradle
+      uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+      with:
+        arguments: build
+        
+    - name: Docker build
+      run: |
+        docker login -u ${{ secrets.DOCERHUB_ID }} -p ${{ secrets.DOCKER_PWD }}
+        docker build -t ${{secrets.DOCERHUB_ID}}/${{secrets.IMAGENAME}}:latest .
+        docker push ${{secrets.DOCERHUB_ID}}/${{secrets.IMAGENAME}}:latest
 
-    - name: Build with Gradle Wrapper
-      run: ./gradlew build
+    # - name: Deploy
+    #   uses: appleboy/ssh-action@master
+    #   with:
+    #     host: ${{ secrets.HOST }}
+    #     username: ${{ secrets.USERNAME }}
+    #     key: ${{ secrets.PRIVATE_KEY }}
+    #     script: |
+    #       docker pull ${{secrets.DOCERHUB_ID}}/${{secrets.IMAGENAME}}:latest
+    #       docker stop server
+    #       docker run -d --rm --name server -p 8080:8080 growth123/test
