@@ -1,7 +1,10 @@
 package com.example.demo.websocket.config;
 
+import com.example.demo.service.jwt.JwtUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -17,6 +20,9 @@ import java.util.Map;
 @Configuration
 @EnableWebSocketMessageBroker // STOMP 프로토콜을 사용하기 위해 WebSocket 메시지 브로커를 활성화
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+    // application.properties의 api.base-url 값 주입
+    @Value("${api.base-url}")
+    private String apiBaseUrl;
 
     /**
      * 메시지 브로커를 구성합니다.
@@ -41,7 +47,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws") // WebSocket 연결을 위한 엔드포인트 설정
-                .setAllowedOrigins("http://localhost:3000") // 허용된 출처 설정
+                .setAllowedOrigins(apiBaseUrl) // 허용된 출처 설정
                 .addInterceptors(new HttpSessionHandshakeInterceptor()) // HTTP 세션을 WebSocket 세션으로 연결
                 .withSockJS(); // SockJS 지원
     }

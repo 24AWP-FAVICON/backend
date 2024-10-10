@@ -39,4 +39,5 @@ out/
 
 # 개인정보 숨기기
 application.properties
+*.properties
 property/
