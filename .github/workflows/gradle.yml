@@ -13,6 +13,43 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
+    # application.properties 파일 생성
+    - run: | 
+        touch ./src/main/resources/application.properties
+        echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
+        cat ./src/main/resources/application.properties
+
+    # property/aws.properties 파일 생성
+    - run: |
+        mkdir -p ./src/main/resources/property
+        touch ./src/main/resources/property/aws.properties
+        echo "${{ secrets.AWS_PROPERTIES }}" > ./src/main/resources/property/aws.properties
+        cat ./src/main/resources/property/aws.properties
+
+    # property/database.properties 파일 생성
+    - run: |
+        touch ./src/main/resources/property/database.properties
+        echo "${{ secrets.DATABASE_PROPERTIES }}" > ./src/main/resources/property/database.properties
+        cat ./src/main/resources/property/database.properties
+
+    # property/jwt.properties 파일 생성
+    - run: |
+        touch ./src/main/resources/property/jwt.properties
+        echo "${{ secrets.JWT_PROPERTIES }}" > ./src/main/resources/property/jwt.properties
+        cat ./src/main/resources/property/jwt.properties
+
+    # property/kafka.properties 파일 생성
+    - run: |
+        touch ./src/main/resources/property/kafka.properties
+        echo "${{ secrets.KAFKA_PROPERTIES }}" > ./src/main/resources/property/kafka.properties
+        cat ./src/main/resources/property/kafka.properties
+
+    # property/oauth2.properties 파일 생성
+    - run: |
+        touch ./src/main/resources/property/oauth2.properties
+        echo "${{ secrets.OAUTH2_PROPERTIES }}" > ./src/main/resources/property/oauth2.properties
+        cat ./src/main/resources/property/oauth2.properties
     
     - name: Set up JDK 17
       uses: actions/setup-java@v4
