@@ -80,4 +80,4 @@ jobs:
         script: |
           docker pull ${{secrets.DOCKERHUB_ID}}/${{secrets.IMAGENAME}}:latest
           docker stop server
-          docker run -d --rm --name server -p 8080:8080 growth123/test
+          docker run -d --rm --name server -p 8080:8080 ${{secrets.DOCKERHUB_ID}}/${{secrets.IMAGENAME}}:latest
