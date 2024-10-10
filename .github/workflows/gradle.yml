@@ -67,9 +67,9 @@ jobs:
         
     - name: Docker build
       run: |
-        docker login -u ${{ secrets.DOCERHUB_ID }} -p ${{ secrets.DOCKER_PWD }}
-        docker build -t ${{secrets.DOCERHUB_ID}}/${{secrets.IMAGENAME}}:latest .
-        docker push ${{secrets.DOCERHUB_ID}}/${{secrets.IMAGENAME}}:latest
+        docker login -u ${{ secrets.DOCKERHUB_ID }} -p ${{ secrets.DOCKER_PWD }}
+        docker build -t ${{secrets.DOCKERHUB_ID}}/${{secrets.IMAGENAME}}:latest .
+        docker push ${{secrets.DOCKERHUB_ID}}/${{secrets.IMAGENAME}}:latest
 
     # - name: Deploy
     #   uses: appleboy/ssh-action@master
@@ -78,6 +78,6 @@ jobs:
     #     username: ${{ secrets.USERNAME }}
     #     key: ${{ secrets.PRIVATE_KEY }}
     #     script: |
-    #       docker pull ${{secrets.DOCERHUB_ID}}/${{secrets.IMAGENAME}}:latest
+    #       docker pull ${{secrets.DOCKERHUB_ID}}/${{secrets.IMAGENAME}}:latest
     #       docker stop server
     #       docker run -d --rm --name server -p 8080:8080 growth123/test
