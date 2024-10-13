@@ -50,7 +50,14 @@ jobs:
         touch ./src/main/resources/property/oauth2.properties
         echo "${{ secrets.OAUTH2_PROPERTIES }}" > ./src/main/resources/property/oauth2.properties
         cat ./src/main/resources/property/oauth2.properties
-    
+        
+   # ssl/keystore.p12 파일 생성 및 디코딩
+    - run: |
+        mkdir -p ./src/main/resources/ssl
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > ./src/main/resources/ssl/keystore.p12
+        ls -al ./src/main/resources/ssl/
+        file ./src/main/resources/ssl/keystore.p12
+
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
