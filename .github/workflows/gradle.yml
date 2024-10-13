@@ -67,17 +67,18 @@ jobs:
         
     - name: Docker build
       run: |
-        docker login -u ${{ secrets.DOCERHUB_ID }} -p ${{ secrets.DOCKER_PWD }}
-        docker build -t ${{secrets.DOCERHUB_ID}}/${{secrets.IMAGENAME}}:latest .
-        docker push ${{secrets.DOCERHUB_ID}}/${{secrets.IMAGENAME}}:latest
+        docker login -u ${{ secrets.DOCKERHUB_ID }} -p ${{ secrets.DOCKER_PWD }}
+        docker build -t ${{secrets.DOCKERHUB_ID}}/${{secrets.IMAGENAME}}:latest .
+        docker push ${{secrets.DOCKERHUB_ID}}/${{secrets.IMAGENAME}}:latest
 
-    # - name: Deploy
-    #   uses: appleboy/ssh-action@master
-    #   with:
-    #     host: ${{ secrets.HOST }}
-    #     username: ${{ secrets.USERNAME }}
-    #     key: ${{ secrets.PRIVATE_KEY }}
-    #     script: |
-    #       docker pull ${{secrets.DOCERHUB_ID}}/${{secrets.IMAGENAME}}:latest
-    #       docker stop server
-    #       docker run -d --rm --name server -p 8080:8080 growth123/test
+    - name: Deploy
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.PRIVATE_KEY }}
+        script: |
+          docker pull ${{secrets.DOCKERHUB_ID}}/${{secrets.IMAGENAME}}:latest
+          docker stop server || true # 기존 컨테이너 멈추기. 없다면 true 반환
+          docker rm server || true  # 기존 컨테이너 삭제. 없다면 true 반환
+          docker run -d --rm --name server -p 8080:8080 ${{secrets.DOCKERHUB_ID}}/${{secrets.IMAGENAME}}:latest
