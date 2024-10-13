@@ -1,4 +1,4 @@
-name: Java CI with Gradle
+name: Java CI/CD with Gradle
 
 on:
   push:
@@ -88,4 +88,4 @@ jobs:
           docker pull ${{secrets.DOCKERHUB_ID}}/${{secrets.IMAGENAME}}:latest
           docker stop server || true # 기존 컨테이너 멈추기. 없다면 true 반환
           docker rm server || true  # 기존 컨테이너 삭제. 없다면 true 반환
-          docker run -d --rm --name server -p 8080:8080 ${{secrets.DOCKERHUB_ID}}/${{secrets.IMAGENAME}}:latest
+          docker run -d --rm --name server -p 443:443 ${{secrets.DOCKERHUB_ID}}/${{secrets.IMAGENAME}}:latest
