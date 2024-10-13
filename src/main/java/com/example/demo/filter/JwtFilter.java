@@ -22,7 +22,8 @@ public class JwtFilter extends GenericFilter {
     private static final Set<Pattern> noAuthUrl= Set.of(
             Pattern.compile("/oauth2/authorization/.*"),
             Pattern.compile("/users/logout/.*"),
-            Pattern.compile("/users/reissue")
+            Pattern.compile("/users/reissue"),
+            Pattern.compile("/ws/.*")
     );
 
     /**

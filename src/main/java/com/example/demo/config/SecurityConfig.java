@@ -8,6 +8,7 @@ import com.example.demo.service.RedisUtil;
 import com.example.demo.handler.OAuth2SuccessHandler;
 import com.example.demo.service.users.user.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,6 +31,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    // application.properties의 api.base-url 값 주입
+    @Value("${api.base-url}")
+    private String apiBaseUrl;
+
     private final JwtUtil jwtUtil; // jwtutil 생성자 주입
     private final RedisUtil redisUtil;
     private final CustomOAuth2UserService customOAuth2UserService;
@@ -40,7 +45,7 @@ public class SecurityConfig {
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin("http://localhost:3000");
+        config.addAllowedOrigin(apiBaseUrl);
         config.setAllowedHeaders(List.of("*"));
         config.setAllowedMethods(List.of("*"));
         config.setAllowCredentials(true);

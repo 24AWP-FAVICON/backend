@@ -41,3 +41,4 @@ out/
 application.properties
 property/
 /src/main/resources/ssl/keystore.p12
+*.properties

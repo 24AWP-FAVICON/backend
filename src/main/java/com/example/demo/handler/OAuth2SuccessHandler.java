@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import com.example.demo.dto.users.user.CustomOAuth2User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,6 +26,10 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 @Slf4j
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+
+    // application.properties의 api.base-url 값 주입
+    @Value("${api.base-url}")
+    private String apiBaseUrl;
 
     private final JwtUtil jwtUtil;
     private final RedisUtil redisUtil;
@@ -62,7 +67,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         response.addCookie(createCookie("refresh", refreshToken)); // refresh token은 쿠키에
         response.setStatus(HttpStatus.OK.value());
         response.getWriter().write("SOCIAL_LOGIN_SUCCESS");
-        response.sendRedirect("http://localhost:3000/login/success");
+        response.sendRedirect(apiBaseUrl + "/login/success");
     }
 
     private Cookie createCookie(String key ,String value) {
